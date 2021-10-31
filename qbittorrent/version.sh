@@ -28,11 +28,14 @@ if [[ $ver_qb_official ]] || [[ $ver_qbbeta_official ]]; then
 fi
 
 ## 检测官方版本与本地版本是否一致，如不一致则发出通知
+stable_build_mark=0
 if [[ $ver_qb_official ]]; then
     if [[ $ver_qb_official != $ver_qb_local ]]; then
         echo "官方已升级qBittorrent版本至：$ver_qb_official"
         notify "qBittorrent已经升级" "当前官方版本: ${ver_qb_official}\n当前本地版本: ${ver_qb_local}"
         echo "$ver_qb_official" > qbittorrent.version
+        stable_build_mark=1
+        ./buildx.sh -v$ver_qb_official &
     else
         echo "qBittorrent官方版本和本地一致，均为：$ver_qb_official"
     fi
@@ -42,6 +45,7 @@ if [[ $ver_qbbeta_official ]]; then
         echo "官方已升级qBittorrent beta版本至：$ver_qbbeta_official"
         notify "qBittorrent beta已经升级" "当前官方版本: ${ver_qbbeta_official}\n当前本地版本: ${ver_qbbeta_local}"
         echo "$ver_qbbeta_official" > qbittorrent-beta.version
+        [[ $stable_build_mark -eq 0 ]] && ./buildx.sh -v$ver_qbbeta_official
     else
         echo "qBittorrent beta官方版本和本地一致，均为：$ver_qbbeta_official"
     fi
