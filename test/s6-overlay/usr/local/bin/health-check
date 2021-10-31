@@ -1,0 +1,8 @@
+#!/bin/bash
+
+. /usr/local/bin/share
+
+if ! $cmd_curl ${api_url_base}/app/version &>/dev/null; then
+    echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] ${HOSTNAME} 已经宕机了，发送通知消息..."
+    notify "${HOSTNAME}已经宕机啦" "检测到${HOSTNAME}已经宕机啦，快检查一下吧！\n发送时间：$(date +'%Y-%m-%d %H:%M:%S')"
+fi

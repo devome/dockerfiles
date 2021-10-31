@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv bash
+
+echo -e "\n[services.d] ======================== 启动定时任务自动刷新程序 ========================\n"
+echo -e "[services.d] 每2秒检测一次$JD_DIR/config/crontab.list是否发生变化，如发生变化则立即刷新定时任务。\n"
+
+exec s6-setuidgid root loop -e 2s -- ./refresh-cron

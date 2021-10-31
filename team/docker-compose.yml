@@ -1,0 +1,16 @@
+version: "2.0"
+services:
+  team:
+    image: team:latest
+    container_name: team
+    restart: always
+    tty: true
+    network_mode: "bridge"
+    hostname: team
+    volumes:
+      - ./:/root
+    ports:
+      - 5670:5670
+    labels:
+      com.centurylinklabs.watchtower.enable: false
+

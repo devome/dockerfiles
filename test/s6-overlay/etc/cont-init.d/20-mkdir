@@ -1,0 +1,26 @@
+#!/usr/bin/with-contenv bash
+
+make_dir() {
+    echo "Make some folders..."
+    
+    cd /data
+    local dirs1=( cache certs config data/logs downloads diy temp torrents watch webui ${QBITTORRENT_HOME}/qBittorrent )
+    for dir in ${dirs1[@]}; do
+        [ ! -d $dir ] && mkdir -p $dir
+    done
+
+    local dirs2=( cache config data )
+    for dir in ${dirs2[@]}; do
+        if [[ $(readlink -f ${QBITTORRENT_HOME}/qBittorrent/$dir 2>/dev/null) != /data/$dir ]]; then
+            rm -rf ${QBITTORRENT_HOME}/qBittorrent/$dir
+            ln -sf /data/$dir ${QBITTORRENT_HOME}/qBittorrent/$dir
+        fi
+    done
+
+    if [[ $(readlink -f /data/logs 2>/dev/null) != /data/data/logs ]]; then
+        rm -rf /data/logs
+        ln -sf data/logs logs
+    fi
+}
+
+make_dir 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"

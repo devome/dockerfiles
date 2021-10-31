@@ -1,0 +1,101 @@
+#!/bin/bash
+
+## 钉钉通知，参考https://github.com/hzgjq/DingTalkRobot，$1：消息内容
+notify_dingding_bot () {
+    local message="{\"msgtype\": \"text\",\"text\": {\"content\": \"$1\"}}"
+    local dd_api_url_base=https://oapi.dingtalk.com/robot/send
+    local timestamp sign dd_api_url send_result err_code err_message
+
+    timestamp=$(date -u "+%s000")
+    sign=$(echo -ne "$timestamp\n$DD_BOT_SECRET" | openssl dgst -sha256 -hmac "$DD_BOT_SECRET" -binary | openssl base64)
+    dd_api_url="${dd_api_url_base}?access_token=${DD_BOT_TOKEN}&timestamp=${timestamp}&sign=${sign}"
+    send_result=$(curl -Ssk -H "Content-Type:application/json" -X POST -d "$message" "$dd_api_url")
+    err_code=$(echo "$send_result" | jq .errcode)
+    err_message=$(echo "$send_result" | jq -r .errmsg)
+    if [[ $err_code -eq 0 ]]; then
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送钉钉BOT通知成功\n"
+    else
+        echo -e "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送钉钉BOT通知失败，错误代码：$err_code，错误消息：$err_message\n"
+    fi
+}
+
+## 发送Telegram通知，$1：消息内容
+notify_telegram () {
+    local message="$(echo -e $1)"
+    local tg_api_url="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
+    local send_result err_code err_message
+    local cmd_proxy_user cmd_proxy
+
+    [[ $TG_PROXY_USER ]] && cmd_proxy_user="--proxy-user ${TG_PROXY_USER}" || cmd_proxy_user=""
+    [[ $TG_PROXY_ADDRESS ]] && cmd_proxy="--proxy $TG_PROXY_ADDRESS $cmd_proxy_user" || cmd_proxy=""
+
+    send_result=$(curl -Ssk $cmd_proxy -H "Content-Type:application/x-www-form-urlencoded" -X POST -d "chat_id=${TG_USER_ID}&text=${message}&disable_web_page_preview=true" "$tg_api_url")
+    send_result=$(echo "$send_result" | sed '{:label; N; s/\n/\\n/g; b label; s/\\n$//}')
+    err_code=$(echo "$send_result" | jq .ok)
+    if [[ $err_code == true ]]; then
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送Telegram通知成功\n"
+    else
+        err_code=$(echo "$send_result" | jq .err_code)
+        [[ err_code == 400 ]] && err_message="请主动给bot发送一条消息并检查接收用户ID是否正确。"
+        [[ err_code == 401 ]] && err_message="Telegram Bot Token 填写错误。"
+        echo -e "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送Telegram通知失败，错误代码：$err_code，错误消息：$err_message\n"
+    fi
+}
+
+## 爱语飞飞通知，$1：标题；$2：内容
+notify_iyuu () {
+    local title="$1"
+    local desp="$(echo -e $2)"
+    local iyuu_url=http://iyuu.cn/${IYUU_TOKEN}.send
+    local send_result err_code err_message
+
+    send_result=$(curl -Ss -X POST -d "text=${title}&desp=${desp}" $iyuu_url)
+    err_code=$(echo "$send_result" | jq .errcode)
+    err_message=$(echo "$send_result" | jq -r .errmsg)
+    if [[ $err_code -eq 0 ]]; then
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送爱语飞飞通知成功\n"
+    else
+        echo -e "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送爱语飞飞通知失败，错误代码：$err_code，错误消息：$err_message\n"
+    fi
+}
+
+## Server酱通知，$1：标题；$2：内容
+notify_serverchan () {
+    local title="$1"
+    local desp="$(echo -e $2)"
+    local serverchan_url send_result
+
+    [[ $SCKEY == SCT* ]] && serverchan_url=https://sctapi.ftqq.com/${SCKEY}.send || serverchan_url=https://fcqq.com/${SCKEY}.send
+    send_result=$(curl -Ssk -X POST -d "text=${title}&desp=${desp}" $serverchan_url)
+    if [[ $(echo "$send_result" | jq .code) -eq 0 ]]; then
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送Server酱通知成功\n"
+    else
+        echo -e "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送Server酱通知失败，错误消息：$send_result\n"
+    fi
+}
+
+## PushPlus，$1：标题；$2：内容
+notify_pushplus() {
+    local title="$1"
+    local desp="$(echo -e $2)"
+    local pushplus_url=http://www.pushplus.plus/send
+    local message="{\"token\": \"${PUSHPLUS_TOKEN}\", \"title\": \"${title}\", \"content\": \"${desp}\", \"channel\": \"wechat\", \"webhook\": \"\", \"callbackUrl\": \"\"}"
+    local send_result
+
+    send_result=$(curl -Ssk -X POST -H "Content-Type: application/json" -d "$message" $pushplus_url)
+    if [[ $(echo $send_result | jq .code) -eq 200 ]]; then
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送PushPlus通知成功\n"
+    else
+        echo -e "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送PushPlus通知失败，错误消息：$(echo $send_result | jq -r .msg)\n"
+    fi
+}
+
+## 发送通知，$1：标题；$2：内容
+title="$1"
+desp="$2"
+[[ $DD_BOT_TOKEN ]] && [[ $DD_BOT_SECRET ]] && notify_dingding_bot "$title\n\n$desp"
+[[ $TG_BOT_TOKEN ]] && [[ $TG_USER_ID ]] && notify_telegram "$title\n\n$desp"
+[[ $IYUU_TOKEN ]] && notify_iyuu "$title" "$desp"
+[[ $SCKEY ]] && notify_serverchan "$title" "$desp"
+[[ $PUSHPLUS_TOKEN ]] && notify_pushplus "$title" "$desp"
+[[ -z $DD_BOT_TOKEN && -z $DD_BOT_SECRET && -z $TG_BOT_TOKEN && -z $TG_USER_ID && -z $IYUU_TOKEN && -z $SCKEY && -z $PUSHPLUS_TOKEN ]] && echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 没有有效的通知渠道，不发送通知消息..."

@@ -1,0 +1,53 @@
+#!/bin/bash
+
+## 传参$1：hash
+change_tag() {
+    local hash="$1"
+    local tag_name="TrackerError"
+
+    # 获取tracker清单
+    local trackers=$($cmd_curl "${api_url_base}/torrents/trackers?hash=${hash}")
+    local trackers_url=( $(echo $trackers | jq -r .[].url | sed "s# #_#g" ) )
+    local trackers_status=( $(echo $trackers | jq .[].status) )
+
+    # 检查tracker消息
+    local add_tag_mark=no
+    local n
+    for ((n = $((${#trackers_url[*]} - 1)); n >= 0; n--)); do
+        if [[ ${trackers_url[n]} == *http* ]] && [[ ${trackers_status[n]} -eq 4 ]]; then
+            add_tag_mark=yes
+            let tracker_error_count++
+            break
+        fi
+    done
+
+    # 调整标签
+    local torrent_info=$($cmd_curl "${api_url_base}/torrents/info?hashes=${hash}" | jq .[0])
+    local tags=( $(echo $torrent_info | jq .tags | sed "s#,##g") )
+    if [[ $add_tag_mark == yes ]]; then
+        $cmd_curl_post -d "hashes=${hash}&tags=${tag_name}" ${api_url_base}/torrents/addTags
+    elif [[ $add_tag_mark == no ]]; then
+        for ((n = 0; n < ${#tags[*]}; n++)); do
+            if [[ ${tags[n]} == \"$tag_name\" ]]; then
+                $cmd_curl_post -d "hashes=${hash}&tags=${tag_name}" ${api_url_base}/torrents/removeTags
+            fi
+        done
+    fi
+}
+
+## 处理所有torrent
+main() {
+    . /usr/local/bin/share
+    hashes=( $($cmd_curl ${api_url_base}/torrents/info | jq -r .[].hash) )
+    tracker_error_count=0
+    for hash in "${hashes[@]}"; do
+        change_tag "$hash"
+        sleep 1
+    done
+    TRACKER_ERROR_COUNT_MIN=${TRACKER_ERROR_COUNT_MIN:-3}
+    if [[ $tracker_error_count -gt 0 && $tracker_error_count -ge $TRACKER_ERROR_COUNT_MIN ]]; then
+        notify "tracker出错数量超过阈值" "主机：${HOSTNAME}\n时间：$(date +'%Y-%m-%d %H:%M:%S')\n注意：当前有${tracker_error_count}个种子tracker出错，建议检查一下\n说明：您收到本通知是因为您设置了通知阈值TRACKER_ERROR_COUNT_MIN=${TRACKER_ERROR_COUNT_MIN}(默认值:3)"
+    fi
+}
+
+main "$@"

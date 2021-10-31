@@ -1,0 +1,51 @@
+#!/bin/bash
+
+. /usr/local/bin/share
+list_detect_path=/tmp/detect_path.list
+list_content_path=/tmp/torrents_content_path.list
+
+## 输入检测路径
+echo -e "本脚本用来检测指定文件夹下，所有子文件夹/文件是否在本qbittorrent客户端中做种或下载，如某个子文件夹/文件当前没有做种或下载，可以选择是否删除它。\n"
+echo -e "注意：检测只针对指定文件夹的下一级文件夹/文件，不会检测再下一级的文件夹/文件以及更底层的文件夹/文件。\n"
+read -p "请输入容器内你想检测的文件夹路径，请注意是容器内的绝对路径（形如 /data/downloads ）：" detect_path
+if [[ -d "$detect_path" && "$detect_path" == "/"* ]]; then
+    find "$detect_path" -mindepth 1 -maxdepth 1 > $list_detect_path
+    path_sum=$(cat $list_detect_path | wc -l)
+    echo -e "\n将要检测的路径是：\"$detect_path\"，该路径下共有 $path_sum 个子文件夹/文件。\n"
+    sleep 1
+else
+    echo -e "\n在本容器内，路径 \"$detect_path\" 不存在，退出脚本。\n"
+    exit 1
+fi
+
+## 检出qbittorrent的content_path
+echo -e "开始检测qbittorrent客户端中的种子保存路径，可能比较耗时，请耐心等待...\n"
+sleep 1
+torrents_info=$($cmd_curl ${api_url_base}/torrents/info)
+torrents_sum=( $(echo $torrents_info | jq '.|length') )
+[[ -f $list_content_path ]] && rm -f $list_content_path
+echo "$torrents_info" | jq -r .[].content_path | sed "s|\(.*\)|\1\/|" > $list_content_path
+
+## 确认是否删除未做种的文件夹
+echo -e "qbittorrent客户端中共有 $torrents_sum 个种子...\n\n开始检测 \"$detect_path\" 下的文件夹/文件是否在qbittorrent客户端中下载或做种...\n"
+sleep 3
+cat $list_detect_path | while read dir; do
+    echo "检测 \"$dir\""
+    if [[ -z $(grep -F "$dir/" $list_content_path 2>/dev/null) ]]; then
+        (
+            echo -en "\n在本qbittorrent客户端中没有检测到保存路径包含 \"$dir\" 的种子...\n\n请确认是否删除 \"$dir\" [y/N]："
+            exec </dev/tty
+            read is_del
+            if [[ $is_del == y || $is_del == Y ]]; then
+                rm -rf "$dir" && echo -e "\n已删除 \"$dir\"\n" || echo -e "\n删除 \"$dir\" 失败，请检查原因\n"
+            else
+                echo -e "\n已忽略 \"$dir\"\n"
+            fi
+            sleep 1
+        )
+    fi
+done
+
+## 删除临时文件
+rm -rf $list_detect_path $list_content_path &>/dev/null
+echo -e "\n程序运行结束。\n"

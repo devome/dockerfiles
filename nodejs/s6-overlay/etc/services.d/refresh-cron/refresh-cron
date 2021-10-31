@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ -s /root/crontab.list ] && [[ $(cat /root/crontab.list) != $(crontab -l) ]]; then
+    echo "[services.d] 检测到/root/crontab.list有变化，立即刷新定时任务..."
+    crontab /root/crontab.list
+fi

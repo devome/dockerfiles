@@ -1,0 +1,47 @@
+#!/bin/bash
+
+send_notify() {
+    local hash="$1"
+    local torrent_info=$($cmd_curl "${api_url_base}/torrents/info?hashes=${hash}" | jq .[0])
+    local torrent_properties=$($cmd_curl "${api_url_base}/torrents/properties?hash=${hash}")
+    local torrent_files=$($cmd_curl "${api_url_base}/torrents/files?hash=${hash}")
+
+    local torrent_name=$(echo "$torrent_info" | jq -r .name)
+    local save_path=$(echo "$torrent_properties" | jq -r .save_path)
+    local category=$(echo "$torrent_info" | jq -r .category)
+    local size=$(echo "$torrent_info" | jq .size | xargs -I {} nice-size {})
+    local files_sum=$(echo $torrent_files | jq '.|length')
+    local addition_date=$(echo "$torrent_properties" | jq .addition_date)
+    local addition_date_format=$(date +'%Y-%m-%d %H:%M:%S' -d @$addition_date)
+    local completion_date=$(echo "$torrent_properties" | jq .completion_date)
+    local completion_date_format=$(date +'%Y-%m-%d %H:%M:%S' -d @$completion_date)
+    local download_time=$(nice-time $(($completion_date - $addition_date)))
+
+    if [[ $torrent_name ]]; then
+        notify "种子下载完成" "种子名称：$torrent_name\n保存路径：$save_path\n种子分类：$category\n选定大小：$size\n文件数量：$files_sum\n开始时间：$addition_date_format\n完成时间：$completion_date_format\n下载用时：$download_time\n"
+    fi
+}
+
+torrent_hash="$1"   ## hash必须是第一个传入参数
+if [[ $torrent_hash =~ ^[0-9a-f]+$ ]]; then
+    . /usr/local/bin/share
+    if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
+        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 将刚下载完成的种子进行分类..."
+        auto-cat -i "$torrent_hash"
+    else
+        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 已设置为不自动分类..."
+    fi
+    
+    if [[ $DL_FINISH_NOTIFY != false ]]; then
+        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送种子下载完成的通知消息..."
+        send_notify "$torrent_hash"
+    else
+        echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 已设置为不发送种子下载完成的通知消息..."
+    fi
+
+    if [[ -f /data/diy/diy.sh ]]; then
+        . /data/diy/diy.sh
+    fi
+else
+    echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 传入参数不正确，请将HASH作为第1个传入参数，形如：dl-finish \"%I\"..."
+fi

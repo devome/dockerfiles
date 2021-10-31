@@ -1,0 +1,78 @@
+#!/bin/bash
+
+change_tracker() {
+    local hash=$1
+    local orig_url=$2
+    local new_url=$3
+    local torrent_name=$($cmd_curl "${api_url_base}/torrents/info?hashes=${hash}" | jq -r .[0].name)
+
+    echo "hash: ${hash}, torrent_name: ${torrent_name}"
+    $cmd_curl_post $api_url_base/torrents/editTracker -d "hash=${hash}&origUrl=${orig_url}&newUrl=${new_url}"
+}
+
+handle_all_match_torrents() {
+    local method=$1
+
+    . /usr/local/bin/share
+    echo -e "\n检测种子清单...\n"
+    hashes=( $($cmd_curl ${api_url_base}/torrents/info | jq -r .[].hash) )
+    echo -e "开始替换...\n\n搜索过程可能较慢，请等待程序运行完成...\n\n有以下种子匹配所提供的信息，并完成替换：\n"
+    local change_count=0
+    for hash in ${hashes[@]}; do
+        trackers_url=( $($cmd_curl $api_url_base/torrents/trackers?hash=$hash | jq -r .[].url | sed "s# #_#g") )
+        for ((n = $((${#trackers_url[*]} - 1)); n >= 0; n--)); do
+            if [[ $method == exact && ${trackers_url[n]} == ${tracker_orig_url} ]]; then
+                change_tracker "$hash" "${tracker_orig_url//&/%26}" "${tracker_new_url//&/%26}"
+                let change_count++
+                break
+            elif [[ $method == blur && ${trackers_url[n]} == *${orig_string}* ]]; then
+                tracker_orig_url=${trackers_url[n]}
+                tracker_new_url=$(echo ${trackers_url[n]} | sed "s#${orig_string}#${new_string}#")
+                change_tracker "$hash" "${tracker_orig_url//&/%26}" "${tracker_new_url//&/%26}"
+                let change_count++
+                break
+            fi
+        done
+    done
+    echo -e "\n共修改了${change_count}个种子的tracker，程序运行完成"
+}
+
+main() {
+    echo -e "匹配模式：\n"
+    echo -e "1. 精确匹配：匹配整个tracker才进行替换。\n"
+    echo -e "2. 模糊匹配：只要tracker中含有所提供的字符，就进行替换，只将tracker中这一部分字符替换为指定字符，其余字符不变。\n"
+    read -p "请选择匹配模式 [1/2]：" match_method
+    echo
+    case $match_method in
+        1)
+            read -p "请输入要替换的tracker：" tracker_orig_url
+            echo
+            read -p "请输入替换后的tracker：" tracker_new_url
+            echo
+            echo -e "替换前：$tracker_orig_url\n"
+            echo -e "替换后：$tracker_new_url\n"
+            read -p "请确认信息无误 [y/N]：" choice1
+            if [[ $choice1 == y || $choice1 == Y ]]; then
+                handle_all_match_torrents exact
+            fi
+            ;;
+        2)
+            read -p "请输入要替换的字符串：" orig_string
+            echo
+            read -p "请输入替换后的字符串：" new_string
+            echo
+            echo -e "替换前：$orig_string\n"
+            echo -e "替换后：$new_string\n"
+            read -p "请确认信息无误 [y/N]：" choice2
+            if [[ $choice2 == y || $choice2 == Y ]]; then
+                handle_all_match_torrents blur
+            fi
+            ;;
+        *)
+            echo "输入错误，退出脚本（请输入'1'或'2'）"
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

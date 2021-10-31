@@ -1,0 +1,45 @@
+#!/usr/bin/with-contenv bash
+
+fix_config() {
+    BT_PORT=${BT_PORT:-34567}
+    WEBUI_PORT=${WEBUI_PORT:-8080}
+    if [ ! -s /data/config/qBittorrent.conf ]; then
+        echo "Initializing qBittorrent configuration..."
+        cat > /data/config/qBittorrent.conf << EOF
+[General]
+ported_to_new_savepath_system=true
+
+[AutoRun]
+enabled=true
+program=dl-finish \"%I\"
+
+[LegalNotice]
+Accepted=true
+
+[Preferences]
+Connection\Interface=
+Connection\PortRangeMin=${BT_PORT}
+Connection\UseUPnP=false
+Downloads\SavePath=/data/downloads/
+General\Locale=zh
+General\UseRandomPort=false
+Queueing\QueueingEnabled=false
+WebUI\Address=*
+WebUI\AlternativeUIEnabled=false
+WebUI\Enabled=true
+WebUI\LocalHostAuth=false
+WebUI\Port=${WEBUI_PORT}
+EOF
+    fi
+
+    echo "Overriding required parameters..."
+    sed -i "{
+        s!ported_to_new_savepath_system.*!ported_to_new_savepath_system=true!g;
+        s!Connection\\\PortRangeMin=.*!Connection\\\PortRangeMin=${BT_PORT}!g;
+        s!WebUI\\\Enabled=.*!WebUI\\\Enabled=true!g;
+        s!WebUI\\\Port=.*!WebUI\\\Port=${WEBUI_PORT}!g;
+        s!WebUI\\\LocalHostAuth=.*!WebUI\\\LocalHostAuth=false!g;
+    }" /data/config/qBittorrent.conf
+}
+
+fix_config 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
