@@ -11,6 +11,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        samurai \
     && rm -rf /tmp/* /var/cache/apk/*
 ARG QBITTORRENT_VERSION
+ARG JNPROC=1
 COPY qBittorrent-${QBITTORRENT_VERSION} /tmp/qBittorrent
 RUN cd /tmp/qBittorrent \
     && cmake \
@@ -23,7 +24,7 @@ RUN cd /tmp/qBittorrent \
         -B release \
         -G Ninja \
     && cd release \
-    && ninja -j 1 \
+    && ninja -j ${JNPROC} \
     && ninja install \
     && ls -al /usr/local/bin/ \
     && qbittorrent-nox --help
@@ -59,7 +60,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && rm -rf /tmp/* /var/cache/apk/* \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
-    && useradd qbittorrent -u ${PUID} -g ${PGID} -m -d ${QBITTORRENT_HOME} -s /sbin/nologin
+    && useradd qbittorrent -u ${PUID} -U -m -d ${QBITTORRENT_HOME} -s /sbin/nologin
 COPY --from=builder /out /
 COPY s6-overlay /
 WORKDIR /data

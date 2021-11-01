@@ -2,6 +2,7 @@
 
 FROM alpine AS builder
 ARG LIBTORRENT_VERSION
+ARG JNPROC=1
 COPY libtorrent-${LIBTORRENT_VERSION} /tmp/libtorrent
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk update \
@@ -15,12 +16,12 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        ninja \
     && cd /tmp/libtorrent \
     && cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_CXX_STANDARD=17 \
-        -B release \
-        -G Ninja \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DCMAKE_CXX_STANDARD=17 \
+       -B release \
+       -G Ninja \
     && cd release \
-    && ninja -j 1 -l 3 \
+    && ninja -j ${JNPROC} -l 3 \
     && ninja install \
     && ls -al /usr/local/lib \
     && apk del .build \

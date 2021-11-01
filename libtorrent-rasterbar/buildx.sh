@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## 1. 运行脚本的前提：已经登陆docker，已经登陆hub-tool；
+## 1. 运行脚本的前提：已经安装docker、docker-pushrm、hub-tool，已经登陆docker和hub-tool；
 ## 2. 本地编译仍然会花费好几个小时；
 ## 3. 在Dockerfile同目录下运行；
 ## 4. 请使用root用户运行；
@@ -74,6 +74,7 @@ base_func() {
     [[ $url ]] && export LIBTORRENT_URL=$url || export LIBTORRENT_URL=https://gitee.com/evine/libtorrent.git
     [[ $bcount ]] && export BUILD_COUNT=$bcount || export BUILD_COUNT=20
     [[ $mcount ]] && export MANIFEST_COUNT=$mcount || export MANIFEST_COUNT=1
+    [[ $jnproc ]] && export JNPROC=$jnproc || export JNPROC=1
     [[ $archtech ]] && export BUILDX_ARCH="$archtech" || export BUILDX_ARCH="386 amd64 arm64 arm/v6 arm/v7 ppc64le s390x"
 
     ## 标签
@@ -96,6 +97,7 @@ echo_console() {
     echo "LIBTORRENT_URL=${LIBTORRENT_URL}"
     echo "BUILDX_ARCH='${BUILDX_ARCH}'"
     echo "MULTITAGS='${MULTITAGS}'"
+    echo "JNPROC=${JNPROC}"
     echo "IMAGES[@]='${IMAGES[@]}'"
 }
 
@@ -106,6 +108,7 @@ usage() {
     echo "-b             # 针对unstable版本，仅推送'unstable'标签，不推送版本标签"
     echo "-c <bcount>    # 构建镜像尝试次数上限，默认20"
     echo "-d <dockfile>  # Dockerfile文件路径，默认Dockerfile"
+    echo "-j <jnproc>    # 用来编译的核心数，默认1"
     echo "-l <yes/no>    # 是否记录日志[YES|Yes|yes|y / NO|No|no|n]，默认yes"
     echo "-n <mcount>    # 信息维护次数，默认1"
     echo "-r <hubrepo>   # 构建镜像名（不含标签），默认nevinee/libtorrent-rasterbar"
@@ -209,13 +212,14 @@ run() {
 
 ## 主函数
 main() {
-    while getopts :a:bc:f:n:r:t:u:v: opt; do
+    while getopts :a:bc:f:j:l:n:r:t:u:v: opt; do
         case $opt in
             # 传入参数
             a) action=$OPTARG;;
             b) onlyunstable=yes;;
             c) bcount=$OPTARG;;
             f) filename=$OPTARG;;
+            j) jnproc=$OPTARG;;
             l) log=$OPTARG;;
             n) mcount=$OPTARG;;
             r) repo=$OPTARG;;
@@ -230,13 +234,14 @@ main() {
     shift $((OPTIND - 1))
     [[ $1 ]] && usage && exit 2
     [[ -z $action ]] && action=all
+    [[ -z $jnproc ]] && jnproc=1
     [[ -z $log ]] && log=yes
     case $action in
         A|all|a|all_except_deltag|c|clone|b|build|p|push|P|push_manifest|Q|push_manifest_deltag|m|manifest|M|manifest_deltag|d|deltag)
             base_func
             case $log in
                 YES|Yes|yes|y) run $action 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${LIBTORRENT_VERSION}.log;;
-                NO|No|no/n)    run $action 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]";;
+                NO|No|no|n)    run $action 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]";;
             esac
             ;;
         *)
