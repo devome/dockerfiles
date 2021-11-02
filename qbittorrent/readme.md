@@ -50,8 +50,8 @@
 
 | 序号 | 变量名                   | 默认值         | 说明 |
 | :-: | :-:                     | :-:           | -    |
-|  1  | PUID                    | 1500          | 用户的uid，输入命令`id -u`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
-|  2  | PGID                    | 1500          | 用户的gid，输入命令`id -g`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
+|  1  | PUID                    | 1000          | 用户的uid，输入命令`id -u`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
+|  2  | PGID                    | 100          | 用户的gid，输入命令`id -g`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
 |  3  | WEBUI_PORT              | 8080          | WebUI访问端口，建议自定义，如需公网访问，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
 |  4  | BT_PORT                 | 34567         | BT监听端口，建议自定义，如需达到`可连接`状态，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
 |  5  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
@@ -299,6 +299,14 @@ networks:
 - 注意新容器的PUID/PGID和要旧容器保持一致。
 
 - 注意在 `设置` -> `下载` 中勾选 `Torrent 完成时运行外部程序` 并填入 `dl-finish "%I"`，如需要https要重新设置证书路径。
+
+</details>
+
+<details>
+
+<summary markdown="span"><b>可不可以不使用默认下载目录</b></summary>
+
+如不想使用默认下载目录，可以额外映射其他路径，比如映射`/volume1/movies:/movies`，然后在qbittorrent中设置默认下载目录为`/movies`，也可以在每次下载时自己输入下载目录为`/movies`。
 
 </details>
 

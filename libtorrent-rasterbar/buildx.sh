@@ -52,7 +52,7 @@ docker_manifest() {
     done
 }
 
-## 删除单平台标签
+## 删除单平台标签，需要先安装好hub-tool：https://github.com/docker/hub-tool
 del_tag() {
     for image in ${IMAGES[@]}; do
         hub-tool tag rm --verbose -f $image
@@ -234,7 +234,6 @@ main() {
     shift $((OPTIND - 1))
     [[ $1 ]] && usage && exit 2
     [[ -z $action ]] && action=all
-    [[ -z $jnproc ]] && jnproc=1
     [[ -z $log ]] && log=yes
     case $action in
         A|all|a|all_except_deltag|c|clone|b|build|p|push|P|push_manifest|Q|push_manifest_deltag|m|manifest|M|manifest_deltag|d|deltag)

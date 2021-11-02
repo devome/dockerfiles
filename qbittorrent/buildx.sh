@@ -52,14 +52,14 @@ docker_manifest() {
     done
 }
 
-## 删除单平台标签
+## 删除单平台标签，需要先安装好hub-tool：https://github.com/docker/hub-tool
 del_tag() {
     for image in ${IMAGES[@]}; do
         hub-tool tag rm --verbose -f $image
     done
 }
 
-## 更新readme
+## 更新readme，需要先安装好docker-pushrm：https://github.com/christian-korneck/docker-pushrm
 docker_pushrm() {
     if [[ $MULTITAGS == *latest ]]; then
         short_description="qBittorrent ${QBITTORRENT_VERSION}：全平台,下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等"
@@ -75,8 +75,8 @@ build_iyuu() {
         docker buildx build \
             --tag ${DOCKERHUB_REPOSITORY}:${QBITTORRENT_VERSION}-iyuu \
             --tag ${DOCKERHUB_REPOSITORY}:iyuu \
-            --cache-from "type=local,src=/root/.buildx-cache" \
-            --cache-to "type=local,dest=/root/.buildx-cache" \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --push \
             --platform $(echo $BUILDX_ARCH | perl -pe "{s|^|linux/|; s| |,linux/|g}") \
             --file Dockerfile.iyuu \
@@ -105,6 +105,8 @@ base_func() {
     ## 标签
     if [[ ${QBITTORRENT_VERSION} == ${LATEST_VERSION} ]]; then
         MULTITAGS="${QBITTORRENT_VERSION} latest"
+    elif [[ ${QBITTORRENT_VERSION} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ || ${QBITTORRENT_VERSION} =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+        MULTITAGS="${QBITTORRENT_VERSION}"
     else
         if [[ $onlyunstable == yes ]]; then
             MULTITAGS="unstable"
@@ -285,7 +287,6 @@ main() {
     shift $((OPTIND - 1))
     [[ $1 ]] && usage && exit 2
     [[ -z $action ]] && action=all
-    [[ -z $jnproc ]] && jnproc=1
     [[ -z $log ]] && log=yes
     case $action in
         A|all|a|all_except_deltag|c|clone|b|build|p|push|P|push_manifest|Q|push_manifest_deltag|r|push_readme|m|manifest|M|manifest_deltag|d|deltag|i|iyuu)

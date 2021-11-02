@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+umask ${UMASK:-022}
+
+exec s6-setuidgid subfinder loop -e ${INTERVAL} -- subfinder -c /config/subfinder.json /media

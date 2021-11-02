@@ -14,14 +14,14 @@ RUN cd /tmp \
     && git clone --branch release-${QBITTORRENT_VERSION} https://github.com/qbittorrent/qBittorrent \
     && cd qBittorrent \
     && cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DVERBOSE_CONFIGURE=OFF \
-        -DSTACKTRACE=OFF \
-        -DDBUS=OFF \
-        -DGUI=OFF \
-        -B release \
-        -G Ninja \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DCMAKE_CXX_STANDARD=17 \
+       -DVERBOSE_CONFIGURE=OFF \
+       -DSTACKTRACE=OFF \
+       -DDBUS=OFF \
+       -DGUI=OFF \
+       -B release \
+       -G Ninja \
     && cd release \
     && ninja -j $(nproc) \
     && ninja install \

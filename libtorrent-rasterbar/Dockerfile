@@ -6,8 +6,7 @@ ARG JNPROC=1
 COPY libtorrent-${LIBTORRENT_VERSION} /tmp/libtorrent
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk update \
-    && apk add --no-cache \
-       libstdc++ \
+    && apk add --no-cache libstdc++ \
     && apk add --no-cache --virtual .build \
        boost-dev \
        build-base \

@@ -8,8 +8,8 @@ for arch in ${BUILDX_ARCH}; do
     echo "------------------------- 构建目标平台：linux/${arch} -------------------------"
     docker buildx build \
         --tag ${DOCKERHUB_REPOSITORY}:${LIBTORRENT_VERSION}-${arch//\//-} \
-        --cache-from "type=local,src=/root/.buildx-cache" \
-        --cache-to "type=local,dest=/root/.buildx-cache" \
+        --cache-from "type=local,src=/tmp/.buildx-cache" \
+        --cache-to "type=local,dest=/tmp/.buildx-cache" \
         --output "type=docker" \
         --platform linux/${arch} \
         --build-arg "LIBTORRENT_VERSION=${LIBTORRENT_VERSION}" \
