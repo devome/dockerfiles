@@ -33,7 +33,7 @@ services:
     image: nevinee/subfinder:latest
     volumes:
       - ./config:/config  # 冒号左边请修改为你想保存配置的路径
-      - ./media:/movies   # 冒号左边请修改为你的媒体目录
+      - ./media:/media   # 冒号左边请修改为你的媒体目录
     environment:
       - PUID=1000
       - PGID=100
