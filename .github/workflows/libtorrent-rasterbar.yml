@@ -1,0 +1,208 @@
+name: 构建libtorrent-rasterbar镜像
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '要构建的版本，可以为v1/v2版，如不输入则默认去检测最新的正式版'
+        required: false
+        default: ''
+  repository_dispatch:
+    types: libtorrent-rasterbar
+
+env:
+  ## 镜像名，也是git仓库中的文件夹名
+  IMAGE_NAME: libtorrent-rasterbar
+  ## Dockerfile文件名称，在这里修改
+  DOCKERFILE_NAME: Dockerfile.GithubAction
+
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    name: 基本信息
+    outputs:
+      full_version: ${{ steps.base.outputs.full_version }}
+      multitags: ${{ steps.base.outputs.multitags }}
+      matrix: ${{ steps.base.outputs.matrix }}
+      build_args: ${{ steps.base.outputs.build_args }}
+    steps:
+      - 
+        name: Set Matrix And Base Infomation
+        id: base
+        run: |
+          FULL_VERSION=${{ github.event.inputs.version }}
+
+          ######################### ↓特殊部分↓ #########################
+          if [[ -z ${FULL_VERSION} ]]; then
+            FULL_VERSION=$(curl -s https://api.github.com/repos/arvidn/libtorrent/tags | jq -r .[]."name" | grep -m1 -E "v([0-9]{1,2}\.?){3,4}$" | sed "s/v//")
+          fi
+          MAJOR_VERSION=$(echo ${FULL_VERSION} | perl -pe "s|^(\d+)\..+|\1|")
+          MULTITAGS="${FULL_VERSION} ${MAJOR_VERSION}"
+          ######################### ↑特殊部分↑ #########################
+
+          ## 要构建哪些平台的镜像，在这里修改
+          MATRIX='{"architecture":["linux/386", "linux/amd64", "linux/arm64", "linux/arm/v7", "linux/arm/v6", "linux/ppc64le", "linux/s390x"]}'
+
+          echo ::set-output name=full_version::${FULL_VERSION}
+          echo ::set-output name=multitags::${MULTITAGS}
+          echo ::set-output name=matrix::${MATRIX}
+          
+          ######################### ↓特殊部分↓ #########################
+          echo ::set-output name=build_args::LIBTORRENT_VERSION=${FULL_VERSION}
+          ######################### ↑特殊部分↑ #########################
+ 
+  build:
+    needs: base
+    runs-on: ubuntu-latest
+    name: 并行构建
+    timeout-minutes: 150
+    strategy:
+      matrix: ${{ fromJSON(needs.base.outputs.matrix) }}
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+      
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          DOCKERHUB_REPOSITORY="${{ secrets.DOCKER_USERNAME }}/${IMAGE_NAME}"
+          FULL_VERSION="${{ needs.base.outputs.full_version }}"
+          ARCH="${{ matrix.architecture }}"
+          TAGS="${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-$(echo ${ARCH} | perl -pe '{s|linux/||g; s|/|-|g}')"
+
+          echo ::set-output name=tags::${TAGS}
+
+      - 
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - 
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - 
+        name: Login DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - 
+        name: Set Up Cache
+        uses: actions/cache@v2
+        id: buildx-cache
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx
+      
+      - 
+        name: Buildx
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ env.IMAGE_NAME }}
+          file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME }}
+          platforms: ${{ matrix.architecture }}
+          push: true
+          build-args: ${{ needs.base.outputs.build_args }}
+          tags: ${{ steps.prepare.outputs.tags }}
+
+  maintain:
+    needs: [base, build]
+    runs-on: ubuntu-latest
+    name: 信息维护
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+      
+      - 
+        name: Login DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - 
+        name: Create And Push Manifest
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          DOCKERHUB_REPOSITORY="${{ secrets.DOCKER_USERNAME }}/${IMAGE_NAME}"
+          FULL_VERSION="${{ needs.base.outputs.full_version }}"
+          MATRIX='${{ needs.base.outputs.matrix }}'
+          ALL_ARCH=( $(echo ${MATRIX} | jq -r .architecture[] | perl -pe '{s|linux/||g; s|/|-|g}') )
+          MULTITAGS="${{ needs.base.outputs.multitags }}"
+
+          echo ALL_ARCH[@]=${ALL_ARCH[@]}
+          
+          IMAGES=()
+          for arch in ${ALL_ARCH[@]}; do
+            IMAGES+=( "${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-${arch}" )
+          done
+
+          echo IMAGES[@]=${IMAGES[@]}
+
+          for tag in ${MULTITAGS}; do
+            docker manifest create "${DOCKERHUB_REPOSITORY}:${tag}" "${IMAGES[@]}"
+          done
+
+          echo MULTITAGS=${MULTITAGS}
+
+          for tag in ${MULTITAGS}; do
+            docker manifest push --purge "${DOCKERHUB_REPOSITORY}:${tag}"
+          done
+      
+  deltag:
+    needs: [base, maintain]
+    runs-on: ubuntu-latest
+    name: 删除标签
+    steps:
+      -
+        ## 参考https://github.com/xaynetwork/xaynet/blob/master/.github/workflows/dockerhub-cleanup.yml
+        name: Setup Hub-tool
+        env:
+          DHUSER: ${{ secrets.DOCKER_USERNAME }}
+          DHTOKEN: ${{ secrets.DOCKER_PASSWORD }}
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          echo "Install hub-tool ..."
+          ver_hub_tool=$(curl -s https://api.github.com/repos/docker/hub-tool/releases/latest | jq -r .name)
+          wget -q https://github.com/docker/hub-tool/releases/download/${ver_hub_tool}/hub-tool-linux-amd64.tar.gz -O /tmp/hub-tool-linux-amd64.tar.gz
+          tar xzvf /tmp/hub-tool-linux-amd64.tar.gz --strip-components 1 -C /tmp hub-tool/hub-tool
+          sudo chmod +x /tmp/hub-tool
+          mkdir -pv -m 700 ~/.docker
+          chmod -v 600 ~/.docker/config.json
+          echo -ne "ewogICJ1c2VybmFtZSI6ICJESFVTRVIiLAogICJwYXNzd29yZCI6ICJESFRPS0VOIgp9Cg==" | base64 -d > /tmp/auth.json
+          echo -ne "ewogICJhdXRocyI6IHsKICAgICJodWItdG9vbCI6IHsKICAgICAgImF1dGgiOiAiREhVU0VSVE9LRU4iCiAgICB9LAogICAgImh1Yi10b29sLXJlZnJlc2gtdG9rZW4iOiB7CiAgICAgICJhdXRoIjogIkRIVVNFUiIKICAgIH0sCiAgICAiaHViLXRvb2wtdG9rZW4iOiB7CiAgICAgICJhdXRoIjogIkRIVVNFUiIsCiAgICAgICJpZGVudGl0eXRva2VuIjogIkpXVFRPS0VOIgogICAgfQogIH0KfQoK" | base64 -d > ~/.docker/config.json
+          RUSERTOKEN=$(echo -ne "${DHUSER}:${DHTOKEN}" | base64 -w0)
+          RUSER=$(echo -ne "${DHUSER}:" | base64 -w0)
+          RTOKEN=$(echo -ne "${DHTOKEN}" | base64 -w0)
+          sed -i -e "s,DHUSERTOKEN,${RUSERTOKEN},g" -e "s,DHUSER,${RUSER},g" -e "s,DHTOKEN,${RTOKEN},g" /tmp/auth.json ~/.docker/config.json
+          JWT=$(curl -s -XPOST "https://hub.docker.com/v2/users/login" -H "Content-Type:application/json" -d "@/tmp/auth.json" | jq -r .token)
+          sed -i -e "s,JWTTOKEN,${JWT},g" ~/.docker/config.json
+
+      -
+        name: Delete Unwanted Tags
+        run: |
+          DOCKERHUB_REPOSITORY="${{ secrets.DOCKER_USERNAME }}/${IMAGE_NAME}"
+          FULL_VERSION="${{ needs.base.outputs.full_version }}"
+          MATRIX='${{ needs.base.outputs.matrix }}'
+          ALL_ARCH=( $(echo ${MATRIX} | jq -r .architecture[] | perl -pe '{s|linux/||g; s|/|-|g}') )
+          TAGS=( $(/tmp/hub-tool tag ls --format json ${DOCKERHUB_REPOSITORY} | jq -r .[].Name) )
+          
+          for tag in ${TAGS[@]}; do
+            for arch in ${ALL_ARCH[@]}; do
+              if [[ ${tag} == ${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-${arch} ]]; then
+                /tmp/hub-tool tag rm --verbose -f $tag
+              fi
+            done
+          done
+      
+      -
+        name: Logout Docker Hub-tool
+        if: always()
+        run: |
+          rm -rf /tmp/auth.json ~/.docker/config.json
+          /tmp/hub-tool logout

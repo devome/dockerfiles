@@ -1,0 +1,26 @@
+name: 更新qBittorrent介绍
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - qbittorrent/readme.md
+      - .github/workflows/qbittorrent-dockerhub-description.yml
+jobs:
+  dockerHubDescription:
+    runs-on: ubuntu-latest
+    steps:
+    - 
+      name: Checkout
+      uses: actions/checkout@v2
+
+    - 
+      name: Update DockerHub Readme
+      uses: christian-korneck/update-container-description-action@v1
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+      with:
+        destination_container_repo: nevinee/qbittorrent
+        provider: dockerhub
+        readme_file: ./qbittorrent/readme.md

@@ -1,0 +1,22 @@
+name: 同步libtorrent仓库
+
+on:
+  #schedule:
+    #- cron:  '16 6,18 * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [mirror, libtorrent-rasterbar, libtorrent-rasterbar-1.x, libtorrent-rasterbar-2.x]
+
+concurrency:
+  group: git-mirror
+
+jobs:
+  git-mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: wearerequired/git-mirror-action@v1
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+        with:
+          source-repo: "https://github.com/arvidn/libtorrent.git"
+          destination-repo: "git@gitee.com:evine/libtorrent.git"

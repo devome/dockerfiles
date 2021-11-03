@@ -4,7 +4,7 @@
 
 基于alpine实现，镜像体积小，支持 amd64/arm64/armv7 三大主流架构。
 
-还有另外一个作者的同类项目目前仍在更新：https://github.com/allanpk716/ChineseSubFinder
+还有另外一个作者的同类项目目前仍在更新：https://github.com/allanpk716/ChineseSubFinder ，但需要媒体中心写入nfo，如果种子本身含有同名nfo就会与pt做种冲突。
 
 ## 创建
 
