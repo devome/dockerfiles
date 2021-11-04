@@ -23,7 +23,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        libffi-dev \
     && ln -sf /usr/bin/python3 /usr/bin/python \
     && pip install subfinder \
-    && useradd subfinder -u ${PUID} -U -m -s /sbin/nologin \
+    && useradd subfinder -u ${PUID} -MU -s /sbin/nologin \
     && apk del .build \
     && rm -rf \
        /tmp/* \

@@ -42,6 +42,8 @@ services:
     network_mode: bridge
     hostname: subfinder
     container_name: subfinder
+    #security_opt:  #armv7设备请解除这两行注释
+      #- seccomp=unconfined
 ```
 
 ## 关于环境变量的说明

@@ -8,7 +8,7 @@ loop的详细用法见：https://github.com/Miserlou/Loop
 
 一些使用案例：
 
-1. https://gitee.com/evine/dockerfiles/blob/master/subfinder/s6-overlay/etc/services.d/subfinder/run
+1. https://gitee.com/evine/dockerfiles/blob/master/subfinder/entrypoint.sh#L16
 
 2. https://gitee.com/evine/dockerfiles/blob/master/nodejs/s6-overlay/etc/services.d/refresh-cron/run
 
