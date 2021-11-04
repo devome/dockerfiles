@@ -14,4 +14,8 @@ docker run --rm -v $(pwd):/music nevinee/ncmdump /music/xxx.ncm
 docker run --rm -v $(pwd):/music nevinee/ncmdump -r /music/xxx.ncm
 ```
 
-Dockerfile见：https://gitee.com/evine/dockerfiles/blob/master/ncmdump/Dockerfile
+源码：
+
+https://gitee.com/evine/dockerfiles/blob/master/ncmdump/Dockerfile
+
+https://github.com/devome/dockerfiles/blob/master/ncmdump/Dockerfile

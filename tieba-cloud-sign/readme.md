@@ -50,3 +50,5 @@ services:
 ## Dockerfile
 
 https://gitee.com/evine/dockerfiles/tree/master/tieba-cloud-sign
+
+https://github.com/devome/dockerfiles/tree/master/tieba-cloud-sign

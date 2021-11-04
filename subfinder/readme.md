@@ -4,7 +4,7 @@
 
 基于alpine实现，镜像体积小，支持 amd64/arm64/armv7 三大主流架构。
 
-还有另外一个作者的同类项目目前仍在更新：https://github.com/allanpk716/ChineseSubFinder ，但需要媒体中心写入nfo，如果种子本身含有同名nfo就会与pt做种冲突。
+还有另外一个作者的同类项目目前仍在更新：https://github.com/allanpk716/ChineseSubFinder ，该项目官方镜像：https://hub.docker.com/r/allanpk716/chinesesubfinder ，以及我基于apline重新制作的，略微减小体积，减少镜像层数：https://hub.docker.com/r/nevinee/chinesesubfinder。
 
 ## 创建
 
@@ -86,3 +86,5 @@ armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](h
 ## 源码
 
 https://gitee.com/evine/dockerfiles/tree/master/subfinder
+
+https://github.com/devome/dockerfiles/tree/master/subfinder

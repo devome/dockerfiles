@@ -21,9 +21,3 @@ services:
 ```
 
 创建好后编辑`./iyuu/config/config.php`即可，不负责解释一切疑问。
-
-## 构建相关
-
-https://github.com/evineee/dockerfiles/tree/master/iyuuautoreseed
-
-https://github.com/evineee/dockerfiles/tree/master/.github/workflows

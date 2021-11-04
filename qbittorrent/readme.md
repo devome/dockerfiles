@@ -256,7 +256,7 @@ networks:
 
 <summary markdown="span"><b>使用此镜像会导致封号吗</b></summary>
 
-此镜像未修改qbittorrent客户端官方任何信息，在和pt站tracker服务器交互时反馈的一切信息均是qbittorrent官方原版反馈的信息，此镜像只是基于qbittorrent额外增加了一些脚本而已。增加的脚本全部代码在 [这里](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent) 可以查看，不会因为使用此镜像导致pt账号被封。
+此镜像未修改qbittorrent客户端官方任何信息，在和pt站tracker服务器交互时反馈的一切信息均是qbittorrent官方原版反馈的信息，此镜像只是基于qbittorrent额外增加了一些脚本而已。增加的脚本全部代码在 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 可以查看，不会因为使用此镜像导致pt账号被封。
 
 </details>
 
@@ -528,8 +528,10 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 
 ## 源代码、问题反馈、意见建议
 
-全套代码见 [这里](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。
+旧的Github账号已经删除了，抱歉。
 
-如有使用上的问题，或者有其他好的功能建议，请在 [这里](https://gitee.com/evine/dockerfiles/issues) 提交。
+全套代码见 [Github](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。
+
+如有使用上的问题，或者有其他好的功能建议，请在 [Github这里](https://github.com/devome/dockerfiles/issues) 或 [Gitee这里](https://gitee.com/evine/dockerfiles/issues) 提交。
 
 [![dockeri.co](http://dockeri.co/image/nevinee/qbittorrent)](https://hub.docker.com/r/nevinee/qbittorrent/)

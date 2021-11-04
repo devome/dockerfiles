@@ -22,4 +22,8 @@ services:
       - CRON=3-53/5 * * * *    # 可以自定义
 ```
 
-Dockerfile见：https://gitee.com/evine/dockerfiles/tree/master/ddns
+Dockerfile：
+
+https://gitee.com/evine/dockerfiles/tree/master/ddns
+
+https://github.com/devome/dockerfiles/tree/master/ddns

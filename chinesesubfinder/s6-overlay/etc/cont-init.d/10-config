@@ -1,0 +1,30 @@
+#!/usr/bin/with-contenv sh
+
+config() {
+    echo "下载最新配置示例文件..."
+    wget -q -O /config/config.yaml.sample.new https://cdn.jsdelivr.net/gh/allanpk716/ChineseSubFinder/config.yaml.sample
+    if [ $? -eq 0 ]; then
+        mv /config/config.yaml.sample.new /config/config.yaml.sample
+    fi
+    if [ -f /config/config.yaml.sample.new ]; then
+        rm -rf /config/config.yaml.sample.new
+    fi
+
+    if [ ! -s /config/config.yaml ]; then
+        echo '文件 "/config/config.yaml" 不存在，复制一份...'
+        if [ -f /config/config.yaml.sample ]; then
+            cp -v /config/config.yaml.sample /config/config.yaml
+        else
+            cp -v /app/config.yaml.sample /config/config.yaml
+        fi
+    else
+        echo '文件 "/config/config.yaml" 已存在，使用该文件作为配置...'
+    fi
+
+    if [[ $(readlink -f /app/config.yaml 2>/dev/null) != /config/config.yaml ]]; then
+        rm -rf /app/config.yaml &>/dev/null
+        ln -s /config/config.yaml /app/config.yaml
+    fi
+}
+
+config 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"

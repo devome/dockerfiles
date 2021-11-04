@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+umask ${UMASK:-022}
+cd /app
+exec s6-setuidgid csf ./chinesesubfinder
