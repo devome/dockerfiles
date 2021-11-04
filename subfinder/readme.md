@@ -1,10 +1,10 @@
 ## 简介
 
-中文字幕自动下载，是这个项目的Docker实现：https://github.com/ausaki/subfinder
+中文字幕自动下载，是这个项目的Docker实现：https://github.com/ausaki/subfinder 
 
 基于alpine实现，镜像体积小，支持 amd64/arm64/armv7 三大主流架构。
 
-还有另外一个作者的同类项目目前仍在更新：https://github.com/allanpk716/ChineseSubFinder ，该项目官方镜像：https://hub.docker.com/r/allanpk716/chinesesubfinder ，以及我基于apline重新制作的，略微减小体积，减少镜像层数：https://hub.docker.com/r/nevinee/chinesesubfinder。
+还有另外一个作者的同类项目目前仍在更新：[ChineseSubFinder](https://github.com/allanpk716/ChineseSubFinder) ，该项目官方镜像：[allanpk716/chinesesubfinder](https://hub.docker.com/r/allanpk716/chinesesubfinder) ，以及我基于apline重新制作的，略微减小体积，减少层数的镜像：[nevinee/chinesesubfinder](https://hub.docker.com/r/nevinee/chinesesubfinder)。
 
 ## 创建
 

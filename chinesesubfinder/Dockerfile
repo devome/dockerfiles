@@ -31,7 +31,10 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        wget \
        shadow \
        s6-overlay \
-    && ln -s /usr/bin/chromium-browser /usr/bin/chrome \
+       tzdata \
+    && ln -sf /usr/bin/chromium-browser /usr/bin/chrome \
+    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo "${TZ}" > /etc/timezone \
     && useradd csf -u ${PUID} -U -m -s /sbin/nologin \
     && rm -rf /tmp/* /var/cache/apk/*
 COPY --from=builder /out /
