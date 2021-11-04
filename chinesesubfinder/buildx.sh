@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 repo="nevinee/chinesesubfinder"
 arch="linux/amd64,linux/arm64"

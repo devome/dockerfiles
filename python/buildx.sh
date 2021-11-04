@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 repo="nevinee/python"
 arch="linux/amd64,linux/arm64,linux/arm/v7"

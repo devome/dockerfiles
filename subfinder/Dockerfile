@@ -5,7 +5,7 @@ ENV INTERVAL=2h \
     PGID=100 \
     PS1="\u@\h:\w \$ "
 COPY --from=nevinee/loop:latest / /
-COPY s6-overlay /
+COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache \
        python3 \
@@ -13,7 +13,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        unzip \
        unrar \
        shadow \
-       s6-overlay \
+       su-exec \
     && apk add --update --no-cache --virtual .build \
        build-base \
        python3-dev \
@@ -30,4 +30,4 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        /root/.cache \
        /var/cache/apk/*
 VOLUME ["/config", "/media"]
-ENTRYPOINT ["/init"]
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]

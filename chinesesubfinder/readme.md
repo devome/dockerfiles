@@ -2,7 +2,7 @@
 
 中文字幕自动下载，是这个项目的Docker实现：https://github.com/allanpk716/ChineseSubFinder
 
-基于alpine实现，比官方镜像体积小、层数少，支持 amd64/arm64。
+基于alpine实现，比官方镜像体积小、层数少，不使用s6-overlay仅一个进程，日志和设置文件全部和配置文件保存在一起，支持 amd64/arm64。
 
 ## 创建
 
@@ -12,8 +12,8 @@
 docker run -d \
     --name chinesesubfinder \
     --hostname chinesesubfinder \
-    -v $(pwd)/config:/config  `# 冒号左边请修改为你想在主机上保存配置文件的路径` \
-    -v $(pwd)/media:/media    `# 冒号左边请修改为需要下载字幕的媒体目录` \
+    -v $(pwd)/config:/config   `# 冒号左边请修改为你想在主机上保存配置、日志等文件的路径` \
+    -v $(pwd)/media:/media     `# 冒号左边请修改为需要下载字幕的媒体目录` \
     -e PUID=1000 \
     -e PGID=100 \
     nevinee/chinesesubfinder
@@ -29,7 +29,7 @@ services:
   chinesesubfinder:
     image: nevinee/chinesesubfinder:latest
     volumes:
-      - ./config:/config  # 冒号左边请修改为你想保存配置的路径
+      - ./config:/config  # 冒号左边请修改为你想在主机上保存配置、日志等文件的路径
       - ./media:/media    # 冒号左边请修改为你的媒体目录
     environment:
       - PUID=1000

@@ -13,8 +13,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && mkdir -p /out/app \
     && cp config.yaml.sample /out/app/config.yaml.sample \
     && cd cmd/chinesesubfinder \
-    && go build -ldflags="-s -w -X main.AppVersion=${VERSION}" -o /out/app/chinesesubfinder
-COPY s6-overlay /out
+    && go build -ldflags="-s -w -X main.AppVersion=${VERSION}" -o /out/usr/local/bin/chinesesubfinder
+COPY entrypoint.sh /out/usr/local/bin/entrypoint.sh
 
 FROM alpine
 ENV TZ=Asia/Shanghai \
@@ -30,15 +30,15 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        ca-certificates \
        wget \
        shadow \
-       s6-overlay \
+       su-exec \
        tzdata \
     && ln -sf /usr/bin/chromium-browser /usr/bin/chrome \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
-    && useradd csf -u ${PUID} -U -m -s /sbin/nologin \
+    && useradd csf -u ${PUID} -MU -s /sbin/nologin \
     && rm -rf /tmp/* /var/cache/apk/*
 COPY --from=builder /out /
-WORKDIR /app
 VOLUME ["/config", "/media"]
-ENTRYPOINT ["/init"]
+WORKDIR /config
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
