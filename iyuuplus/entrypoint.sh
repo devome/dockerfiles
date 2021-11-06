@@ -35,4 +35,4 @@ echo "当前crontab如下："
 crontab -l
 
 php start.php start -d
-crond -f
+exec crond -f
