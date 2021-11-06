@@ -24,6 +24,7 @@ services:
       - DB_PASSWD=janejane123456  # 数据库密码
       - DB_NAME=tiebacloud        # 数据库名
       - CSRF=true
+      - CRON_TASK=* * * * *       # 执行do.php的cron，默认每分钟执行，明白这是何含义的可以自己改
     #volumes:                                        # 如果重新创建或更新镜像希望保留之前的所有信息，请解除此两行注释
       #- ./install.lock:/var/www/setup/install.lock  # 在当前目录下自行新建文件install.lock，内容为：1
     ports:

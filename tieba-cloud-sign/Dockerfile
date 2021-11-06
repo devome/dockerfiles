@@ -2,6 +2,7 @@ FROM alpine
 ENV LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \
     WORKDIR=/var/www \
+    CRON_TASK="* * * * *" \
     PS1="\u@\h:\w \$ "
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories \
     && apk add --no-cache --update \
@@ -29,6 +30,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories 
        $WORKDIR/* \
        /var/cache/apk/* \
        /tmp/* \
+    && git config --global pull.ff only \
     && git clone -b master https://github.com/MoeNetwork/Tieba-Cloud-Sign $WORKDIR
 COPY s6-overlay /
 WORKDIR $WORKDIR

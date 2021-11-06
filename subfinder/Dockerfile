@@ -15,6 +15,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        shadow \
        su-exec \
        tini \
+       libxml2 \
+       libxslt \
     && apk add --update --no-cache --virtual .build \
        build-base \
        python3-dev \
@@ -25,7 +27,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && ln -sf /usr/bin/python3 /usr/bin/python \
     && pip install subfinder \
     && useradd subfinder -u ${PUID} -MU -s /sbin/nologin \
-    && apk del .build \
+    && apk del --purge --no-cache .build \
     && rm -rf \
        /tmp/* \
        /root/.cache \
