@@ -31,4 +31,4 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        /root/.cache \
        /var/cache/apk/*
 VOLUME ["/config", "/media"]
-ENTRYPOINT ["/sbin/tini", "--", "entrypoint.sh"]
+ENTRYPOINT ["tini", "entrypoint.sh"]

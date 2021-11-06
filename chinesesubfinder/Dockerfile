@@ -39,4 +39,4 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 COPY --from=builder /out /
 VOLUME ["/config", "/media"]
 WORKDIR /config
-ENTRYPOINT ["/sbin/tini", "--", "entrypoint.sh"]
+ENTRYPOINT ["tini", "entrypoint.sh"]

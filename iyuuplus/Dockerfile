@@ -45,4 +45,4 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 EXPOSE 8787
 VOLUME ["/IYUU"]
-ENTRYPOINT ["/sbin/tini", "--", "entrypoint.sh"]
+ENTRYPOINT ["tini", "entrypoint.sh"]
