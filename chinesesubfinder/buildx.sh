@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 repo="nevinee/chinesesubfinder"
-arch="linux/amd64,linux/arm64"
+arch="linux/amd64,linux/arm64,linux/arm/v7"
 ver=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/releases/latest | jq -r .tag_name | sed "s/v//")
 
 buildx() {
@@ -18,7 +18,7 @@ buildx() {
         --tag ${repo}:latest \
         --push \
         .
-    docker-pushrm -s "自动下载中文字幕，支持平台：amd64/arm64，减小镜像体积小" $repo
+    docker-pushrm -s "自动下载中文字幕，支持平台：amd64/arm64/armv7" $repo
 }
 
 if [[ $ver ]]; then

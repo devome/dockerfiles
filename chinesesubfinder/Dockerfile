@@ -24,15 +24,14 @@ ENV TZ=Asia/Shanghai \
     PS1="\u@\h:\w \$ "
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache \
-       chromium \
        ffmpeg \
        yasm \
        ca-certificates \
        wget \
        shadow \
+       tini \
        su-exec \
        tzdata \
-    && ln -sf /usr/bin/chromium-browser /usr/bin/chrome \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
     && useradd csf -u ${PUID} -MU -s /sbin/nologin \
@@ -40,5 +39,4 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 COPY --from=builder /out /
 VOLUME ["/config", "/media"]
 WORKDIR /config
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
+ENTRYPOINT ["/sbin/tini", "--", "entrypoint.sh"]

@@ -14,6 +14,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        unrar \
        shadow \
        su-exec \
+       tini \
     && apk add --update --no-cache --virtual .build \
        build-base \
        python3-dev \
@@ -30,4 +31,4 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        /root/.cache \
        /var/cache/apk/*
 VOLUME ["/config", "/media"]
-ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "entrypoint.sh"]

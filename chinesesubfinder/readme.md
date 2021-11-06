@@ -2,7 +2,7 @@
 
 中文字幕自动下载，是这个项目的Docker实现：https://github.com/allanpk716/ChineseSubFinder
 
-基于alpine实现，比官方镜像体积小、层数少，不使用s6-overlay仅一个进程，日志和设置文件全部和配置文件保存在一起，支持 amd64/arm64。
+基于alpine实现，比官方镜像体积小、层数少，不使用s6-overlay仅一个进程，日志和设置文件全部和配置文件保存在一起，支持 amd64/arm64/armv7。
 
 **这个项目会修改文件，不建议pt用户使用！！！**
 
