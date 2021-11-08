@@ -12,7 +12,6 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        py3-pip \
        unzip \
        unrar \
-       shadow \
        su-exec \
        tini \
        libxml2 \
@@ -26,7 +25,6 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        libffi-dev \
     && ln -sf /usr/bin/python3 /usr/bin/python \
     && pip install subfinder \
-    && useradd subfinder -u ${PUID} -MU -s /sbin/nologin \
     && apk del --purge --no-cache .build \
     && rm -rf \
        /tmp/* \

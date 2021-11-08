@@ -20,12 +20,8 @@ else
     echo '文件 "/config/config.yaml" 已存在，使用该文件作为配置...'
 fi
 
-echo '修改文件夹 "/config" 的所有者为 "csf" 用户...'
-groupmod -o -g "${PGID}" csf
-usermod -o -u "${PUID}" csf
-chown -R csf:csf /config
-
+chown -R "${PUID}:${PGID}" /config
 echo "启动ChineseSubFinder，生成的日志以及setting.db和config.yaml保存在一起..."
 umask ${UMASK:-022}
 cd /config
-exec su-exec csf:csf chinesesubfinder
+exec su-exec "${PUID}:${PGID}" chinesesubfinder

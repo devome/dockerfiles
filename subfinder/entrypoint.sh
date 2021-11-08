@@ -7,10 +7,6 @@ else
     echo '文件 "/config/subfinder.json" 已存在，使用该文件作为配置...'
 fi
 
-echo '修改文件夹 "/config" 的所有者为 "subfinder" 用户...'
-groupmod -o -g "${PGID}" subfinder
-usermod -o -u "${PUID}" subfinder
-chown -R subfinder:subfinder /config
-
+chown -R "${PUID}:${PGID}" /config
 umask ${UMASK:-022}
-exec su-exec subfinder:subfinder loop -e ${INTERVAL} -- subfinder -c /config/subfinder.json /media
+exec su-exec "${PUID}:${PGID}" loop -e ${INTERVAL} -- subfinder -c /config/subfinder.json /media

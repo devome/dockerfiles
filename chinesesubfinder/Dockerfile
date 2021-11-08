@@ -28,13 +28,11 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        yasm \
        ca-certificates \
        wget \
-       shadow \
        tini \
        su-exec \
        tzdata \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
-    && useradd csf -u ${PUID} -MU -s /sbin/nologin \
     && rm -rf /tmp/* /var/cache/apk/*
 COPY --from=builder /out /
 VOLUME ["/config", "/media"]
