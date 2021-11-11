@@ -20,6 +20,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories 
        php7-mysqli \
        php7-zip \
        php7-gd \
+    && caddy upgrade \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo -e "${TZ}" > /etc/timezone \
     && echo -e "max_execution_time = 3600\nupload_max_filesize=128M\npost_max_size=128M\nmemory_limit=1024M\ndate.timezone=${TZ}" > /etc/php7/conf.d/99-overrides.ini \

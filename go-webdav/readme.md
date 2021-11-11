@@ -4,6 +4,8 @@ webdav，是这个项目的Docker实现：https://github.com/hacdias/webdav
 
 基于alpine实现，支持 amd64/arm64/armv7。
 
+**注意：只有webdav协议，没有http文件浏览器功能。**
+
 ## 创建
 
 **创建前请在要映射的`config`目录下按[官方教程](https://github.com/hacdias/webdav)建立`config.yml`。**
