@@ -13,10 +13,11 @@ ENV LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \
     PS1="\u@\h:\w \$ "
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && if [[ $(uname -m) == armv7* ]]; then openjdk_ver=8; else openjdk_ver=11; fi \
     && apk add --update --no-cache \
        nginx \
        nginx-mod-stream \
-       openjdk11-jre \
+       openjdk${openjdk_ver}-jre \
        net-tools \
        curl \
        wget \

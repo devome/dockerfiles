@@ -4,9 +4,9 @@
 
 ## 和官方镜像的不同点
 
-1. 本镜像支持amd64/arm64; 
+1. 本镜像支持amd64/arm64/armv7，其中amd64/arm64使用openjdk11，armv7使用openjdk8; 
 
-2. 本镜像基于alpine，缩小了体积，减少了docker层数，从9层减少到3层；
+2. 本镜像基于alpine，体积减小了大约三分之一，同时还减少了docker层数，从9层减少到3层；
 
 3. 增加了状态捕捉，重启/重建速度更快。
 
@@ -49,6 +49,6 @@ services:
 
 ## 源码
 
-https://gitee.com/evine/dockerfiles/blob/master/nginxwebui/Dockerfile
+https://gitee.com/evine/dockerfiles/tree/master/nginxwebui
 
-https://github.com/devome/dockerfiles/blob/master/nginxwebui/Dockerfile
+https://github.com/devome/dockerfiles/blob/master/nginxwebui

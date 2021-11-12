@@ -3,7 +3,7 @@
 set -o pipefail
 
 repo="nevinee/nginxwebui"
-arch="linux/amd64,linux/arm64"
+arch="linux/amd64,linux/arm64,linux/arm/v7"
 
 buildx() {
     docker pull tonistiigi/binfmt
@@ -27,7 +27,7 @@ if [[ $ver != $(cat version 2>/dev/null) ]]; then
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
     [[ $? -eq 0 ]] && {
         echo $ver > version
-        docker pushrm -s "可视化配置nginx，减小体积，支持amd64/arm64" $repo  # https://github.com/christian-korneck/docker-pushrm
+        docker pushrm -s "可视化配置nginx，减小体积，支持amd64/arm64/armv7" $repo  # https://github.com/christian-korneck/docker-pushrm
     }
 else
     echo "当前版本：$ver"
