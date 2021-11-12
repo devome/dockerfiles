@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-repo="nevinee/go-webdav"
-arch="linux/amd64,linux/arm64,linux/arm/v7"
-ver=$(curl -s https://api.github.com/repos/hacdias/webdav/releases/latest | jq -r .tag_name | sed "s/v//")
+set -o pipefail
+
+repo="nevinee/nginxwebui"
+arch="linux/amd64,linux/arm64"
 
 buildx() {
     docker pull tonistiigi/binfmt
@@ -13,17 +14,21 @@ buildx() {
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
         --platform "$arch" \
-        --build-arg "VERSION=${ver}" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
         --push \
         .
-    docker pushrm -s "go-webdav，支持平台：amd64/arm64/armv7" $repo  # https://github.com/christian-korneck/docker-pushrm
 }
 
-if [[ $ver ]]; then
+git -C src pull
+ver=$(cat src/pom.xml | grep -A1 nginxWebUI | grep version | perl -pe "s|.*((\d+\.?){3,}).*|\1|")
+if [[ $ver != $(cat version 2>/dev/null) ]]; then
     [[ ! -d logs ]] && mkdir logs
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
+    [[ $? -eq 0 ]] && {
+        echo $ver > version
+        docker pushrm -s "可视化配置nginx，减小体积，支持amd64/arm64" $repo  # https://github.com/christian-korneck/docker-pushrm
+    }
 else
-    echo "未获取到最新版本号"
+    echo "当前版本：$ver"
 fi

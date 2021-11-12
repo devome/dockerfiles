@@ -15,7 +15,7 @@ buildx() {
         --tag ${repo}:latest \
         --push \
         .
-    docker-pushrm $repo
+    docker pushrm $repo  # https://github.com/christian-korneck/docker-pushrm
 }
 
 [[ ! -d logs ]] && mkdir logs

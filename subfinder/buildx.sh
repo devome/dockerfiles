@@ -17,7 +17,7 @@ buildx() {
         --tag ${repo}:latest \
         --push \
         .
-    docker-pushrm -s "自动下载中文字幕，支持平台：amd64/arm64/armv7，镜像体积小" $repo
+    docker pushrm -s "自动下载中文字幕，支持平台：amd64/arm64/armv7，镜像体积小" $repo  # https://github.com/christian-korneck/docker-pushrm
 }
 
 if [[ $ver ]]; then

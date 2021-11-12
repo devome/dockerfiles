@@ -1,0 +1,34 @@
+FROM alpine AS builder
+COPY src /build
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk add --update --no-cache maven \
+    && cd /build \
+    && mvn clean package \
+    && mkdir -p /out/home \
+    && cp target/nginxWebUI-*.jar /out/home/nginxWebUI.jar
+COPY entrypoint.sh /out/usr/local/bin/entrypoint.sh
+
+FROM alpine
+ENV LANG=zh_CN.UTF-8 \
+    TZ=Asia/Shanghai \
+    PS1="\u@\h:\w \$ "
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk add --update --no-cache \
+       nginx \
+       nginx-mod-stream \
+       openjdk11-jre \
+       net-tools \
+       curl \
+       wget \
+       ttf-dejavu \
+       fontconfig \
+       tzdata \
+       tini \
+    && fc-cache -f -v \
+    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo "${TZ}" > /etc/timezone \
+    && rm -rf /var/cache/apk/* /tmp/*
+COPY --from=builder /out /
+VOLUME ["/home/nginxWebUI"]
+ENTRYPOINT ["tini", "entrypoint.sh"]
+       
