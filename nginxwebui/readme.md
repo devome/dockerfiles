@@ -2,13 +2,7 @@
 
 这个项目的docker实现：https://github.com/cym1102/nginxWebUI
 
-## 和官方镜像的不同点
-
-1. 本镜像支持amd64/arm64/armv7，其中amd64/arm64使用openjdk11，armv7使用openjdk8; 
-
-2. 本镜像基于alpine，体积减小了大约三分之一，同时还减少了docker层数，从9层减少到3层；
-
-3. 增加了状态捕捉，重启/重建速度更快。
+本镜像经过测试以后，已经将相关构建代码推送到官方仓库。
 
 ## 创建
 

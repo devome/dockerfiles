@@ -1,0 +1,6 @@
+*
+!src/src
+!src/pom.xml
+!Dockerfile
+!entrypoint.sh
+!settings.xml

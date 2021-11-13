@@ -1,0 +1,23 @@
+<settings>
+  <localRepository>/usr/share/maven/ref/repository</localRepository>
+  <mirrors>
+    <mirror>
+      <id>aliyun</id>
+      <mirrorOf>central</mirrorOf>
+      <name>aliyun maven</name>
+      <url>https://maven.aliyun.com/repository/public</url>
+    </mirror>
+    <mirror>
+      <id>huaweicloud</id>
+      <mirrorOf>central</mirrorOf>
+      <name>huaweicloud maven</name>
+      <url>https://mirrors.huaweicloud.com/repository/maven/</url>
+    </mirror>
+    <mirror>
+      <id>tencentcloud</id>
+      <mirrorOf>central</mirrorOf>
+      <name>tencentloud maven</name>
+      <url>http://mirrors.cloud.tencent.com/nexus/repository/maven-public/</url>
+    </mirror>
+  </mirrors>
+</settings>

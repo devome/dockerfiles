@@ -1,5 +1,6 @@
 FROM alpine AS builder
 COPY src /build
+COPY settings.xml /root/.m2/settings.xml
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache maven \
     && cd /build \

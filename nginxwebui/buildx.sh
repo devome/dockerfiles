@@ -30,5 +30,5 @@ if [[ $ver != $(cat version 2>/dev/null) ]]; then
         docker pushrm -s "可视化配置nginx，减小体积，支持amd64/arm64/armv7" $repo  # https://github.com/christian-korneck/docker-pushrm
     }
 else
-    echo "当前版本：$ver"
+    echo "当前已经是最新版本：$ver"
 fi
