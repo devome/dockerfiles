@@ -1,6 +1,6 @@
 *
 !src/src
 !src/pom.xml
+!src/settings.xml
 !Dockerfile
 !entrypoint.sh
-!settings.xml

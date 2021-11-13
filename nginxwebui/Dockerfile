@@ -1,9 +1,12 @@
 FROM alpine AS builder
 COPY src /build
-COPY settings.xml /root/.m2/settings.xml
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache maven \
     && cd /build \
+    && if [[ -s settings.xml ]]; then \
+           mkdir -p /root/.m2; \
+           cp -fv settings.xml /root/.m2/settings.xml; \
+       fi \
     && mvn clean package \
     && mkdir -p /out/home \
     && cp target/nginxWebUI-*.jar /out/home/nginxWebUI.jar
@@ -25,6 +28,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        fontconfig \
        tzdata \
        tini \
+       acme.sh \
     && fc-cache -f -v \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
