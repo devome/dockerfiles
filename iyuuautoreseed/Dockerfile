@@ -26,7 +26,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories 
        /tmp/* \
        /usr/share/man \
        /usr/share/php7
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 WORKDIR /iyuu
 VOLUME ["/iyuu"]
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

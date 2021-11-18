@@ -24,4 +24,4 @@ echo -e "${CRON_GIT_PULL} git -C /iyuu pull\n${CRON_IYUU} php /iyuu/iyuu.php" | 
 echo "当前crontab如下："
 crontab -l
 
-exec -- crond -f
+exec crond -f
