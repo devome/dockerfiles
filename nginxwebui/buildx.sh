@@ -35,7 +35,7 @@ if [[ $ver != $(cat version 2>/dev/null) ]]; then
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
     [[ $? -eq 0 ]] && {
         echo $ver > version
-        docker pushrm -s "可视化配置nginx，减小体积，支持amd64/arm64/armv7等" $repo  # https://github.com/christian-korneck/docker-pushrm
+        docker pushrm -s "可视化配置nginx，支持amd64/arm64/armv7等7个平台" $repo  # https://github.com/christian-korneck/docker-pushrm
     }
 else
     echo "当前已经是最新版本：$ver"

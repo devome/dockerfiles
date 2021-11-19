@@ -52,6 +52,10 @@ services:
 
 - `INTERVAL`表示检测媒体目录的间隔，可以设置的形式如：`INTERVAL=5h`(每5小时)、`INTERVAL=30m`(每30分钟)、`INTERVAL=1d`(每1天)，默认为：`INTERVAL=2h`。
 
+## 关于多个资源目录如何配置的问题
+
+将所有资源目录映射在/media的下一层即可，形如`-v /你的资源目录1:/media/目录1 -v /你的资源目录2:/media/目录2 -v /你的资源目录3:/media/目录3`。
+
 ## 关于配置文件的说明
 
 默认配置如下，如不想使用默认配置，请参考：https://github.com/ausaki/subfinder ，修改`config/subfinder.json`即可。

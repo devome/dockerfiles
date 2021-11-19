@@ -438,6 +438,14 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 </details>
 
+<details>
+
+<summary markdown="span"><b>为什么没法使用搜索功能</b></summary>
+
+搜索功能依赖于python，请在创建容器时添加环境变量`INSTALL_PYTHON`，并将值设置为`true`。
+
+</details>
+
 ## 命令
 
 <details>
