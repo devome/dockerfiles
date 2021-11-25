@@ -19,11 +19,12 @@ prepare_buildx() {
 
 ## 克隆脚本
 git_clone() {
-    if [[ ! -d libtorrent-${LIBTORRENT_VERSION} ]]; then
-        git clone --branch v${LIBTORRENT_VERSION} ${LIBTORRENT_URL} libtorrent-${LIBTORRENT_VERSION}
-    else
-        echo "本地已经克隆好了"
-    fi
+    #if [[ ! -d libtorrent-${LIBTORRENT_VERSION} ]]; then
+        #git clone --branch v${LIBTORRENT_VERSION} --recurse-submodules ${LIBTORRENT_URL} libtorrent-${LIBTORRENT_VERSION}
+    #else
+        #echo "本地已经克隆好了"
+    #fi
+    echo "构建时在容器内克隆"
 }
 
 ## 构建

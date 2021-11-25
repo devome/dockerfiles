@@ -20,10 +20,10 @@ RUN cd /tmp \
        -DSTACKTRACE=OFF \
        -DDBUS=OFF \
        -DGUI=OFF \
-       -B release \
-       -G Ninja \
+       -Brelease \
+       -GNinja \
     && cd release \
-    && ninja -j $(nproc) \
+    && ninja -j$(nproc) \
     && ninja install \
     && ls -al /usr/local/bin/ \
     && qbittorrent-nox --help

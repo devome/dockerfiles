@@ -1,9 +1,7 @@
-## 本地构建使用
-
-FROM alpine AS builder
+FROM alpine
 ARG LIBTORRENT_VERSION
 ARG JNPROC=1
-COPY libtorrent-${LIBTORRENT_VERSION} /tmp/libtorrent
+ARG URL=https://github.com/arvidn/libtorrent
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk update \
     && apk add --no-cache libstdc++ \
@@ -12,16 +10,18 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        build-base \
        openssl-dev \
        cmake \
-       ninja \
+       samurai \
+       git \
+    && git clone --branch v${LIBTORRENT_VERSION} --recurse-submodules ${URL} /tmp/libtorrent \
     && cd /tmp/libtorrent \
     && cmake \
        -DCMAKE_BUILD_TYPE=Release \
        -DCMAKE_CXX_STANDARD=17 \
-       -B release \
-       -G Ninja \
+       -Brelease \
+       -GNinja \
     && cd release \
-    && ninja -j ${JNPROC} -l 3 \
+    && ninja -j${JNPROC} -l3 \
     && ninja install \
     && ls -al /usr/local/lib \
-    && apk del .build \
+    && apk del --purge .build \
     && rm -rf /tmp/* /var/cache/apk/*

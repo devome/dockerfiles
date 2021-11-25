@@ -18,7 +18,7 @@ COPY entrypoint.sh /out/usr/local/bin/entrypoint.sh
 
 FROM alpine
 ENV TZ=Asia/Shanghai \
-    PUID=1026 \
+    PUID=1000 \
     PGID=100 \
     UMASK=022 \
     PS1="\u@\h:\w \$ "
