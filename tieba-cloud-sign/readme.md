@@ -2,6 +2,8 @@
 
 官方镜像也是本人维护的，现在可以直接使用官方镜像。https://hub.docker.com/r/moenetwork/tieba-cloud-sign
 
+2021-11-28，本镜像增加了一个小功能：每天会自动更新一下源代码。
+
 ## 创建
 
 `docker-compose.yml`文件如下，**除了镜像名称不同外，其余同 [官方教程](https://github.com/MoeNetwork/Tieba-Cloud-Sign) 一致。**
@@ -25,8 +27,8 @@ services:
       - DB_NAME=tiebacloud        # 数据库名
       - CSRF=true
       - CRON_TASK=* * * * *       # 执行do.php的cron，默认每分钟执行，明白这是何含义的可以自己改
-    #volumes:                                        # 如果重新创建或更新镜像希望保留之前的所有信息，请解除此两行注释
-      #- ./install.lock:/var/www/setup/install.lock  # 在当前目录下自行新建文件install.lock，内容为：1
+    volumes:
+      - ./www:/var/www
     ports:
       - 8080:8080
     links:
@@ -53,3 +55,5 @@ services:
 https://gitee.com/evine/dockerfiles/tree/master/tieba-cloud-sign
 
 https://github.com/devome/dockerfiles/tree/master/tieba-cloud-sign
+
+[![dockeri.co](http://dockeri.co/image/nevinee/tieba-cloud-sign)](https://hub.docker.com/r/nevinee/tieba-cloud-sign/)

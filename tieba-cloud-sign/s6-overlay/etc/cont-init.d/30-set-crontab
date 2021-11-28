@@ -2,7 +2,9 @@
 
 set_crontab() {
     echo "Set crontab to system..."
-    echo "${CRON_TASK} php $WORKDIR/do.php" | crontab -
+    minute=$(($RANDOM % 60))
+    hour=$(($RANDOM % 24))
+    echo -e "${CRON_TASK} php $WORKDIR/do.php\n$minute $hour * * * git -C $WORKDIR pull" | crontab -
 }
 
 set_crontab 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
