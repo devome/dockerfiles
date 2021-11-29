@@ -44,6 +44,12 @@ jobs:
           else
             MULTITAGS="${FULL_VERSION} unstable"
           fi
+
+          if [[ $(echo ${FULL_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${FULL_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
+            LIBTORRENT_VERSION=1
+          else
+            LIBTORRENT_VERSION=2
+          fi
           ######################### ↑特殊部分↑ #########################
 
           ## 要构建哪些平台的镜像，在这里修改
@@ -54,7 +60,8 @@ jobs:
           echo ::set-output name=matrix::${MATRIX}
 
           ######################### ↓特殊部分↓ #########################
-          echo ::set-output name=build_args::QBITTORRENT_VERSION=${FULL_VERSION}
+          echo ::set-output name=build_args_QBITTORRENT_VERSION::QBITTORRENT_VERSION=${FULL_VERSION}
+          echo ::set-output name=build_args_LIBTORRENT_VERSION::LIBTORRENT_VERSION=${LIBTORRENT_VERSION}
           ######################### ↑特殊部分↑ #########################
 
   build:
@@ -71,23 +78,16 @@ jobs:
 
       -
         name: Prepare
-        id: prepare
+        id: prep
         run: |
           DOCKERHUB_REPOSITORY="${{ secrets.DOCKER_USERNAME }}/${IMAGE_NAME}"
           FULL_VERSION="${{ needs.base.outputs.full_version }}"
           ARCH="${{ matrix.architecture }}"
           TAGS="${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-$(echo ${ARCH} | perl -pe '{s|linux/||g; s|/|-|g}')"
+          JNPROC=$(nproc)
           
-          ######################### ↓特殊部分↓ #########################
-          ## 修改LIBTORRENT的基础版本
-          if [[ $(echo ${FULL_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${FULL_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
-            perl -i -pe "s|LIBTORRENT_MAJOR_VERSION|1|" ${IMAGE_NAME}/${DOCKERFILE_NAME}
-          else
-            perl -i -pe "s|LIBTORRENT_MAJOR_VERSION|2|" ${IMAGE_NAME}/${DOCKERFILE_NAME}
-          fi
-          ######################### ↑特殊部分↑ #########################
-
           echo ::set-output name=tags::${TAGS}
+          echo ::set-output name=build_args_JNPROC::JNPROC=${JNPROC}
 
       - 
         name: Set Up QEMU
@@ -120,8 +120,11 @@ jobs:
           file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME }}
           platforms: ${{ matrix.architecture }}
           push: true
-          build-args: ${{ needs.base.outputs.build_args }}
-          tags: ${{ steps.prepare.outputs.tags }}
+          build-args: |
+            ${{ needs.base.outputs.build_args_QBITTORRENT_VERSION }}
+            ${{ needs.base.outputs.build_args_LIBTORRENT_VERSION }}
+            ${{ steps.prep.outputs.build_args_JNPROC }}
+          tags: ${{ steps.prep.outputs.tags }}
 
   maintain:
     needs: [base, build]
@@ -248,7 +251,7 @@ jobs:
       
       -
         name: Prepare
-        id: prepare
+        id: prep
         run: |
           MATRIX='${{ needs.base.outputs.matrix }}'
           PLATFORMS="$(echo ${MATRIX} | jq -r .architecture[])"
@@ -284,7 +287,7 @@ jobs:
         with:
           context: ${{ env.IMAGE_NAME }}
           file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME2 }}
-          platforms: ${{ steps.prepare.outputs.platforms }}
+          platforms: ${{ steps.prep.outputs.platforms }}
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.base.outputs.full_version }}-iyuu

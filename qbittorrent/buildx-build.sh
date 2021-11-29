@@ -13,6 +13,7 @@ for arch in ${BUILDX_ARCH}; do
         --output "type=docker" \
         --platform linux/${arch} \
         --build-arg "QBITTORRENT_VERSION=${QBITTORRENT_VERSION}" \
+        --build-arg "LIBTORRENT_VERSION=${LIBTORRENT_VERSION}" \
         --build-arg "JNPROC=${JNPROC}" \
         --file ${DOCKERFILE_NAME} \
         .

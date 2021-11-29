@@ -1,18 +1,20 @@
-## Github Action构建使用，需要在使用前替换LIBTORRENT_MAJOR_VERSION
-
-FROM nevinee/libtorrent-rasterbar:LIBTORRENT_MAJOR_VERSION AS builder
-RUN apk add --update --no-cache \
+ARG LIBTORRENT_VERSION
+FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk add --update --no-cache \
        boost-dev \
        build-base \
        qt5-qttools-dev \
-       git \
        cmake \
+       curl \
+       tar \
        samurai \
     && rm -rf /tmp/* /var/cache/apk/*
 ARG QBITTORRENT_VERSION
-RUN cd /tmp \
-    && git clone --branch release-${QBITTORRENT_VERSION} https://github.com/qbittorrent/qBittorrent \
-    && cd qBittorrent \
+ARG JNPROC=1
+RUN mkdir -p /tmp/qbittorrent \
+    && cd /tmp/qbittorrent \
+    && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xvz --strip-components 1 \
     && cmake \
        -DCMAKE_BUILD_TYPE=Release \
        -DCMAKE_CXX_STANDARD=17 \
@@ -23,20 +25,18 @@ RUN cd /tmp \
        -Brelease \
        -GNinja \
     && cd release \
-    && ninja -j$(nproc) \
+    && ninja -j${JNPROC} \
     && ninja install \
     && ls -al /usr/local/bin/ \
     && qbittorrent-nox --help
 RUN echo "Copy to /out" \
     && strip /usr/local/lib/libtorrent-rasterbar.so.* \
     && strip /usr/local/bin/qbittorrent-nox \
-    && mkdir /out \
-    && mkdir -p /out/usr/lib \
-    && mkdir -p /out/usr/bin \
+    && mkdir -p /out/usr/lib /out/usr/bin \
     && cp -d /usr/local/lib/libtorrent-rasterbar.so* /out/usr/lib \
     && cp /usr/local/bin/qbittorrent-nox /out/usr/bin
 
-FROM alpine
+FROM alpine:3.14
 ENV QBITTORRENT_HOME=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \

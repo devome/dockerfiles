@@ -48,7 +48,7 @@ jobs:
           echo ::set-output name=matrix::${MATRIX}
           
           ######################### ↓特殊部分↓ #########################
-          echo ::set-output name=build_args::LIBTORRENT_VERSION=${FULL_VERSION}
+          echo ::set-output name=build_args_LIBTORRENT_VERSION::LIBTORRENT_VERSION=${FULL_VERSION}
           ######################### ↑特殊部分↑ #########################
  
   build:
@@ -65,14 +65,16 @@ jobs:
       
       -
         name: Prepare
-        id: prepare
+        id: prep
         run: |
           DOCKERHUB_REPOSITORY="${{ secrets.DOCKER_USERNAME }}/${IMAGE_NAME}"
           FULL_VERSION="${{ needs.base.outputs.full_version }}"
           ARCH="${{ matrix.architecture }}"
           TAGS="${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-$(echo ${ARCH} | perl -pe '{s|linux/||g; s|/|-|g}')"
+          JNPROC=$(nproc)
 
           echo ::set-output name=tags::${TAGS}
+          echo ::set-output name=build_args_JNPROC::JNPROC=${JNPROC}
 
       - 
         name: Set Up QEMU
@@ -105,8 +107,10 @@ jobs:
           file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME }}
           platforms: ${{ matrix.architecture }}
           push: true
-          build-args: ${{ needs.base.outputs.build_args }}
-          tags: ${{ steps.prepare.outputs.tags }}
+          build-args: |
+            ${{ needs.base.outputs.build_args_LIBTORRENT_VERSION }}
+            ${{ steps.prep.outputs.build_args_JNPROC }}
+          tags: ${{ steps.prep.outputs.tags }}
 
   maintain:
     needs: [base, build]

@@ -17,16 +17,6 @@ prepare_buildx() {
     docker buildx inspect --bootstrap
 }
 
-## 克隆脚本
-git_clone() {
-    #if [[ ! -d libtorrent-${LIBTORRENT_VERSION} ]]; then
-        #git clone --branch v${LIBTORRENT_VERSION} --recurse-submodules ${LIBTORRENT_URL} libtorrent-${LIBTORRENT_VERSION}
-    #else
-        #echo "本地已经克隆好了"
-    #fi
-    echo "构建时在容器内克隆"
-}
-
 ## 构建
 docker_build() {
     for ((c=1; c<=${BUILD_COUNT}; c++)); do
@@ -72,7 +62,6 @@ base_func() {
     [[ $ver ]] && export LIBTORRENT_VERSION=$ver || export LIBTORRENT_VERSION=${LATEST_VERSION}
     [[ $repo ]] && export DOCKERHUB_REPOSITORY=$repo || export DOCKERHUB_REPOSITORY=nevinee/libtorrent-rasterbar
     [[ $filename ]] && export DOCKERFILE_NAME=${filename} || export DOCKERFILE_NAME=Dockerfile
-    [[ $url ]] && export LIBTORRENT_URL=$url || export LIBTORRENT_URL=https://gitee.com/evine/libtorrent.git
     [[ $bcount ]] && export BUILD_COUNT=$bcount || export BUILD_COUNT=20
     [[ $mcount ]] && export MANIFEST_COUNT=$mcount || export MANIFEST_COUNT=1
     [[ $jnproc ]] && export JNPROC=$jnproc || export JNPROC=1
@@ -95,7 +84,6 @@ echo_console() {
     echo "LIBTORRENT_VERSION=${LIBTORRENT_VERSION}"
     echo "DOCKERHUB_REPOSITORY=${DOCKERHUB_REPOSITORY}"
     echo "DOCKERFILE_NAME=${DOCKERFILE_NAME}"
-    echo "LIBTORRENT_URL=${LIBTORRENT_URL}"
     echo "BUILDX_ARCH='${BUILDX_ARCH}'"
     echo "MULTITAGS='${MULTITAGS}'"
     echo "JNPROC=${JNPROC}"
@@ -114,14 +102,12 @@ usage() {
     echo "-n <mcount>    # 信息维护次数，默认1"
     echo "-r <hubrepo>   # 构建镜像名（不含标签），默认nevinee/libtorrent-rasterbar"
     echo "-t <archtech>  # 构建架构，默认全构架"
-    echo "-u <giturl>    # 克隆代码网址，默认https://gitee.com/evine/libtorrent.git"
     echo "-v <version>   # 构建版本，默认最新稳定版"
     echo
     echo "其中'-a'选项可接受的动作："
-    echo "A|all                   # 克隆代码、构建镜像、推送镜像、维护信息、删除标签(默认值)"
-    echo "a|all_except_deltag     # 克隆代码、构建镜像、推送镜像、维护信息"
-    echo "c|clone                 # 克隆代码"
-    echo "b|build                 # 克隆代码、构建镜像"
+    echo "A|all                   # 构建镜像、推送镜像、维护信息、删除标签(默认值)"
+    echo "a|all_except_deltag     # 构建镜像、推送镜像、维护信息"
+    echo "b|build                 # 构建镜像"
     echo "p|push                  # 推送镜像"
     echo "P|push_manifest         # 推送镜像、维护信息"
     echo "Q|push_manifest_deltag  # 推送镜像、维护信息、删除标签"
@@ -133,12 +119,11 @@ usage() {
 ## 运行
 run() {
     case $1 in
-        a | all_except_deltag) # 克隆代码、构建镜像、推送镜像、更新教程、维护信息
+        a | all_except_deltag) # 构建镜像、推送镜像、更新教程、维护信息
             echo_console
             echo "BUILD_COUNT=${BUILD_COUNT}"
             echo "MANIFEST_COUNT=${MANIFEST_COUNT}"
             prepare_buildx
-            git_clone
             docker_build && {
                 docker_push
                 docker_manifest
@@ -148,12 +133,11 @@ run() {
                 exit 4
             }
             ;;
-        A | all) # 克隆代码、构建镜像、推送镜像、维护信息、更新教程、删除标签
+        A | all) # 构建镜像、推送镜像、维护信息、更新教程、删除标签
             echo_console
             echo "BUILD_COUNT=${BUILD_COUNT}"
             echo "MANIFEST_COUNT=${MANIFEST_COUNT}"
             prepare_buildx
-            git_clone
             docker_build && {
                 docker_push
                 docker_manifest
@@ -164,21 +148,16 @@ run() {
                 exit 4
             }
             ;;
-        b | build) # 克隆代码、构建镜像
+        b | build) # 构建镜像
             echo_console
             echo "BUILD_COUNT=${BUILD_COUNT}"
             echo "MANIFEST_COUNT=${MANIFEST_COUNT}"
             prepare_buildx
-            git_clone
             docker_build
             ;;
         d | deltag) # 删除标签
             echo_console
             del_tag
-            ;;
-        c | clone) # 克隆代码
-            echo_console
-            git_clone
             ;;
         m | manifest) # 维护信息
             echo_console
@@ -213,7 +192,7 @@ run() {
 
 ## 主函数
 main() {
-    while getopts :a:bc:f:j:l:n:r:t:u:v: opt; do
+    while getopts :a:bc:f:j:l:n:r:t:v: opt; do
         case $opt in
             # 传入参数
             a) action=$OPTARG;;
@@ -225,7 +204,6 @@ main() {
             n) mcount=$OPTARG;;
             r) repo=$OPTARG;;
             t) archtech=$OPTARG;;
-            u) url=$OPTARG;;
             v) ver=$OPTARG;;
 
             # 帮助
@@ -237,7 +215,7 @@ main() {
     [[ -z $action ]] && action=all
     [[ -z $log ]] && log=yes
     case $action in
-        A|all|a|all_except_deltag|c|clone|b|build|p|push|P|push_manifest|Q|push_manifest_deltag|m|manifest|M|manifest_deltag|d|deltag)
+        A|all|a|all_except_deltag|b|build|p|push|P|push_manifest|Q|push_manifest_deltag|m|manifest|M|manifest_deltag|d|deltag)
             base_func
             case $log in
                 YES|Yes|yes|y) run $action 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${LIBTORRENT_VERSION}.log;;
