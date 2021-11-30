@@ -4,13 +4,7 @@
 
 基于alpine实现，比官方镜像体积小、层数少，日志和设置文件全部和配置文件保存在一起，支持 amd64/arm64/armv7。
 
-**这个项目会修改文件，不建议pt用户使用！！！**
-
-**这个项目会修改文件，不建议pt用户使用！！！**
-
-**这个项目会修改文件，不建议pt用户使用！！！**
-
-pt用户可以使用另一个类似的镜像：https://hub.docker.com/r/nevinee/subfinder
+**从0.18.8起，可以不修改原字幕，详见：[v0.18.8](https://github.com/allanpk716/ChineseSubFinder/releases/tag/v0.18.8)**
 
 ## 创建
 

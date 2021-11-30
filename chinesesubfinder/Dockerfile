@@ -1,3 +1,4 @@
+ARG ALPINE_VERSION=latest
 FROM golang:alpine AS builder
 ARG VERSION
 ENV CGO_ENABLED=1 \
@@ -7,16 +8,17 @@ ENV CGO_ENABLED=1 \
 WORKDIR /build
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache \
-       git \
+       curl \
+       tar \
        build-base \
-    && git clone -b v${VERSION} https://github.com/allanpk716/ChineseSubFinder . \
+    && curl -sSL https://github.com/allanpk716/ChineseSubFinder/archive/refs/tags/v${VERSION}.tar.gz | tar xvz --strip-components 1 \
     && mkdir -p /out/app \
     && cp config.yaml.sample /out/app/config.yaml.sample \
     && cd cmd/chinesesubfinder \
     && go build -ldflags="-s -w -X main.AppVersion=${VERSION}" -o /out/usr/local/bin/chinesesubfinder
 COPY entrypoint.sh /out/usr/local/bin/entrypoint.sh
 
-ARG ALPINE_VERSION=latest
+ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION}
 ENV TZ=Asia/Shanghai \
     PUID=1000 \
