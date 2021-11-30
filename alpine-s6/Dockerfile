@@ -1,4 +1,5 @@
-FROM alpine:latest
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk --no-cache --update add -f bash s6-overlay \
     && rm -rf /var/cache/apk/*

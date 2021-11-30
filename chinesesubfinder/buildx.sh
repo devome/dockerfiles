@@ -3,6 +3,7 @@
 repo="nevinee/chinesesubfinder"
 arch="linux/amd64,linux/arm64,linux/arm/v7"
 ver=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/releases/latest | jq -r .tag_name | sed "s/v//")
+alpine_ver=${1:-latest}
 
 buildx() {
     docker pull tonistiigi/binfmt
@@ -14,6 +15,7 @@ buildx() {
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
         --platform "$arch" \
         --build-arg "VERSION=${ver}" \
+        --build-arg "ALPINE_VERSION=${alpine_ver}" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
         --push \
@@ -23,6 +25,7 @@ buildx() {
 
 if [[ $ver ]]; then
     [[ ! -d logs ]] && mkdir logs
+    echo "alpine_ver=${1:-latest}"
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
 else
     echo "未获取到最新版本号"

@@ -3,6 +3,7 @@
 repo="nevinee/iyuuplus"
 arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x"
 ver=$(curl -s https://gitee.com/ledc/iyuuplus/raw/master/app/functions.php | grep -P "return \'(\d+\.?){3,4}\'" | head -1 | perl -pe "s|[\D\.]+((\d+\.?){3,4}).*|\1|")
+alpine_ver=${1:-latest}
 
 buildx() {
     docker pull tonistiigi/binfmt
@@ -12,6 +13,7 @@ buildx() {
     docker buildx build \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
+        --build-arg "ALPINE_VERSION=$alpine_ver" \
         --platform "$arch" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
@@ -22,6 +24,7 @@ buildx() {
 
 if [[ $ver ]]; then
     [[ ! -d logs ]] && mkdir logs
+    echo "alpine_ver=${1:-latest}"
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
 else
     echo "未获取到最新版本号"

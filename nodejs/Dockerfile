@@ -1,4 +1,5 @@
-FROM alpine:3.14
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Evine Deng <evinedeng@foxmail.com>"
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     HOME=/root \

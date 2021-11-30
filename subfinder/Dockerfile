@@ -1,4 +1,5 @@
-FROM alpine
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 ENV INTERVAL=2h \
     UMASK=022 \
     PUID=1000 \

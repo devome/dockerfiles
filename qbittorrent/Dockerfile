@@ -1,4 +1,5 @@
 ARG LIBTORRENT_VERSION
+ARG ALPINE_VERSION=latest
 FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --update --no-cache \
@@ -36,7 +37,8 @@ RUN echo "Copy to /out" \
     && cp -d /usr/local/lib/libtorrent-rasterbar.so* /out/usr/lib \
     && cp /usr/local/bin/qbittorrent-nox /out/usr/bin
 
-FROM alpine:3.14
+ARG ALPINE_VERSION
+FROM alpine:${ALPINE_VERSION}
 ENV QBITTORRENT_HOME=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \

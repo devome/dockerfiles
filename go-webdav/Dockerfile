@@ -12,7 +12,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && go build -ldflags="-s -w" -o /out/usr/local/bin/webdav \
     && cp /etc/ssl/certs/ca-certificates.crt /out/etc/ssl/certs/ca-certificates.crt
 
-FROM alpine
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 COPY --from=builder /out /
 VOLUME ["/etc/webdav"]
 ENTRYPOINT ["webdav"]

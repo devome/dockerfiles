@@ -1,6 +1,7 @@
 ## 修改自：https://github.com/ledccn/IYUUAutoReseed
 
-FROM alpine
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 ENV APP_ENV=prod \
     LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \

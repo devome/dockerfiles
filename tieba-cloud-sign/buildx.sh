@@ -2,10 +2,8 @@
 
 repo="nevinee/tieba-cloud-sign"
 arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x"
-[[ $1 ]] && {
-    ver=$1
-    cmd_tag="--tag ${repo}:${ver} --tag ${repo}:latest"
-} || cmd_tag="--tag ${repo}:latest"
+ver=$(curl -s https://raw.githubusercontent.com/MoeNetwork/Tieba-Cloud-Sign/master/init.php | grep "'SYSTEM_VER'" | awk -F "'" '{print $4}')
+alpine_ver=${1:-latest}
 
 buildx() {
     docker pull tonistiigi/binfmt
@@ -15,12 +13,20 @@ buildx() {
     docker buildx build \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
+        --build-arg "ALPINE_VERSION=$alpine_ver" \
         --platform "$arch" \
+        --tag ${repo}:${ver} \
+        --tag ${repo}:latest \
         --push \
         $cmd_tag \
         .
     docker pushrm $repo  # https://github.com/christian-korneck/docker-pushrm
 }
 
-[[ ! -d logs ]] && mkdir logs
-buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
+if [[ $ver ]]; then
+    [[ ! -d logs ]] && mkdir logs
+    echo "alpine_ver=${1:-latest}"
+    buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
+else
+    echo "未获取到最新版本号"
+fi

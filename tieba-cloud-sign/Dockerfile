@@ -1,4 +1,5 @@
-FROM alpine:3.14
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 ENV LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \
     WORKDIR=/var/www \

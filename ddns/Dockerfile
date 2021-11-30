@@ -1,4 +1,5 @@
-FROM alpine
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \

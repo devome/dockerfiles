@@ -12,6 +12,7 @@ buildx() {
     docker buildx build \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
+        --build-arg "ALPINE_VERSION=${ver}" \
         --platform "$arch" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \

@@ -1,4 +1,5 @@
-FROM alpine:3.14
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 ARG LIBTORRENT_VERSION
 ARG JNPROC=1
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \

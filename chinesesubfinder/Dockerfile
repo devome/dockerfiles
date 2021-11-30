@@ -16,7 +16,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && go build -ldflags="-s -w -X main.AppVersion=${VERSION}" -o /out/usr/local/bin/chinesesubfinder
 COPY entrypoint.sh /out/usr/local/bin/entrypoint.sh
 
-FROM alpine
+ARG ALPINE_VERSION=latest
+FROM alpine:${ALPINE_VERSION}
 ENV TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=100 \

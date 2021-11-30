@@ -2,8 +2,9 @@
 
 set -o pipefail
 
-repo="${1:-nevinee}/nginxwebui"
+repo="nevinee/nginxwebui"
 arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x"
+alpine_ver=${1:-latest}
 
 buildx() {
     cd src
@@ -16,6 +17,7 @@ buildx() {
     docker buildx build \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
+        --build-arg "ALPINE_VERSION=$alpine_ver" \
         --platform "$arch" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
@@ -29,6 +31,7 @@ if [[ $ver != $(cat version 2>/dev/null) ]]; then
     echo "构建镜像：$repo"
     echo "构建平台：$arch"
     echo "构建版本：$ver"
+    echo "基础镜像：$alpine_ver"
     echo "3秒后开始编译jar并构建镜像..."
     sleep 3
     [[ ! -d logs ]] && mkdir logs
