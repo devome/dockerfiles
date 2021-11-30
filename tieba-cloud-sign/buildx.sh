@@ -18,7 +18,6 @@ buildx() {
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
         --push \
-        $cmd_tag \
         .
     docker pushrm $repo  # https://github.com/christian-korneck/docker-pushrm
 }
