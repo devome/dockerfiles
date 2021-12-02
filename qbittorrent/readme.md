@@ -12,9 +12,6 @@
 
 ## 标签
 
-
-所有标签可用平台：`amd64` `386` `arm/v6` `arm/v7` `arm64` `ppc64le` `s390x`。
-
 | 标签  | 备注 |
 | :-:  | -   |
 | `4.x.x` `latest`        | 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。 |
@@ -537,6 +534,8 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 ## 源代码、问题反馈、意见建议
 
 旧的Github账号已经删除了，抱歉。
+
+如果镜像好用，请点亮star。
 
 全套代码见 [Github](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。
 

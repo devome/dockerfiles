@@ -3,8 +3,8 @@
 set -o pipefail
 
 repo="nevinee/nginxwebui"
-arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x"
-alpine_ver=${1:-latest}
+arch="linux/amd64,linux/arm64,linux/arm/v7"
+ubuntu_ver=${1:-latest}
 
 buildx() {
     cd src
@@ -17,7 +17,7 @@ buildx() {
     docker buildx build \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
-        --build-arg "ALPINE_VERSION=$alpine_ver" \
+        --build-arg "UBUNTU_VERSION=$ubuntu_ver" \
         --platform "$arch" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
@@ -31,14 +31,14 @@ if [[ $ver != $(cat version 2>/dev/null) ]]; then
     echo "构建镜像：$repo"
     echo "构建平台：$arch"
     echo "构建版本：$ver"
-    echo "基础镜像：$alpine_ver"
+    echo "基础镜像：$ubuntu_ver"
     echo "3秒后开始编译jar并构建镜像..."
     sleep 3
     [[ ! -d logs ]] && mkdir logs
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
     [[ $? -eq 0 ]] && {
         echo $ver > version
-        docker pushrm -s "可视化配置nginx，支持amd64/arm64/armv7等7个平台" $repo  # https://github.com/christian-korneck/docker-pushrm
+        docker pushrm -s "可视化配置nginx，支持amd64/arm64/armv7" $repo  # https://github.com/christian-korneck/docker-pushrm
     }
 else
     echo "当前已经是最新版本：$ver"

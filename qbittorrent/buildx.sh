@@ -53,7 +53,7 @@ del_tag() {
 ## 更新readme，需要先安装好docker-pushrm：https://github.com/christian-korneck/docker-pushrm
 docker_pushrm() {
     if [[ $MULTITAGS == *latest ]]; then
-        short_description="qBittorrent ${QBITTORRENT_VERSION}：全平台,下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等"
+        short_description="qBittorrent ${QBITTORRENT_VERSION}：下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等"
         docker pushrm -p dockerhub -f readme.md -s "$short_description" ${DOCKERHUB_REPOSITORY}
     else
         docker pushrm -p dockerhub -f readme.md ${DOCKERHUB_REPOSITORY}

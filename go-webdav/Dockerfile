@@ -1,3 +1,4 @@
+ARG ALPINE_VERSION=latest
 FROM golang:alpine as builder
 ARG VERSION
 ARG GOPROXY=https://goproxy.cn,https://mirrors.aliyun.com/goproxy/,https://goproxy.io,direct
@@ -12,7 +13,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && go build -ldflags="-s -w" -o /out/usr/local/bin/webdav \
     && cp /etc/ssl/certs/ca-certificates.crt /out/etc/ssl/certs/ca-certificates.crt
 
-ARG ALPINE_VERSION=latest
+ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION}
 COPY --from=builder /out /
 VOLUME ["/etc/webdav"]
