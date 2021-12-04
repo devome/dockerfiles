@@ -26,8 +26,10 @@ torrent_hash="$1"   ## hash必须是第一个传入参数
 if [[ $torrent_hash =~ ^[0-9a-f]+$ ]]; then
     . /usr/local/bin/share
     if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
-        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 将刚下载完成的种子进行分类..."
-        auto-cat -i "$torrent_hash"
+        if [[ -z $($cmd_curl "${api_url_base}/torrents/info?hashes=${hash}" | jq -r .[0].category) ]]; then
+            echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 将刚下载完成的种子进行分类..."
+            auto-cat -i "$torrent_hash"
+        fi
     else
         echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 已设置为不自动分类..."
     fi

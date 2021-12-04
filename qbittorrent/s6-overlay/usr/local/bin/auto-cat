@@ -21,28 +21,46 @@ category_one() {
     fi
 }
 
+category_all_uncategorized() {
+    local hashes=( $($cmd_curl ${api_url_base}/torrents/info?category= | jq -r .[].hash) )
+
+    if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
+        for hash in "${hashes[@]}"; do
+            category_one "$hash"
+        done
+    else
+        echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 你已将 ENABLE_AUTO_CATEGORY 设置为 false，禁止自动分类..."
+    fi
+}
+
 category_all() {
     local hashes=( $($cmd_curl ${api_url_base}/torrents/info | jq -r .[].hash) )
 
     if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
         for hash in "${hashes[@]}"; do
             category_one "$hash"
-            sleep 1
         done
+    else
+        echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 你已将 ENABLE_AUTO_CATEGORY 设置为 false，禁止自动分类..."
     fi
 }
 
 usage() {
     echo "用法："
-    echo "auto-cat -a        # 将所有种子按tracker分类"
+    echo "auto-cat -a        # 将所有未分类的种子按tracker分类"
+    echo "auto-cat -A        # 将所有种子按tracker分类"
     echo "auto-cat -h        # 使用帮助"
     echo "auto-cat -i <hash> # 指定某个种子的hash，将其按tracker分类"
 }
 
 main() {
-    while getopts :ahi: OPT; do
+    while getopts :aAhi: OPT; do
         case $OPT in
             a)
+                base_fun
+                category_all_uncategorized
+                ;;
+            A)
                 base_fun
                 category_all
                 ;;
