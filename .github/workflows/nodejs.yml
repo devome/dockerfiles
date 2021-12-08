@@ -1,11 +1,11 @@
-name: 构建NodeJS镜像
+name: 构建镜像：nodejs
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建多平台镜像
+    name: 构建镜像：nodejs
     env:
       IMAGE_NAME: nodejs
     steps:

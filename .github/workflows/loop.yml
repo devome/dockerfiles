@@ -1,10 +1,11 @@
-name: 构建Loop镜像
+name: 构建镜像：loop
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: 构建镜像：loop
     env:
       IMAGE_NAME: loop
       DOCKER_CLI_EXPERIMENTAL: enabled

@@ -1,8 +1,6 @@
-name: 同步libtorrent仓库
+name: 同步仓库：libtorrent
 
 on:
-  #schedule:
-    #- cron:  '16 6,18 * * *'
   workflow_dispatch:
   repository_dispatch:
     types: [mirror, libtorrent-rasterbar, libtorrent-rasterbar-1.x, libtorrent-rasterbar-2.x]
@@ -13,6 +11,7 @@ concurrency:
 jobs:
   git-mirror:
     runs-on: ubuntu-latest
+    name: 同步仓库：libtorrent
     steps:
       - uses: wearerequired/git-mirror-action@v1
         env:

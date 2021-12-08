@@ -1,11 +1,11 @@
-name: 构建nginxWebUI镜像
+name: 构建镜像：nginxwebui
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建多平台镜像
+    name: 构建镜像：nginxwebui
     env:
       IMAGE_NAME: nginxwebui
     steps:
@@ -14,11 +14,18 @@ jobs:
         uses: actions/checkout@master
       
       -
-        name: prepare
+        name: Prepare
         id: prepare
         run: |
           version=$(curl -s https://gitee.com/cym1102/nginxWebUI/raw/master/pom.xml | grep -A1 nginxWebUI | grep version | perl -pe "s|.*((\d+\.?){3,}).*|\1|")
           echo ::set-output name=version::${version}
+      
+      - name: Build nginxWebUI.jar
+        run: |
+          cd ${{ env.IMAGE_NAME }}
+          git clone https://gitee.com/cym1102/nginxWebUI src
+          cd src
+          mvn clean package
 
       - 
         name: Set Up QEMU
@@ -54,9 +61,7 @@ jobs:
             linux/amd64
             linux/arm64
             linux/arm/v7
-            linux/arm/v6
-            linux/ppc64le
-            linux/s390x
+            linux/mips64le
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}

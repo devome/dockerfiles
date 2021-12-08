@@ -1,13 +1,13 @@
-name: 构建镜像：python
+name: 构建镜像：ubuntu-s6
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建镜像：python
+    name: 构建镜像：ubuntu-s6
     env:
-      IMAGE_NAME: python
+      IMAGE_NAME: ubuntu-s6
     steps:
       - 
         name: Checkout
@@ -37,7 +37,7 @@ jobs:
           key: ${{ runner.os }}-buildx
 
       - 
-        name: Buildx
+        name: Buildx Latest
         uses: docker/build-push-action@v2
         with:
           context: ${{ env.IMAGE_NAME }}
@@ -46,7 +46,11 @@ jobs:
             linux/amd64
             linux/arm64
             linux/arm/v7
+            linux/ppc64le
           push: true
+          build-args: |
+            UBUNTU_VERSION=latest
           tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:20.04
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:focal
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            

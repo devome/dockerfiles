@@ -1,4 +1,4 @@
-name: 构建Tieba-Cloud-Sign镜像
+name: 构建镜像：tieba-cloud-sign
 
 on:
   workflow_dispatch:
@@ -14,12 +14,19 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建镜像
+    name: 构建镜像：tieba-cloud-sign
     timeout-minutes: 30
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
+
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          version=$(curl -s https://raw.githubusercontent.com/MoeNetwork/Tieba-Cloud-Sign/master/init.php | grep "'SYSTEM_VER'" | awk -F "'" '{print $4}')
+          echo ::set-output name=version::${version}
 
       - 
         name: Set Up QEMU
@@ -52,4 +59,6 @@ jobs:
           file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME }}
           platforms: linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest

@@ -1,17 +1,24 @@
-name: 构建DDNS镜像
+name: 构建镜像：ddns
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建DDNS
+    name: 构建镜像：ddns
     env:
       IMAGE_NAME: ddns
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
+
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          version=$(curl -s https://api.github.com/repos/NewFuture/DDNS/releases/latest | jq -r .tag_name | sed "s/v//")
+          echo ::set-output name=version::${version}
 
       - 
         name: Set Up QEMU
@@ -44,4 +51,6 @@ jobs:
           file: ${{ env.IMAGE_NAME }}/Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest

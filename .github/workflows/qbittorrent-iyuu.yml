@@ -1,4 +1,4 @@
-name: 构建qBittorrent-IYUU镜像
+name: 构建镜像：qbittorrent(iyuu)
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ env:
 jobs:
   build2:
     runs-on: ubuntu-latest
-    name: 并行构建QB-IYUU
+    name: 构建镜像：qbittorrent(iyuu)
     timeout-minutes: 10
     steps:
       - 
@@ -57,4 +57,5 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version }}-iyuu
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu

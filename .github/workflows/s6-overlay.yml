@@ -1,23 +1,23 @@
-name: 构建镜像：chinesesubfinder
+name: 构建镜像：s6-overlay
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建镜像：chinesesubfinder
+    name: 构建镜像：s6-overlay
     env:
-      IMAGE_NAME: chinesesubfinder
+      IMAGE_NAME: s6-overlay
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
-      
+
       -
         name: Prepare
         id: prepare
         run: |
-          version=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/releases/latest | jq -r .tag_name | sed "s/v//")
+          version=$(curl -s https://api.github.com/repos/just-containers/s6-overlay/releases/latest | jq -r .tag_name | sed "s/v//")
           echo ::set-output name=version::${version}
 
       - 
@@ -44,17 +44,43 @@ jobs:
           key: ${{ runner.os }}-buildx
 
       - 
-        name: Buildx
+        name: Buildx Latest
         uses: docker/build-push-action@v2
         with:
           context: ${{ env.IMAGE_NAME }}
           file: ${{ env.IMAGE_NAME }}/Dockerfile
           platforms: |
+            linux/386
             linux/amd64
             linux/arm64
             linux/arm/v7
+            linux/arm/v6
+            linux/ppc64le
           push: true
+          build-args: |
+            ALPINE_VERSION=latest
+            S6_OVERLAY_VERSION=${{ steps.prepare.outputs.version }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            
+
+      - 
+        name: Buildx Bin is Softlink Version
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ env.IMAGE_NAME }}
+          file: ${{ env.IMAGE_NAME }}/Dockerfile.bin_is_softlink
+          platforms: |
+            linux/386
+            linux/amd64
+            linux/arm64
+            linux/arm/v7
+            linux/arm/v6
+            linux/ppc64le
+          push: true
+          build-args: |
+            ALPINE_VERSION=latest
+            S6_OVERLAY_VERSION=${{ steps.prepare.outputs.version }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}-bin-is-softlink
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:bin-is-softlink

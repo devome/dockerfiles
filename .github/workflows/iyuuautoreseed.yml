@@ -1,11 +1,11 @@
-name: 构建IYUUAutoReseed镜像
+name: 构建镜像：iyuuautoreseed
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建IYUUAutoReseed
+    name: 构建镜像：iyuuautoreseed
     env:
       IMAGE_NAME: iyuuautoreseed
     steps:

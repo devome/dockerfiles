@@ -1,11 +1,11 @@
-name: 构建ncmdump镜像
+name: 构建镜像：ncmdump
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建多平台镜像
+    name: 构建镜像：ncmdump
     env:
       IMAGE_NAME: ncmdump
     steps:

@@ -1,17 +1,30 @@
-name: 构建Alpine-S6镜像
+name: 构建镜像：alpine-s6
+
 on:
   workflow_dispatch:
+    inputs:
+      alpine_version:
+        description: '请输入alpine基础镜像的版本'
+        required: true
+        default: ''
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建多平台镜像
+    name: 构建镜像：alpine-s6
     env:
       IMAGE_NAME: alpine-s6
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
+
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          version=$(curl -s https://api.github.com/repos/just-containers/s6-overlay/releases/latest | jq -r .tag_name | sed "s/v//")
+          echo ::set-output name=version::${version}
 
       - 
         name: Set Up QEMU
@@ -49,8 +62,10 @@ jobs:
             linux/arm/v7
             linux/arm/v6
             linux/ppc64le
-            linux/s390x
+          build-args: |
+            ALPINE_VERSION=${{ github.event.inputs.alpine_version }}
+            S6_OVERLAY_VERSION=${{ steps.prepare.outputs.version }}
           push: true
           tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.alpine_version }}
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:3.14

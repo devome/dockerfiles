@@ -16,7 +16,6 @@ buildx() {
         --platform "$arch" \
         --tag ${repo}:latest \
         --push \
-        --file Dockerfile.base \
         .
 }
 

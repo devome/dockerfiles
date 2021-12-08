@@ -1,11 +1,11 @@
-name: 构建go-webdav镜像
+name: 构建镜像：go-webdav
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建多平台镜像
+    name: 构建镜像：go-webdav
     env:
       IMAGE_NAME: go-webdav
     steps:
@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@master
       
       -
-        name: prepare
+        name: Prepare
         id: prepare
         run: |
           version=$(curl -s https://api.github.com/repos/hacdias/webdav/releases/latest | jq -r .tag_name | sed "s/v//")

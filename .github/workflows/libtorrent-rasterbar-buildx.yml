@@ -1,21 +1,20 @@
-name: 构建qBittorrent镜像
+name: 构建镜像：libtorrent-rasterbar
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: '要构建的版本，可以为beta/rc版，如不输入则默认去检测最新的正式版'
+        description: '要构建的版本，可以为v1/v2版，如不输入则默认去检测最新的正式版'
         required: false
         default: ''
   repository_dispatch:
-    types: qbittorrent
+    types: libtorrent-rasterbar
 
 env:
   ## 镜像名，也是git仓库中的文件夹名
-  IMAGE_NAME: qbittorrent
+  IMAGE_NAME: libtorrent-rasterbar
   ## Dockerfile文件名称，在这里修改
-  DOCKERFILE_NAME: Dockerfile
-  DOCKERFILE_NAME2: Dockerfile.iyuu
+  DOCKERFILE_NAME: Dockerfile.GithubAction
 
 jobs:
   base:
@@ -32,24 +31,13 @@ jobs:
         id: base
         run: |
           FULL_VERSION=${{ github.event.inputs.version }}
-          
+
           ######################### ↓特殊部分↓ #########################
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/qbittorrent/qBittorrent/tags | jq -r .[]."name" | grep -m1 -E "release-([0-9]{1,2}\.?){3,4}$" | sed "s/release-//")
           if [[ -z ${FULL_VERSION} ]]; then
-            FULL_VERSION=${LATEST_VERSION}
+            FULL_VERSION=$(curl -s https://api.github.com/repos/arvidn/libtorrent/tags | jq -r .[]."name" | grep -m1 -E "v([0-9]{1,2}\.?){3,4}$" | sed "s/v//")
           fi
-
-          if [[ ${FULL_VERSION} == ${LATEST_VERSION} ]]; then
-            MULTITAGS="${FULL_VERSION} latest"
-          else
-            MULTITAGS="${FULL_VERSION} unstable"
-          fi
-
-          if [[ $(echo ${FULL_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${FULL_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
-            LIBTORRENT_VERSION=1
-          else
-            LIBTORRENT_VERSION=2
-          fi
+          MAJOR_VERSION=$(echo ${FULL_VERSION} | perl -pe "s|^(\d+)\..+|\1|")
+          MULTITAGS="${FULL_VERSION} ${MAJOR_VERSION}"
           ######################### ↑特殊部分↑ #########################
 
           ## 要构建哪些平台的镜像，在这里修改
@@ -58,12 +46,11 @@ jobs:
           echo ::set-output name=full_version::${FULL_VERSION}
           echo ::set-output name=multitags::${MULTITAGS}
           echo ::set-output name=matrix::${MATRIX}
-
+          
           ######################### ↓特殊部分↓ #########################
-          echo ::set-output name=build_args_QBITTORRENT_VERSION::QBITTORRENT_VERSION=${FULL_VERSION}
-          echo ::set-output name=build_args_LIBTORRENT_VERSION::LIBTORRENT_VERSION=${LIBTORRENT_VERSION}
+          echo ::set-output name=build_args_LIBTORRENT_VERSION::LIBTORRENT_VERSION=${FULL_VERSION}
           ######################### ↑特殊部分↑ #########################
-
+ 
   build:
     needs: base
     runs-on: ubuntu-latest
@@ -75,7 +62,7 @@ jobs:
       - 
         name: Checkout
         uses: actions/checkout@master
-
+      
       -
         name: Prepare
         id: prep
@@ -85,7 +72,7 @@ jobs:
           ARCH="${{ matrix.architecture }}"
           TAGS="${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-$(echo ${ARCH} | perl -pe '{s|linux/||g; s|/|-|g}')"
           JNPROC=$(nproc)
-          
+
           echo ::set-output name=tags::${TAGS}
           echo ::set-output name=build_args_JNPROC::JNPROC=${JNPROC}
 
@@ -121,7 +108,6 @@ jobs:
           platforms: ${{ matrix.architecture }}
           push: true
           build-args: |
-            ${{ needs.base.outputs.build_args_QBITTORRENT_VERSION }}
             ${{ needs.base.outputs.build_args_LIBTORRENT_VERSION }}
             ${{ steps.prep.outputs.build_args_JNPROC }}
           tags: ${{ steps.prep.outputs.tags }}
@@ -171,20 +157,7 @@ jobs:
           for tag in ${MULTITAGS}; do
             docker manifest push --purge "${DOCKERHUB_REPOSITORY}:${tag}"
           done
-
-      - 
-        name: Update DockerHub Description
-        if: endsWith(needs.base.outputs.multitags, 'latest')
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASSPWORD }}
-        with:
-          destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
-          provider: dockerhub
-          readme_file: ./${{ env.IMAGE_NAME }}/readme.md
-          short_description: ${{ env.IMAGE_NAME }} ${{ needs.base.outputs.full_version }}：全平台,下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等
-
+      
   deltag:
     needs: [base, maintain]
     runs-on: ubuntu-latest
@@ -237,58 +210,3 @@ jobs:
         run: |
           rm -rf /tmp/auth.json ~/.docker/config.json
           /tmp/hub-tool logout
-
-  build2:
-    needs: [base, build, maintain]
-    if: endsWith(needs.base.outputs.multitags, 'latest')
-    runs-on: ubuntu-latest
-    name: 并行构建IYUU
-    timeout-minutes: 10
-    steps:
-      - 
-        name: Checkout
-        uses: actions/checkout@master
-      
-      -
-        name: Prepare
-        id: prep
-        run: |
-          MATRIX='${{ needs.base.outputs.matrix }}'
-          PLATFORMS="$(echo ${MATRIX} | jq -r .architecture[])"
-          PLATFORMS=$(echo ${PLATFORMS} | perl -pe "s| |,|g")
-          echo "::set-output name=platforms::${PLATFORMS}"
-
-      - 
-        name: Set Up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - 
-        name: Set Up Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - 
-        name: Login DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - 
-        name: Set Up Cache
-        uses: actions/cache@v2
-        id: buildx-cache
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx
-      
-      - 
-        name: Buildx
-        uses: docker/build-push-action@v2
-        with:
-          context: ${{ env.IMAGE_NAME }}
-          file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME2 }}
-          platforms: ${{ steps.prep.outputs.platforms }}
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.base.outputs.full_version }}-iyuu
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu

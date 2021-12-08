@@ -1,14 +1,15 @@
-name: 更新qBittorrent介绍
+name: 更新介绍：qbittorrent
 on:
   push:
     branches:
       - master
     paths:
       - qbittorrent/readme.md
-      - .github/workflows/qbittorrent-dockerhub-description.yml
+
 jobs:
   dockerHubDescription:
     runs-on: ubuntu-latest
+    name: 更新介绍：qbittorrent
     steps:
     - 
       name: Checkout

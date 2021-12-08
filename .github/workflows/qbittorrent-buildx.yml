@@ -1,4 +1,4 @@
-name: 构建Test镜像
+name: 构建镜像：qbittorrent
 
 on:
   workflow_dispatch:
@@ -7,10 +7,12 @@ on:
         description: '要构建的版本，可以为beta/rc版，如不输入则默认去检测最新的正式版'
         required: false
         default: ''
+  repository_dispatch:
+    types: qbittorrent
 
 env:
   ## 镜像名，也是git仓库中的文件夹名
-  IMAGE_NAME: test
+  IMAGE_NAME: qbittorrent
   ## Dockerfile文件名称，在这里修改
   DOCKERFILE_NAME: Dockerfile
   DOCKERFILE_NAME2: Dockerfile.iyuu
@@ -42,17 +44,24 @@ jobs:
           else
             MULTITAGS="${FULL_VERSION} unstable"
           fi
+
+          if [[ $(echo ${FULL_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${FULL_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
+            LIBTORRENT_VERSION=1
+          else
+            LIBTORRENT_VERSION=2
+          fi
           ######################### ↑特殊部分↑ #########################
 
           ## 要构建哪些平台的镜像，在这里修改
-          MATRIX='{"architecture":["linux/386", "linux/amd64"]}'
+          MATRIX='{"architecture":["linux/386", "linux/amd64", "linux/arm64", "linux/arm/v7", "linux/arm/v6", "linux/ppc64le", "linux/s390x"]}'
 
           echo ::set-output name=full_version::${FULL_VERSION}
           echo ::set-output name=multitags::${MULTITAGS}
           echo ::set-output name=matrix::${MATRIX}
 
           ######################### ↓特殊部分↓ #########################
-          echo ::set-output name=build_args::QBITTORRENT_VERSION=${FULL_VERSION}
+          echo ::set-output name=build_args_QBITTORRENT_VERSION::QBITTORRENT_VERSION=${FULL_VERSION}
+          echo ::set-output name=build_args_LIBTORRENT_VERSION::LIBTORRENT_VERSION=${LIBTORRENT_VERSION}
           ######################### ↑特殊部分↑ #########################
 
   build:
@@ -69,23 +78,16 @@ jobs:
 
       -
         name: Prepare
-        id: prepare
+        id: prep
         run: |
           DOCKERHUB_REPOSITORY="${{ secrets.DOCKER_USERNAME }}/${IMAGE_NAME}"
           FULL_VERSION="${{ needs.base.outputs.full_version }}"
           ARCH="${{ matrix.architecture }}"
           TAGS="${DOCKERHUB_REPOSITORY}:${FULL_VERSION}-$(echo ${ARCH} | perl -pe '{s|linux/||g; s|/|-|g}')"
+          JNPROC=$(nproc)
           
-          ######################### ↓特殊部分↓ #########################
-          ## 修改LIBTORRENT的基础版本
-          if [[ $(echo ${FULL_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${FULL_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
-            perl -i -pe "s|LIBTORRENT_MAJOR_VERSION|1|" ${IMAGE_NAME}/${DOCKERFILE_NAME}
-          else
-            perl -i -pe "s|LIBTORRENT_MAJOR_VERSION|2|" ${IMAGE_NAME}/${DOCKERFILE_NAME}
-          fi
-          ######################### ↑特殊部分↑ #########################
-
           echo ::set-output name=tags::${TAGS}
+          echo ::set-output name=build_args_JNPROC::JNPROC=${JNPROC}
 
       - 
         name: Set Up QEMU
@@ -118,13 +120,15 @@ jobs:
           file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME }}
           platforms: ${{ matrix.architecture }}
           push: true
-          build-args: ${{ needs.base.outputs.build_args }}
-          tags: ${{ steps.prepare.outputs.tags }}
+          build-args: |
+            ${{ needs.base.outputs.build_args_QBITTORRENT_VERSION }}
+            ${{ needs.base.outputs.build_args_LIBTORRENT_VERSION }}
+            ${{ steps.prep.outputs.build_args_JNPROC }}
+          tags: ${{ steps.prep.outputs.tags }}
 
   maintain:
     needs: [base, build]
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     name: 信息维护
     steps:
       - 
@@ -171,18 +175,19 @@ jobs:
       - 
         name: Update DockerHub Description
         if: endsWith(needs.base.outputs.multitags, 'latest')
-        uses: peter-evans/dockerhub-description@v2
+        uses: christian-korneck/update-container-description-action@v1
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSPWORD }}
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
-          readme-filepath: ./${{ env.IMAGE_NAME }}/readme.md
-          short-description: ${{ env.IMAGE_NAME }} ${{ needs.base.outputs.full_version }}：全平台, 下载完成通知, 自动分类, tracker错误标记, 批量修改tracker, 宕机通知, 日志显示
-      
+          destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          provider: dockerhub
+          readme_file: ./${{ env.IMAGE_NAME }}/readme.md
+          short_description: ${{ env.IMAGE_NAME }} ${{ needs.base.outputs.full_version }}：下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等
+
   deltag:
     needs: [base, maintain]
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     name: 删除标签
     steps:
       -
@@ -237,8 +242,8 @@ jobs:
     needs: [base, build, maintain]
     if: endsWith(needs.base.outputs.multitags, 'latest')
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     name: 并行构建IYUU
+    timeout-minutes: 10
     steps:
       - 
         name: Checkout
@@ -246,7 +251,7 @@ jobs:
       
       -
         name: Prepare
-        id: prepare
+        id: prep
         run: |
           MATRIX='${{ needs.base.outputs.matrix }}'
           PLATFORMS="$(echo ${MATRIX} | jq -r .architecture[])"
@@ -282,8 +287,9 @@ jobs:
         with:
           context: ${{ env.IMAGE_NAME }}
           file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME2 }}
-          platforms: ${{ steps.prepare.outputs.platforms }}
+          platforms: ${{ steps.prep.outputs.platforms }}
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.base.outputs.full_version }}-iyuu
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu
