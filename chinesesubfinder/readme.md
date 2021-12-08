@@ -48,6 +48,21 @@ services:
 
 如在使用诸如emby、jellyfin、plex、qbittorrent、transmission、deluge、jackett、sonarr、radarr等等的docker镜像，请在创建本容器时的设置和它们的PUID/PGID和它们一样，如若真的不想设置为一样，至少要保证本容器PUID/PGID所定义的用户拥有你设置的媒体目录（默认是`/media`）的读取和写入权限。
 
+## 关于armv7设备的补充说明
+
+armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements)。
+
+解决办法如下：
+
+- docker cli方式可以在创建命令中增加一行`--security-opt seccomp=unconfined \`。
+
+- docker-compose方式请在`docker-compose.yml`最后增加两行：
+
+    ```
+    security_opt:
+      - seccomp=unconfined
+    ```
+
 ## 源码
 
 https://gitee.com/evine/dockerfiles/tree/master/chinesesubfinder

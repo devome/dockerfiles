@@ -12,13 +12,19 @@
 
 ## 标签
 
-| 标签  | 备注 |
-| :-:  | -   |
-| `4.x.x` `latest`        | 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。 |
-| `4.x.x-iyuu` `iyuu`     | 标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`iyuu`标签，自动设置好下载器。 |
-| `4.x.xbetax` `4.x.xrcx` `unstable` | 标签中带有`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。 |
+1. **`4.x.x` `latest`**
 
-## 更新日志(仅列出稳定版)
+  标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。
+
+2. **`4.x.x-iyuu` `iyuu`**
+
+  标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`iyuu`标签，自动安装好iyuuplus，自动设置好下载器，主要针对不会设置下载器的用户。
+
+3. **`4.x.xbetax` `4.x.xrcx` `unstable`**
+
+  标签中带有`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。此标签仅供测试使用及向qBittorrent官方反馈bug使用。
+
+## 更新日志（仅列出稳定版）
 
 | Date     | qBittorrent | libtorrent | alpine | 备注 |
 | :-:      | :-:         | :-:        | :-:    | -    |
@@ -41,7 +47,7 @@
 
 <details>
 
-<summary markdown="span"><b>点击这里展开环境变量列表</b></summary>
+<summary markdown="span"><b><h3> ▶▶▶ 点击这里展开环境变量列表 ◀◀◀ </h></b></summary>
 
 **以下是所有标签均可用的环境变量：**
 
@@ -81,13 +87,11 @@
 
 </details>
 
-## 创建
-
-**点击下列每种部署方式可展开详情。**
+## 创建（点击每种部署方式展开详情）
 
 <details>
 
-<summary markdown="span"><b>群晖</b></summary>
+<summary markdown="span"><b><h3> ▶ 1. 群晖  </h></b></summary>
 
 请见 [这里](https://gitee.com/evine/dockerfiles/blob/master/qbittorrent/dsm.md)。安装后访问`http://ip:8080`。如想使用集成了IYUUPlus的qBittorrent（自动设置好IYUUPlus中的下载器），请使用docker cli以命令行方式部署。
 
@@ -95,7 +99,15 @@
 
 <details>
 
-<summary markdown="span"><b>docker cli</b></summary>
+<summary markdown="span"><b><h3> ▶ 2. 命令行docker cli </h></b></summary>
+
+- 除`WEBUI_PORT` `BT_PORT` `PUID` `PGID`这几个环境变量外，如果你还需要使用其他环境变量，请根据[环境变量清单](#环境变量清单)按照`-e 变量名="变量值" \`的形式自行添加在创建命令中。
+
+- armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements)。可以在创建命令中增加一行`--security-opt seccomp=unconfined \` 来解决。
+
+- 创建完成后请访问`http://<IP>:<WEBUI_PORT>`（如未修改，对安装机默认是`http://127.0.0.1:8080`）来对qbittorrent作进一步设置，初始用户名密码：`admin/adminadmin`。如要在公网访问，请务必修改用户名和密码。
+
+- 针对`iyuu`标签，创建后可访问`http://<IP>:8787`进行IYUUPlus设置。
 
 ```
 ## latest标签或unstable标签
@@ -130,21 +142,13 @@ docker run -dit \
   nevinee/qbittorrent:iyuu
 ```
 
-- 除`WEBUI_PORT` `BT_PORT` `PUID` `PGID`这几个环境变量外，如果你还需要使用其他环境变量，请根据[环境变量清单](#环境变量清单)按照`-e 变量名="变量值" \`的形式自行添加在创建命令中。
-
-- armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements)。可以在创建命令中增加一行`--security-opt seccomp=unconfined \` 来解决。
-
-- 创建完成后请访问`http://<IP>:<WEBUI_PORT>`（如未修改，对安装机默认是`http://127.0.0.1:8080`）来对qbittorrent作进一步设置，初始用户名密码：`admin/adminadmin`。如要在公网访问，请务必修改用户名和密码。
-
-- 针对`iyuu`标签，创建后可访问`http://<IP>:8787`进行IYUUPlus设置。
-
 </details>
 
 <details>
 
-<summary markdown="span"><b>docker-compose</b></summary>
+<summary markdown="span"><b><h3> ▶ 3. docker compose </h></b></summary>
 
-新建`docker-compose.yml`文件如下（[点我查看arm设备如何安装docker-compose](https://www.jianshu.com/p/1beecfed17bc)），创建好后以`docker-compose up -d`命令启动即可。
+新建`compose.yml`文件如下（[docker compose安装方法](https://docs.docker.com/compose/cli-command/)），创建好后以`docker-compose up -d`(旧版)或`docker compose up -d`(新版)命令启动即可。
 
 ```
 version: "2.0"
@@ -245,13 +249,11 @@ networks:
 
 *在这里可以查阅所有可用的非官方webui：https://github.com/qbittorrent/qBittorrent/wiki/List-of-known-alternate-WebUIs*
 
-## 相关问题
-
-**点击每个问题可展开答案。**
+## 相关问题（点击每个问题可展开答案）
 
 <details>
 
-<summary markdown="span"><b>使用此镜像会导致封号吗</b></summary>
+<summary markdown="span"><b> ▶ 01. 使用此镜像会导致封号吗</b></summary>
 
 此镜像未修改qbittorrent客户端官方任何信息，在和pt站tracker服务器交互时反馈的一切信息均是qbittorrent官方原版反馈的信息，此镜像只是基于qbittorrent额外增加了一些脚本而已。增加的脚本全部代码在 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 可以查看，不会因为使用此镜像导致pt账号被封。
 
@@ -259,7 +261,7 @@ networks:
 
 <details>
 
-<summary markdown="span"><b>如何在运行 dl-finish "%I" 时调用自定义脚本</b></summary>
+<summary markdown="span"><b> ▶ 02. 如何在运行 dl-finish "%I" 时调用自定义脚本</b></summary>
 
 - 此功能可用版本：4.3.7+；
 
@@ -273,7 +275,7 @@ networks:
 
 <details>
 
-<summary markdown="span"><b>如何优雅的关闭qbittorrent容器</b></summary>
+<summary markdown="span"><b> ▶ 03. 如何优雅的关闭qbittorrent容器</b></summary>
 
 - 暴力强制关闭qbittorrent容器自然是容易丢失任务的，所以在关闭前应当先将所有种子暂停，过一会再关闭容器。这时，所有的配置文件和torrent恢复文件也都是暂停后的状态，然后再新建容器或重新部署，启动后再开始所有任务。
 
@@ -283,7 +285,7 @@ networks:
 
 <details>
 
-<summary markdown="span"><b>如何从其他作者的镜像/套件版转移至本镜像</b></summary>
+<summary markdown="span"><b> ▶ 04. 如何从其他作者的镜像/套件版转移至本镜像</b></summary>
 
 -  **如果启用了ssl/https，请先在原qbittorrent的webui中禁用，或者将`qBittorrent.conf`中`WebUI\HTTPS\Enabled=true`改为`WebUI\HTTPS\Enabled=false`。**
 
@@ -301,15 +303,15 @@ networks:
 
 <details>
 
-<summary markdown="span"><b>可不可以不使用默认下载目录</b></summary>
+<summary markdown="span"><b> ▶ 05. 可不可以不使用默认下载目录</b></summary>
 
-如不想使用默认下载目录，可以额外映射其他路径，比如映射`/volume1/movies:/movies`，然后在qbittorrent中设置默认下载目录为`/movies`，也可以在每次下载时自己输入下载目录为`/movies`。
+如不想使用默认下载目录，可以额外映射其他路径，比如映射`/volume1/media:/media`，然后在qbittorrent中设置默认下载目录为`/media`，也可以在每次下载时自己输入下载目录为`/media`。
 
 </details>
 
 <details>
 
-<summary markdown="span"><b>遗忘登陆密码如何重置</b></summary>
+<summary markdown="span"><b> ▶ 06. 遗忘登陆密码如何重置</b></summary>
 
 ```
 # 进入容器
@@ -326,7 +328,7 @@ curl -X POST -d 'json={"web_ui_username":"新的用户名","web_ui_password":"�
 
 <details>
 
-<summary markdown="span"><b>如何与emby, jellyfin, plex等等配合使用</b></summary>
+<summary markdown="span"><b> ▶ 07. 如何与emby, jellyfin, plex等等配合使用</b></summary>
 
 将需要配合使用的容器的环境变量PUID/PGID设置为一样的即可。
 
@@ -334,7 +336,7 @@ curl -X POST -d 'json={"web_ui_username":"新的用户名","web_ui_password":"�
 
 <details>
 
-<summary markdown="span"><b>启用了其他非官方webui，导致webui打不开，如何关闭</b></summary>
+<summary markdown="span"><b> ▶ 08. 启用了其他非官方webui，导致webui打不开，如何关闭</b></summary>
 
 ```
 # 进入容器
@@ -351,7 +353,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>如何自动更新容器</b></summary>
+<summary markdown="span"><b> ▶ 09. 如何自动更新容器</b></summary>
 
 安装watchtower即可，详见 [这里](https://hub.docker.com/r/containrrr/watchtower)
 
@@ -359,7 +361,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>安装了watchtower，如何让qbittorrent不被watchtower自动更新</b></summary>
+<summary markdown="span"><b> ▶ 10. 安装了watchtower，如何让qbittorrent不被watchtower自动更新</b></summary>
 
 - 方法1：部署qbittorrent容器时，直接指定标签，如`nevinee/qbittorrent:4.3.7`；
 
@@ -380,7 +382,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>为何建议将qbittorrent安装在macvlan网络上</b></summary>
+<summary markdown="span"><b> ▶ 11. 为何建议将qbittorrent安装在macvlan网络上</b></summary>
 
 - 可以在网关上给qbittorrent所在ip独立设置限速; 
 
@@ -390,7 +392,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>将qbittorrent安装在macvlan网络上时，如何使用IYUUAutoReseed自动辅种</b></summary>
+<summary markdown="span"><b> ▶ 12. 将qbittorrent安装在macvlan网络上时，如何使用IYUUAutoReseed自动辅种</b></summary>
 
 将两个容器都安装在同一个macvlan网络上即可，或者直接安装`nevinee/qbittorrent:iyuu`标签。
 
@@ -398,7 +400,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>如何使用 CRON_ALTER_LIMITS 这个环境变量</b></summary>
+<summary markdown="span"><b> ▶ 13. 如何使用 CRON_ALTER_LIMITS 这个环境变量</b></summary>
 
 - 4.3.8+可用。
 
@@ -418,7 +420,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>如何使用 CRON_IYUU_HELP 这个环境变量</b></summary>
+<summary markdown="span"><b> ▶ 14. 如何使用 CRON_IYUU_HELP 这个环境变量</b></summary>
 
 - 4.3.8+可用。
 
@@ -437,17 +439,17 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>为什么没法使用搜索功能</b></summary>
+<summary markdown="span"><b> ▶ 15. 为什么没法使用搜索功能</b></summary>
 
 搜索功能依赖于python，请在创建容器时添加环境变量`INSTALL_PYTHON`，并将值设置为`true`。
 
 </details>
 
-## 命令
+## 命令（点击每一类命令展开详情）
 
 <details>
 
-<summary markdown="span"><b>1. 由设置的cron或在下载完成时自动运行的命令（所有标签可用），点击本文字可展开详情</b></summary>
+<summary markdown="span"><b> ▶ 1. 自动运行的命令（所有标签可用，由设置的cron或在下载完成时自动运行，当然也可以手动运行）</b></summary>
 
 ```
 # 发送通知
@@ -483,16 +485,16 @@ docker exec qbittorrent iyuu-help
 
 <details open>
 
-<summary markdown="span"><b>2. 需要手动运行的命令（所有标签可用）</b></summary>
+<summary markdown="span"><b> ▼ 2. 需要手动运行的命令（所有标签可用）</b></summary>
 
 ```
 # 查看qbittorrent日志，也可以直接在portainer控制台中看到
 docker logs -f qbittorrent
 
-# 批量修改tracker，4.3.7+可用
+# 批量修改tracker，详见下面效果图，4.3.7+可用
 docker exec -it qbittorrent change-tracker
 
-# 检测指定文件夹下没有在qbittorrent客户端中做种或下载的子文件夹/子文件，由用户确认是否删除，4.3.8+可用
+# 检测指定文件夹下没有在qbittorrent客户端中做种或下载的子文件夹/子文件，由用户确认是否删除，详见下面效果图，4.3.8+可用
 docker exec -it qbittorrent del-unseed-dir
 ```
 
@@ -500,7 +502,7 @@ docker exec -it qbittorrent del-unseed-dir
 
 <details>
 
-<summary markdown="span"><b>3. 仅“iyuu”标签可用的命令，点击展开</b></summary>
+<summary markdown="span"><b> ▶ 3. 仅“iyuu”标签可用的命令</b></summary>
 
 ```
 # 更新IYUUPlus脚本
@@ -529,13 +531,9 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
   
 - [80x86/qbittorrent](https://hub.docker.com/r/80x86/qbittorrent), 借鉴了标签和分类的理念，正因为此镜像源码未公开，且长期不更新，这才催生我重写代码；
 
-- [arpaulnet/s6-overlay-stage](https://hub.docker.com/r/arpaulnet/s6-overlay-stage), 学习了多平台镜像制作方法。
-
 ## 源代码、问题反馈、意见建议
 
-旧的Github账号已经删除了，抱歉。
-
-如果镜像好用，请点亮star。
+旧的Github账号已经删除了，抱歉。如果镜像好用，请点亮star。
 
 全套代码见 [Github](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。
 

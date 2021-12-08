@@ -1,4 +1,4 @@
 *
 !src/target/nginxWebUI-*.jar
-!Dockerfile
+!Dockerfile*
 !entrypoint.sh

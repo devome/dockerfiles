@@ -15,7 +15,7 @@ ARG QBITTORRENT_VERSION
 ARG JNPROC=1
 RUN mkdir -p /tmp/qbittorrent \
     && cd /tmp/qbittorrent \
-    && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xvz --strip-components 1 \
+    && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xz --strip-components 1 \
     && cmake \
        -DCMAKE_BUILD_TYPE=Release \
        -DCMAKE_CXX_STANDARD=17 \
