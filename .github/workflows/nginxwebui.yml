@@ -57,11 +57,9 @@ jobs:
           context: ${{ env.IMAGE_NAME }}
           file: ${{ env.IMAGE_NAME }}/Dockerfile
           platforms: |
-            linux/386
             linux/amd64
             linux/arm64
             linux/arm/v7
-            linux/mips64le
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
