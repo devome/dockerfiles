@@ -1,11 +1,11 @@
-name: 构建镜像：nginxwebui-base(ubuntu)
+name: 构建镜像：nginxwebui-base(debian)
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建镜像：nginxwebui-base(ubuntu)
+    name: 构建镜像：nginxwebui-base(debian)
     env:
       IMAGE_NAME: nginxwebui-base
     steps:
@@ -41,13 +41,13 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ${{ env.IMAGE_NAME }}
-          file: ${{ env.IMAGE_NAME }}/Dockerfile
+          file: ${{ env.IMAGE_NAME }}/Dockerfile.debian
           platforms: |
+            linux/386
             linux/amd64
             linux/arm64
             linux/arm/v7
+            linux/mips64le
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-ubuntu
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-debian
             

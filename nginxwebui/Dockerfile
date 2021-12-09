@@ -1,4 +1,5 @@
-FROM nevinee/nginxwebui-base
+ARG BASE_TAG=latest
+FROM nevinee/nginxwebui-base:${BASE_TAG}
 ENV LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \
     PS1="\u@\h:\w \$ "

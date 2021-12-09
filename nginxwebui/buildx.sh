@@ -3,7 +3,8 @@
 set -o pipefail
 
 repo="nevinee/nginxwebui"
-arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/mips64le"
+arch_ubuntu="linux/amd64,linux/arm64,linux/arm/v7"
+arch_debian="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/mips64le"
 
 buildx() {
     cd src
@@ -12,12 +13,22 @@ buildx() {
     docker pull tonistiigi/binfmt
     docker run --privileged --rm tonistiigi/binfmt --install all
     docker buildx create --name builder --use 2>/dev/null || docker buildx use builder
-    docker buildx inspect --bootstrap
+    docker buildx inspect --bootstrap    
     docker buildx build \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
-        --build-arg "BASE_VERSION=$base_ver" \
-        --platform "$arch" \
+        --build-arg "BASE_TAG=latest-debian" \
+        --platform "$arch_debian" \
+        --tag ${repo}:${ver}-debian \
+        --tag ${repo}:latest-debian \
+        --push \
+        .
+
+    docker buildx build \
+        --cache-from "type=local,src=/tmp/.buildx-cache" \
+        --cache-to "type=local,dest=/tmp/.buildx-cache" \
+        --build-arg "BASE_TAG=latest" \
+        --platform "$arch_ubuntu" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
         --push \
