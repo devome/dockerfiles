@@ -39,7 +39,9 @@ RUN echo "Copy to /out" \
 
 ARG ALPINE_VERSION
 FROM alpine:${ALPINE_VERSION}
-ENV QBITTORRENT_HOME=/home/qbittorrent \
+ENV S6_SERVICES_GRACETIME=30000 \
+    S6_KILL_GRACETIME=60000 \
+    QBITTORRENT_HOME=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=100 \

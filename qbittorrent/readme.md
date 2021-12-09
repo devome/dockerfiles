@@ -12,15 +12,15 @@
 
 ## 标签
 
-1. **`4.x.x` `latest`**
+1. **`4.x.x` , `latest`**
 
   标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。
 
-2. **`4.x.x-iyuu` `iyuu`**
+2. **`4.x.x-iyuu` , `iyuu`**
 
   标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`iyuu`标签，自动安装好iyuuplus，自动设置好下载器，主要针对不会设置下载器的用户。
 
-3. **`4.x.xbetax` `4.x.xrcx` `unstable`**
+3. **`4.x.xbetax` , `4.x.xrcx` , `unstable`**
 
   标签中带有`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。此标签仅供测试使用及向qBittorrent官方反馈bug使用。
 
@@ -53,31 +53,32 @@
 
 | 序号 | 变量名                   | 默认值         | 说明 |
 | :-: | :-:                     | :-:           | -    |
-|  1  | PUID                    | 1000          | 用户的uid，输入命令`id -u`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
-|  2  | PGID                    | 100          | 用户的gid，输入命令`id -g`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
-|  3  | WEBUI_PORT              | 8080          | WebUI访问端口，建议自定义，如需公网访问，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
-|  4  | BT_PORT                 | 34567         | BT监听端口，建议自定义，如需达到`可连接`状态，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
-|  5  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
-|  6  | INSTALL_PYTHON          | false         | 默认不安装python，如需要python（qBittorrent的搜索功能必须安装python），请设置为`true`，设置后将在首次启动容器时自动安装好。 |
-|  7  | ENABLE_AUTO_CATEGORY    | true          | 是否自动分类，默认自动分类，如不想自动分类，请设置为`false`。4.3.7+可用。 |
-|  8  | DL_FINISH_NOTIFY        | true          | 默认会在下载完成时向设定的通知渠道发送种子下载完成的通知消息，如不想收此类通知，则设置为`false`。 |
-|  9  | TRACKER_ERROR_COUNT_MIN | 3             | 可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。4.3.7+可用。 |
-|  10 | UMASK_SET               | 000           | 权限掩码`umask`，指定qBittorrent在建立文件时预设的权限掩码，可以设置为`022`。 |
-|  11 | TG_USER_ID              |               | 通知渠道telegram，如需使用需要和 TG_BOT_TOKEN 同时赋值，私聊 @getuseridbot 获取。 |
-|  12 | TG_BOT_TOKEN            |               | 通知渠道telegram，如需使用需要和 TG_USER_ID 同时赋值，私聊 @BotFather 获取。 |
-|  13 | TG_PROXY_ADDRESS        |               | 给TG机器人发送消息的代理地址，当设置了`TG_USER_ID`和`TG_BOT_TOKEN`后可以设置此值，形如：`http://192.168.1.1:7890`，也可以不设置。4.3.7+可用。 |
-|  14 | TG_PROXY_USER           |               | 给TG机器人发送消息的代理的用户名和密码，当设置了`TG_PROXY_ADDRESS`后可以设置此值，格式为：`<用户名>:<密码>`，形如：`admin:password`，如没有可不设置。4.3.7+可用。 |
-|  15 | DD_BOT_TOKEN            |               | 通知渠道钉钉，如需使用需要和 DD_BOT_SECRET 同时赋值，机器人设置中webhook链接`access_token=`后面的字符串（不含`=`以及`=`之前的字符）。 |
-|  16 | DD_BOT_SECRET           |               | 通知渠道钉钉，如需使用需要和 DD_BOT_TOKEN 同时赋值，机器人设置中**只启用**`加签`，加签的秘钥，形如：`SEC1234567890abcdefg`。 |
-|  17 | IYUU_TOKEN              |               | 通知渠道爱语飞飞，通过 [这里](http://iyuu.cn) 获取，爱语飞飞的TOKEN。 |
-|  18 | SCKEY                   |               | 通知渠道ServerChan，通过 [这里](http://sc.ftqq.com/3.version) 获取。 |
-|  19 | PUSHPLUS_TOKEN          |               | 通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)，4.3.7+可用。 |
-|  20 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
-|  21 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron将所有种子按tracker分类。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。 |
-|  22 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
-|  23 | MONITOR_IP              |               | 可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。4.3.8+可用。 |
-|  24 | CRON_ALTER_LIMITS       |               | 启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 一节“如何使用 CRON_ALTER_LIMITS 这个环境变量”。4.3.8+可用。 |
-|  25 | CRON_IYUU_HELP          |               | IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 一节“如何使用 CRON_IYUU_HELP 这个环境变量”。4.3.8+可用。 |
+|  1  | S6_SERVICES_GRACETIME   | 3000(qb<=4.3.9)<br>30000(qb>=4.4.0) | 在关闭/重启/重建容器时，关闭容器内程序（主要就是qbittorrent程序）前的**最长等待时间（单位：毫秒）**。具体见 [相关问题](#相关问题) 问题16。 |
+|  2  | PUID                    | 1000          | 用户的uid，输入命令`id -u`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
+|  3  | PGID                    | 100          | 用户的gid，输入命令`id -g`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
+|  4  | WEBUI_PORT              | 8080          | WebUI访问端口，建议自定义，如需公网访问，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
+|  5  | BT_PORT                 | 34567         | BT监听端口，建议自定义，如需达到`可连接`状态，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
+|  6  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
+|  7  | INSTALL_PYTHON          | false         | 默认不安装python，如需要python（qBittorrent的搜索功能必须安装python），请设置为`true`，设置后将在首次启动容器时自动安装好。 |
+|  8  | ENABLE_AUTO_CATEGORY    | true          | 是否自动分类，默认自动分类，如不想自动分类，请设置为`false`。4.3.7+可用。 |
+|  9  | DL_FINISH_NOTIFY        | true          | 默认会在下载完成时向设定的通知渠道发送种子下载完成的通知消息，如不想收此类通知，则设置为`false`。 |
+|  10 | TRACKER_ERROR_COUNT_MIN | 3             | 可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。4.3.7+可用。 |
+|  11 | UMASK_SET               | 000           | 权限掩码`umask`，指定qBittorrent在建立文件时预设的权限掩码，可以设置为`022`。 |
+|  12 | TG_USER_ID              |               | 通知渠道telegram，如需使用需要和 TG_BOT_TOKEN 同时赋值，私聊 @getuseridbot 获取。 |
+|  13 | TG_BOT_TOKEN            |               | 通知渠道telegram，如需使用需要和 TG_USER_ID 同时赋值，私聊 @BotFather 获取。 |
+|  14 | TG_PROXY_ADDRESS        |               | 给TG机器人发送消息的代理地址，当设置了`TG_USER_ID`和`TG_BOT_TOKEN`后可以设置此值，形如：`http://192.168.1.1:7890`，也可以不设置。4.3.7+可用。 |
+|  15 | TG_PROXY_USER           |               | 给TG机器人发送消息的代理的用户名和密码，当设置了`TG_PROXY_ADDRESS`后可以设置此值，格式为：`<用户名>:<密码>`，形如：`admin:password`，如没有可不设置。4.3.7+可用。 |
+|  16 | DD_BOT_TOKEN            |               | 通知渠道钉钉，如需使用需要和 DD_BOT_SECRET 同时赋值，机器人设置中webhook链接`access_token=`后面的字符串（不含`=`以及`=`之前的字符）。 |
+|  17 | DD_BOT_SECRET           |               | 通知渠道钉钉，如需使用需要和 DD_BOT_TOKEN 同时赋值，机器人设置中**只启用**`加签`，加签的秘钥，形如：`SEC1234567890abcdefg`。 |
+|  18 | IYUU_TOKEN              |               | 通知渠道爱语飞飞，通过 [这里](http://iyuu.cn) 获取，爱语飞飞的TOKEN。 |
+|  19 | SCKEY                   |               | 通知渠道ServerChan，通过 [这里](http://sc.ftqq.com/3.version) 获取。 |
+|  20 | PUSHPLUS_TOKEN          |               | 通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)，4.3.7+可用。 |
+|  21 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
+|  22 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron将所有种子按tracker分类。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。 |
+|  23 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
+|  24 | MONITOR_IP              |               | 可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。4.3.8+可用。 |
+|  25 | CRON_ALTER_LIMITS       |               | 启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。4.3.8+可用。 |
+|  26 | CRON_IYUU_HELP          |               | IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。4.3.8+可用。 |
 
 **以下是仅`iyuu`标签额外可用的环境变量：**
 
@@ -442,6 +443,24 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 <summary markdown="span"><b> ▶ 15. 为什么没法使用搜索功能</b></summary>
 
 搜索功能依赖于python，请在创建容器时添加环境变量`INSTALL_PYTHON`，并将值设置为`true`。
+
+</details>
+
+<details>
+
+<summary markdown="span"><b> ▶ 16. 环境变量S6_SERVICES_GRACETIME的含义</b></summary>
+
+- 本镜像使用了s6-overlay程序，在关闭/重启/重建容器时，s6-overlay程序会在关闭容器内程序前等待一定的时间。s6-overlay程序可以设置两个等待的最大时长，一个是`S6_SERVICES_GRACETIME`，一个是`S6_KILL_GRACETIME`，其含义详见[这里](https://github.com/just-containers/s6-overlay#customizing-s6-behaviour)。嫌太长可以直接看本文下面的说明。
+
+- qBittorrent程序在下线时，会尝试保存`qBittorrent.conf`, `qBittorrent-data.conf`, `BT_bacup`下的种子做种状态数据以及其他文件。尤其是`BT_bacup`文件夹的数据，对保留做种状态是极其重要的。在qBittorrent做种数量大时，保存这些数据可能需要花费较长的时间，所以我们需要尽量将`S6_SERVICES_GRACETIME`设置大一些。设置大了也不要紧，这只是等待的最长时间，实际使用时大部分都不会等待这么久。
+
+- 我们为了**温和（不要暴力）的关闭**qBittorrent程序，需要尽可能的等待qBittorrent程序自行下线，也就是加大`S6_SERVICES_GRACETIME`的值。
+
+- 但在4.3.9版本及以前，本镜像没有重设`S6_SERVICES_GRACETIME`的值，所以采用了s6-overlay程序默认的`3000`毫秒，这对qBittorrent程序来说，不是一个合适的值，因此建议4.3.9版本及以前的在创建容器时，手动指定一个更大的值，个人认为`30000`毫秒是一个不错的选择。
+
+- 如果你发现容器在关闭/重启/重建时所花费的时间已经比较接近，甚至是超过`S6_SERVICES_GRACETIME`所设置的时间时，就建议将`S6_SERVICES_GRACETIME`设置得再大一些，大到远远超过关闭/重启/重建时所花费的时间。
+
+- 在4.4.0及以后，本镜像将重设`S6_SERVICES_GRACETIME`的值为`30000`毫秒，但仍然可以由用户指定其他值。
 
 </details>
 

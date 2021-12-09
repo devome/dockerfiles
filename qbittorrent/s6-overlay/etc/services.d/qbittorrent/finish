@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv bash
+
+. /usr/local/bin/share
+$cmd_curl ${api_url_base}/app/shutdown
