@@ -19,12 +19,6 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        -DCMAKE_BUILD_TYPE=Release \
        -DCMAKE_CXX_STANDARD=17 \
        -DBUILD_SHARED_LIBS=ON \
-       -Dstatic_runtime=OFF \
-       -Dbuild_tests=ON \
-       -Dbuild_examples=ON \
-       -Dbuild_tools=ON \
-       -Dpython-bindings=ON \
-       -Dencryption=ON \
        -Brelease \
        -GNinja \
     && cd release \

@@ -47,22 +47,7 @@ jobs:
           key: ${{ runner.os }}-buildx
 
       - 
-        name: Buildx Based Ubuntu
-        uses: docker/build-push-action@v2
-        with:
-          context: ${{ env.IMAGE_NAME }}
-          file: ${{ env.IMAGE_NAME }}/Dockerfile
-          platforms: |
-            linux/amd64
-            linux/arm64
-            linux/arm/v7
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-      
-      - 
-        name: Buildx Based Debian
+        name: Buildx Based on Debian
         uses: docker/build-push-action@v2
         with:
           context: ${{ env.IMAGE_NAME }}
@@ -79,3 +64,18 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-debian
           build-args: |
             BASE_TAG=latest-debian
+
+      - 
+        name: Buildx Based on Ubuntu
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ env.IMAGE_NAME }}
+          file: ${{ env.IMAGE_NAME }}/Dockerfile
+          platforms: |
+            linux/amd64
+            linux/arm64
+            linux/arm/v7
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
