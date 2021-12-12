@@ -1,0 +1,70 @@
+name: 构建镜像：iperf3
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: 构建镜像：iperf3
+    env:
+      IMAGE_NAME: iperf3
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          version=$(curl -s https://api.github.com/repos/esnet/iperf/tags | jq -r .[].name | grep -m1 -P "(\d+\.){2}\d+")
+          echo ::set-output name=version::${version}
+
+      - 
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - 
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - 
+        name: Login DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - 
+        name: Set Up Cache
+        uses: actions/cache@v2
+        id: buildx-cache
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx
+
+      - 
+        name: Buildx
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ env.IMAGE_NAME }}
+          file: ${{ env.IMAGE_NAME }}/Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x
+          push: true
+          build-args: |
+            ALPINE_VERSION=latest
+            VERSION=${{ steps.prepare.outputs.version }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+      - 
+        name: Update DockerHub Description
+        uses: christian-korneck/update-container-description-action@v1
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          provider: dockerhub
+          readme_file: ./${{ env.IMAGE_NAME }}/readme.md
