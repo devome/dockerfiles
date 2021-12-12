@@ -9,6 +9,7 @@ RUN apk add --update --no-cache \
        musl-dev \
        make \
        gcc \
+       binutils \
        tar \
        gzip \
     && mkdir build \
@@ -17,6 +18,7 @@ RUN apk add --update --no-cache \
     && sed -i "s|int random_data_flag;|extern int random_data_flag;|" src/fping.h \
     && ./configure \
     && make install \
+    && strip $(type fping | awk '{print $3}') \
     && cd .. \
     && sed "s|./fping|fping|" build/src/cf.sh > cf.sh \
     && chmod +x cf.sh \
