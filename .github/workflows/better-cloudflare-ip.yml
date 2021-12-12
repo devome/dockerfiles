@@ -1,24 +1,17 @@
-name: 构建镜像：iyuuplus
+name: 构建镜像：better-cloudflare-ip
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建镜像：iyuuplus
+    name: 构建镜像：better-cloudflare-ip
     env:
-      IMAGE_NAME: iyuuplus
+      IMAGE_NAME: better-cloudflare-ip
     steps:
       - 
         name: Checkout
         uses: actions/checkout@master
-
-      -
-        name: Prepare
-        id: prepare
-        run: |
-          version=$(curl -s https://gitee.com/ledc/iyuuplus/raw/master/app/functions.php | grep -P "return \'(\d+\.?){3,4}\'" | head -1 | perl -pe "s|[\D\.]+((\d+\.?){3,4}).*|\1|")
-          echo ::set-output name=version::${version}
 
       - 
         name: Set Up QEMU
@@ -51,9 +44,7 @@ jobs:
           file: ${{ env.IMAGE_NAME }}/Dockerfile
           platforms: linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
       - 
         name: Update DockerHub Description
