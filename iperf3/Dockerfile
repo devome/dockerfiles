@@ -6,15 +6,13 @@ RUN apk add --no-cache --virtual .build \
        musl-dev \
        make \
        gcc \
-       binutils \
        tar \
        gzip \
     && mkdir -p /tmp/build \
     && cd /tmp/build \
     && curl -sSL https://github.com/esnet/iperf/archive/refs/tags/${VERSION}.tar.gz | tar xz --strip-components 1 \
-    && ./configure \
-    && make install \
-    && strip $(type iperf3 | awk '{print $3}') \
+    && ./configure --prefix=/usr --disable-static \
+    && make install-strip \
     && apk del --purge .build \
     && apk add libcrypto1.1 \
     && rm -rf /tmp/* /var/cache/apk/*

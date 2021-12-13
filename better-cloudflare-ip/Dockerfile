@@ -9,14 +9,14 @@ RUN apk add --update --no-cache \
        musl-dev \
        make \
        gcc \
-       binutils \
        tar \
        gzip \
     && mkdir build \
     && cd build \
     && curl -sSL https://github.com/badafans/better-cloudflare-ip/releases/latest/download/linux.tar.gz | tar xz --strip-components 1 \
-    && sed -i "s|int random_data_flag;|extern int random_data_flag;|" src/fping.h \
-    && ./configure \
+    && sed -i "s|^int random_data_flag;|extern int random_data_flag;|" src/fping.h \
+    && ./configure --prefix=/usr \
+    && make \
     && make install \
     && strip $(type fping | awk '{print $3}') \
     && cd .. \
