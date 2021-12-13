@@ -52,7 +52,7 @@ main() {
             echo -e "替换前：$tracker_orig_url\n"
             echo -e "替换后：$tracker_new_url\n"
             read -p "请确认信息无误 [y/N]：" choice1
-            if [[ $choice1 == y || $choice1 == Y ]]; then
+            if [[ $choice1 == [Yy] || $choice1 == [Yy][Ee][Ss] ]]; then
                 handle_all_match_torrents exact
             fi
             ;;
@@ -64,7 +64,7 @@ main() {
             echo -e "替换前：$orig_string\n"
             echo -e "替换后：$new_string\n"
             read -p "请确认信息无误 [y/N]：" choice2
-            if [[ $choice2 == y || $choice2 == Y ]]; then
+            if [[ $choice2 == [Yy] || $choice2 == [Yy][Ee][Ss] ]]; then
                 handle_all_match_torrents blur
             fi
             ;;

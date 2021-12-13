@@ -36,7 +36,7 @@ cat $list_detect_path | while read dir; do
             echo -en "\n在本qbittorrent客户端中没有检测到保存路径包含 \"$dir\" 的种子...\n\n请确认是否删除 \"$dir\" [y/N]："
             exec </dev/tty
             read is_del
-            if [[ $is_del == y || $is_del == Y ]]; then
+            if [[ $is_del == [Yy] || $is_del == [Yy][Ee][Ss] ]]; then
                 rm -rf "$dir" && echo -e "\n已删除 \"$dir\"\n" || echo -e "\n删除 \"$dir\" 失败，请检查原因\n"
             else
                 echo -e "\n已忽略 \"$dir\"\n"
