@@ -54,6 +54,9 @@ jobs:
             linux/arm64
             linux/arm/v7
           push: true
+          build-args: |
+            ALPINE_VERSION=latest
+            VERSION=${{ steps.prepare.outputs.version }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
