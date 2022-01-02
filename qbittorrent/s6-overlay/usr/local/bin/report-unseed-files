@@ -1,0 +1,54 @@
+#!/bin/bash
+
+seed_files=/data/diy/seed_files.list
+unseed_files=/data/diy/unseed_files.list
+
+echo -e "本脚本用来检测指定的文件夹中所有文件（包括所有下级文件）是否在本qBittorrent客户端中做种，并将未做种的文件形成一份清单。\n"
+echo -e "生成的未做种文件清单位于容器内的：$unseed_files，再次运行本脚本将会重新生成该文件。\n"
+echo -e "继续执行前请确认以下两个前提条件是否已经满足：\n"
+echo -e "1. 已经运行过 'report-seed-files' 脚本，并已经生成了做种文件清单：$seed_files；\n"
+echo -e "2. 已经生成的 $seed_files 是本qBittorrent客户端的当前最新状态。\n"
+read -p "请确认是否继续执行本脚本 [y/N]：" is_report
+echo
+
+if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
+    if [[ ! -f $seed_files ]]; then
+        echo -e "做种文件清单 '$seed_files' 不存在，请确认前提条件是否已经满足\n"
+        exit 1
+    else
+        modtime=$(date +'%Y-%m-%d %H:%M:%S' -d @$(stat -c %Y $seed_files))
+        echo -e "检测到做种文件清单 '$seed_files' 已存在，该清单的最后修改时间为：$modtime。\n"
+        read -p "请确认该文件是本qBittorrent客户端的最新状态 [y/N]：" is_new
+        echo
+        if [[ $is_new != [Yy] && $is_new != [Yy][Ee][Ss] ]]; then
+            exit 2
+        fi
+    fi
+    echo -e "请输入要检测的文件夹的绝对路径，多个路径之间使用半角冒号分隔，形如 /movies:/tv:/music\n"
+    read -p "请输入所有检测路径：" detect_pathes
+    echo
+    detect_pathes=$(echo $detect_pathes | sed 's|:|\n|g')
+    echo "$detect_pathes" | while read path; do
+        if [[ ! -d "$path" ]]; then
+            echo -e "路径 '$path' 不存在，退出脚本"
+            exit 3
+        fi
+    done
+
+    [[ -f $unseed_files ]] && rm $unseed_files
+    echo "$detect_pathes" | while read path; do
+        find "$path" -type f | while read file; do
+            if [[ -z $(grep -Fx "$file" $seed_files 2>/dev/null) ]]; then
+                echo -n "未做种："
+                echo "$file" | tee -a $unseed_files
+            else
+                echo "做种中：$file"
+            fi
+        done
+    done
+    echo -e "\n已成功生成指定路径下所有未做种文件清单：$unseed_files\n"
+    echo -e "如果需要删除某些未做种文件，请按以下流程操作：\n"
+    echo -e "1. 打开清单 '$unseed_files'，并将想保留在系统中的文件从该清单中删除，也就是仅将想要删除的文件保留在这个清单中；\n"
+    echo -e "2. 再三确认该清单中所有文件都是想要删除的文件，务必确保这一点；\n"
+    echo -e "3. 最后在容器中运行此命令即可进行批量删除：cat $unseed_files | while read file; do rm \"\$file\"; done\n"
+fi

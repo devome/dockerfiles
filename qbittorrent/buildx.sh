@@ -66,6 +66,7 @@ build_iyuu() {
         docker buildx build \
             --tag ${DOCKERHUB_REPOSITORY}:${QBITTORRENT_VERSION}-iyuu \
             --tag ${DOCKERHUB_REPOSITORY}:iyuu \
+            --tag ${DOCKERHUB_REPOSITORY}:latest-iyuu \
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --push \

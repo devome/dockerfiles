@@ -1,0 +1,28 @@
+#!/bin/bash
+
+tmplist1=$(mktemp)
+tmplist2=$(mktemp)
+seed_files=/data/diy/seed_files.list
+
+. /usr/local/bin/share
+
+echo -e "本脚本用于生成本qBittorrent客户端中所有种子中的文件清单，生成的清单位于容器内的：$seed_files\n"
+echo -e "种子越多，生成清单也就越耗时，请勿在生成清单过程中打断...\n"
+read -p "请确认是否继续执行本脚本 [y/N]：" is_report
+echo
+if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
+    hashes=( $($cmd_curl ${api_url_base}/torrents/info | jq -r .[].hash) )
+    for ((i=0; i<${#hashes[@]}; i++)); do
+        echo "$(( $i + 1)): ${hashes[i]}"
+        torrent_properties=$($cmd_curl "${api_url_base}/torrents/properties?hash=${hashes[i]}")
+        save_path=$(echo "$torrent_properties" | jq -r .save_path)
+        torrent_files=$($cmd_curl "${api_url_base}/torrents/files?hash=${hashes[i]}")
+        echo "$torrent_files" | jq -r .[].name | while read file; do
+            echo "${save_path}${file}" >> $tmplist1
+        done
+    done
+    cat $tmplist1 | sort -u > $tmplist2
+    mv $tmplist2 $tmplist1
+    mv $tmplist1 $seed_files
+    echo -e "\n生成完毕，生成的清单文件为：$seed_files\n"
+fi

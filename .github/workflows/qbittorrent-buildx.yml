@@ -291,5 +291,5 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.base.outputs.full_version }}-iyuu
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu

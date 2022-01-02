@@ -57,5 +57,5 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version }}-iyuu
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
