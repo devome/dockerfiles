@@ -35,6 +35,8 @@ services:
       - db
     depends_on:
       - db
+    #security_opt:  # armv7设备请解除这两行注释
+      #- seccomp=unconfined
 
   db:
     image: agrozyme/mariadb  #如若此镜像在你的平台上不可用，可以自行在docker hub上搜索你平台可用的mariadb镜像
@@ -44,11 +46,27 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
 ```
+    
 [mysql官方镜像](https://hub.docker.com/_/mysql) 可用平台：`amd64`。
 
 [mariadb官方镜像](https://hub.docker.com/_/mariadb) 可用平台：`amd64` `arm64` `ppc64le`。
 
 [agrozyme/mariadb镜像](https://hub.docker.com/r/agrozyme/mariadb) 可用平台：`amd64` `386` `arm64` `arm/v7` `arm/v6` `ppc64le` `s390x`。
+
+## 关于armv7设备的补充说明
+
+armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0)。
+
+解决办法如下：
+
+- docker cli方式可以在创建命令中增加一行`--security-opt seccomp=unconfined \`。
+
+- docker-compose方式请在`docker-compose.yml`最后增加两行：
+
+    ```
+    security_opt:
+      - seccomp=unconfined
+    ```
 
 ## Dockerfile
 

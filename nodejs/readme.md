@@ -16,6 +16,19 @@ docker run -dit \
 docker exec -it nodejs bash
 ```
 
+armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0)。
+
+解决办法如下：
+
+- docker cli方式可以在创建命令中增加一行`--security-opt seccomp=unconfined \`。
+
+- docker-compose方式请在`docker-compose.yml`最后增加两行：
+
+    ```
+    security_opt:
+      - seccomp=unconfined
+    ```
+
 如果映射目录下存在`crontab.list`，将在创建后以它作为容器的定时任务。修改`crontab.list`两秒后会自动更新容器的cron。
 
 [![dockeri.co](http://dockeri.co/image/nevinee/nodejs)](https://hub.docker.com/r/nevinee/nodejs/)

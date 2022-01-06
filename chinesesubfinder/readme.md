@@ -4,8 +4,6 @@
 
 基于alpine实现，比官方镜像体积小、层数少，日志和设置文件全部和配置文件保存在一起，支持 amd64/arm64/armv7。
 
-**从0.18.8起，可以不修改原字幕，详见：[v0.18.8](https://github.com/allanpk716/ChineseSubFinder/releases/tag/v0.18.8)**
-
 ## 创建
 
 **docker cli**
@@ -48,9 +46,28 @@ services:
 
 如在使用诸如emby、jellyfin、plex、qbittorrent、transmission、deluge、jackett、sonarr、radarr等等的docker镜像，请在创建本容器时的设置和它们的PUID/PGID和它们一样，如若真的不想设置为一样，至少要保证本容器PUID/PGID所定义的用户拥有你设置的媒体目录（默认是`/media`）的读取和写入权限。
 
+## 关于多个电影目录如何配置的问题
+
+将所有电影目录映射在/media的下一层即可，形如：
+```
+-v /你的电影目录1:/media/目录1 \
+-v /你的电影目录2:/media/目录2 \
+-v /你的电影目录3:/media/目录3 \
+```
+
+如果将剧集目录也映射在`/media`下，需要将电影和剧集放在不同的下级文件夹。比如将多个电影目录都映射到`/media/movies`下，形如：
+```
+-v /你的电影目录1:/media/movies/目录1 \
+-v /你的电影目录2:/media/movies/目录2 \
+-v /你的电影目录3:/media/movies/目录3 \
+-v /你的剧集目录1:/media/tv/目录1 \
+-v /你的剧集目录2:/media/tv/目录2 \
+-v /你的剧集目录3:/media/tv/目录3 \
+```
+
 ## 关于armv7设备的补充说明
 
-armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirements)。
+armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0)。
 
 解决办法如下：
 
