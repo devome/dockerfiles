@@ -1,0 +1,126 @@
+name: 构建镜像：qbittorrent2
+
+on:
+  workflow_dispatch:
+    inputs:
+      qbittorrent_version:
+        description: '要构建的qBittorrent版本，可以为beta/rc版，如不输入则默认去检测最新的正式版'
+        required: false
+        default: ''
+      alpine_version:
+        description: '要使用的alpine基础版本，如不输入则默认使用latest'
+        required: false
+        default: ''
+  repository_dispatch:
+    types: qbittorrent
+
+env:
+  ## 镜像名，也是git仓库中的文件夹名
+  IMAGE_NAME: qbittorrent
+
+  ## Dockerfile文件名称，在这里修改
+  DOCKERFILE_NAME: Dockerfile
+  DOCKERFILE_NAME2: Dockerfile.iyuu
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: 构建镜像：qbittorrent2
+    timeout-minutes: 500
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@master
+
+      -
+        name: Prepare
+        id: prepare
+        run: |
+          QBITTORRENT_VERSION=${{ github.event.inputs.qbittorrent_version }}
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/qbittorrent/qBittorrent/tags | jq -r .[]."name" | grep -m1 -E "release-([0-9]{1,2}\.?){3,4}$" | sed "s/release-//")
+          if [[ -z ${QBITTORRENT_VERSION} ]]; then
+            QBITTORRENT_VERSION=${LATEST_VERSION}
+          fi
+
+          if [[ $(echo ${FULL_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${FULL_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
+            LIBTORRENT_VERSION=1
+          else
+            LIBTORRENT_VERSION=2
+          fi
+
+          ALPINE_VERSION=${{ github.event.inputs.alpine_version }}
+          if [[ -z ${ALPINE_VERSION} ]]; then
+            ALPINE_VERSION=latest
+          fi
+
+          JNPROC=$(nproc)
+          
+          echo ::set-output name=qbittorrent_version::${QBITTORRENT_VERSION}
+          echo ::set-output name=libtorrent_version::${LIBTORRENT_VERSION}
+          echo ::set-output name=alpine_version::${ALPINE_VERSION}
+          echo ::set-output name=jnproc::${JNPROC}
+
+      - 
+        name: Set Up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - 
+        name: Set Up Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - 
+        name: Login DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - 
+        name: Set Up Cache
+        uses: actions/cache@v2
+        id: buildx-cache
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx
+      
+      - 
+        name: Buildx qBittorrent
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ env.IMAGE_NAME }}
+          file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME }}
+          platforms: linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x
+          push: true
+          build-args: |
+            QBITTORRENT_VERSION=${{ steps.prepare.outputs.qbittorrent_version }}
+            LIBTORRENT_VERSION=${{ steps.prepare.outputs.libtorrent_version }}
+            ALPINE_VERSION=${{ steps.prepare.outputs.alpine_version }}
+            JNPROC=${{ steps.prepare.outputs.jnproc }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.QBITTORRENT_VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+      - 
+        name: Buildx qBittorrent With IYUUPlus
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ env.IMAGE_NAME }}
+          file: ${{ env.IMAGE_NAME }}/${{ env.DOCKERFILE_NAME2 }}
+          platforms: linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.QBITTORRENT_VERSION }}-iyuu
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
+
+      - 
+        name: Update DockerHub Description
+        uses: christian-korneck/update-container-description-action@v1
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSPWORD }}
+        with:
+          destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          provider: dockerhub
+          readme_file: ./${{ env.IMAGE_NAME }}/readme.md
+          short_description: ${{ env.IMAGE_NAME }} ${{ steps.prepare.outputs.QBITTORRENT_VERSION }}：下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等

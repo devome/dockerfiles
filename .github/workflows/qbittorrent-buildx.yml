@@ -7,6 +7,10 @@ on:
         description: '要构建的版本，可以为beta/rc版，如不输入则默认去检测最新的正式版'
         required: false
         default: ''
+      alpine_version:
+        description: '要使用的alpine基础版本，如不输入则默认使用latest'
+        required: false
+        default: ''
   repository_dispatch:
     types: qbittorrent
 
