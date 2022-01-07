@@ -1,7 +1,8 @@
 ARG LIBTORRENT_VERSION
 ARG ALPINE_VERSION=latest
 FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
-RUN apk add --update --no-cache \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
+    && apk add --update --no-cache \
        boost-dev \
        build-base \
        qt5-qttools-dev \

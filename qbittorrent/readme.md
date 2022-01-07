@@ -1,13 +1,21 @@
 ## 特点
 
 - 自动按`tracker`分类（**可以选择关闭**）。
+
 - 下载完成发送通知（**可以选择关闭**），可选途径：钉钉（[效果图](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/notify.png)）, Telegram, ServerChan, 爱语飞飞, PUSHPLUS推送加；搭配RSS功能（[RSS教程](https://www.jianshu.com/p/54e6137ea4e3)）自动下载效果很好；下载完成后还可以补充运行你的自定义脚本。
+
 - 故障时发送通知，可选途径同上。
+
 - 按设定的cron检查tracker状态，如发现种子的tracker状态有问题，将给该种子添加`TrackerError`的标签，方便筛选；如果tracker出错数量超过设定的阈值，给设定渠道发送通知。
-- **一些辅助功能：批量修改tracker；检测指定文件夹下未做种的子文件夹/文件；配合IYUU自动重新校验和自动恢复做种；指定设备上线时自动限速；多时段限速等等。**
+
+- **一些辅助功能：批量修改tracker；检测指定文件夹下未做种的子文件夹/文件；生成做种文件清单；生成未做种文件清单；配合IYUU自动重新校验和自动恢复做种；指定设备上线时自动限速；多时段限速等等。**
+
 - 日志输出到docker控制台，可从portainer查看。
+
 - `python`为可选安装项，设置为`true`就自动安装。
+
 - 体积小，默认中文UI，默认东八区时区。
+
 - `iyuu`标签集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，自动设置好下载器，减少IYUUPlus设置复杂程度。
 
 ## 标签
@@ -16,9 +24,9 @@
 
   标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。
 
-2. **`4.x.x-iyuu` , `iyuu`**
+2. **`4.x.x-iyuu` , `latest-iyuu` , `iyuu`**
 
-  标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`iyuu`标签，自动安装好iyuuplus，自动设置好下载器，主要针对不会设置下载器的用户。
+  标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`latest-iyuu`和`iyuu`标签，自动安装好[IYUUPlus](https://github.com/ledccn/IYUUPlus)，自动设置好下载器，主要针对不会设置下载器的用户。
 
 3. **`4.x.xbetax` , `4.x.xrcx` , `unstable`**
 
@@ -34,6 +42,7 @@
 | 20210804 | 4.3.7       | 1.2.14     | 3.14.0 | 1. 增加5个环境变量控制开关，详见[环境变量清单](#环境变量清单)；<br>2. 增加批量修改 tracker的功能，详见[命令](#命令)；<br>3. 增加在运行`dl-finish %I`时运行自定义脚本的功能，详见[相关问题](#相关问题)。 |
 | 20210830 | 4.3.8       | 1.2.14     | 3.14.2 | 1. 增加3个环境变量控制开关，详见[环境变量清单](#环境变量清单)；<br>2. 增加检测指定目录未做种的子文件夹/文件功能，详见[命令](#命令)。 |
 | 20211101 | 4.3.9       | 1.2.14     | 3.14.2 | 修复通知内容中含有字符"&"时无法正常发送的bug。 |
+| 20220107 | 4.4.0       | 2.0.5      | 3.14.3 | 1. 增加环境变量`EXTRA_PACKAGES`，详见[环境变量清单](#环境变量清单)；<br>2. 默认运行自动分类程序时仅对未分类的种子进行分类，如需要强制对所有种子进行分类，请参考[命令](#命令)；<br>3. 增加两个需要手动运行的脚本`report-seed-files`(导出所有做种文件清单)和`report-unseed-files`(导出指定文件夹下未做种文件清单)，详见[命令](#命令)。 |
 
 ## 环境变量清单
 
@@ -60,25 +69,26 @@
 |  5  | BT_PORT                 | 34567         | BT监听端口，建议自定义，如需达到`可连接`状态，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
 |  6  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
 |  7  | INSTALL_PYTHON          | false         | 默认不安装python，如需要python（qBittorrent的搜索功能必须安装python），请设置为`true`，设置后将在首次启动容器时自动安装好。 |
-|  8  | ENABLE_AUTO_CATEGORY    | true          | 是否自动分类，默认自动分类，如不想自动分类，请设置为`false`。4.3.7+可用。 |
+|  8  | ENABLE_AUTO_CATEGORY    | true          | 4.3.7+可用。是否自动分类，默认自动分类，如不想自动分类，请设置为`false`。 |
 |  9  | DL_FINISH_NOTIFY        | true          | 默认会在下载完成时向设定的通知渠道发送种子下载完成的通知消息，如不想收此类通知，则设置为`false`。 |
-|  10 | TRACKER_ERROR_COUNT_MIN | 3             | 可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。4.3.7+可用。 |
+|  10 | TRACKER_ERROR_COUNT_MIN | 3             | 4.3.7+可用。可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。 |
 |  11 | UMASK_SET               | 000           | 权限掩码`umask`，指定qBittorrent在建立文件时预设的权限掩码，可以设置为`022`。 |
 |  12 | TG_USER_ID              |               | 通知渠道telegram，如需使用需要和 TG_BOT_TOKEN 同时赋值，私聊 @getuseridbot 获取。 |
 |  13 | TG_BOT_TOKEN            |               | 通知渠道telegram，如需使用需要和 TG_USER_ID 同时赋值，私聊 @BotFather 获取。 |
-|  14 | TG_PROXY_ADDRESS        |               | 给TG机器人发送消息的代理地址，当设置了`TG_USER_ID`和`TG_BOT_TOKEN`后可以设置此值，形如：`http://192.168.1.1:7890`，也可以不设置。4.3.7+可用。 |
-|  15 | TG_PROXY_USER           |               | 给TG机器人发送消息的代理的用户名和密码，当设置了`TG_PROXY_ADDRESS`后可以设置此值，格式为：`<用户名>:<密码>`，形如：`admin:password`，如没有可不设置。4.3.7+可用。 |
+|  14 | TG_PROXY_ADDRESS        |               | 4.3.7+可用。给TG机器人发送消息的代理地址，当设置了`TG_USER_ID`和`TG_BOT_TOKEN`后可以设置此值，形如：`http://192.168.1.1:7890`，也可以不设置。 |
+|  15 | TG_PROXY_USER           |               | 4.3.7+可用。给TG机器人发送消息的代理的用户名和密码，当设置了`TG_PROXY_ADDRESS`后可以设置此值，格式为：`<用户名>:<密码>`，形如：`admin:password`，如没有可不设置。 |
 |  16 | DD_BOT_TOKEN            |               | 通知渠道钉钉，如需使用需要和 DD_BOT_SECRET 同时赋值，机器人设置中webhook链接`access_token=`后面的字符串（不含`=`以及`=`之前的字符）。 |
 |  17 | DD_BOT_SECRET           |               | 通知渠道钉钉，如需使用需要和 DD_BOT_TOKEN 同时赋值，机器人设置中**只启用**`加签`，加签的秘钥，形如：`SEC1234567890abcdefg`。 |
 |  18 | IYUU_TOKEN              |               | 通知渠道爱语飞飞，通过 [这里](http://iyuu.cn) 获取，爱语飞飞的TOKEN。 |
 |  19 | SCKEY                   |               | 通知渠道ServerChan，通过 [这里](http://sc.ftqq.com/3.version) 获取。 |
-|  20 | PUSHPLUS_TOKEN          |               | 通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)，4.3.7+可用。 |
+|  20 | PUSHPLUS_TOKEN          |               | 4.3.7+可用。通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)。 |
 |  21 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
 |  22 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron将所有种子按tracker分类。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。 |
 |  23 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
-|  24 | MONITOR_IP              |               | 可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。4.3.8+可用。 |
-|  25 | CRON_ALTER_LIMITS       |               | 启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。4.3.8+可用。 |
-|  26 | CRON_IYUU_HELP          |               | IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。4.3.8+可用。 |
+|  24 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
+|  25 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
+|  26 | CRON_IYUU_HELP          |               | 4.3.8+可用。IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。 |
+|  27 | EXTRA_PACKAGES          |               | 4.4.0+可用。你需要安装的其他软件包，形如`htop nano nodejs`，多个软件包用半角空格分开，在docker cli中请用一对双引号引起来，在docker-compose中不要增加引号。 |
 
 **以下是仅`iyuu`标签额外可用的环境变量：**
 
@@ -474,8 +484,9 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 # 发送通知
 docker exec qbittorrent notify "测试消息标题" "测试消息通知内容"
 
-# 将所有种子按tracker进行分类，由CRON_AUTO_CATEGOR设置的cron来调用
-docker exec qbittorrent auto-cat -a
+# 将种子按tracker进行分类，由CRON_AUTO_CATEGOR设置的cron来调用
+docker exec qbittorrent auto-cat -a  # 对所有未分类的种子进行分类，由程序自动调用，也可手动运行
+docker exec qbittorrent auto-cat -A  # 对所有种子进行分类，需要手动运行
 
 # 将指定种子按tracker进行分类，会自动在下载完成时运行一次（由 dl-finish <hash> 命令调用）
 docker exec qbittorrent auto-cat -i <hash>   # hash可以在种子详情中的"普通"标签页上查看到
@@ -515,6 +526,15 @@ docker exec -it qbittorrent change-tracker
 
 # 检测指定文件夹下没有在qbittorrent客户端中做种或下载的子文件夹/子文件，由用户确认是否删除，详见下面效果图，4.3.8+可用
 docker exec -it qbittorrent del-unseed-dir
+
+# 对所有种子进行分类，请注意-A是大写，如果是小写的-a，则只对未分类的种子进行分类，4.4.0+可用
+docker exec qbittorrent auto-cat -A
+
+# 生成本qBittorrent客户端中所有做种文件清单，4.4.0+可用
+docker exec -it qbittorrent report-seed-files
+
+# 生成指定路径下没有在本qBittorrent客户端做种的文件清单，4.4.0+可用
+docker exec -it qbittorrent report-unseed-files
 ```
 
 </details>
@@ -548,7 +568,7 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 
 - [crazymax/qbittorrent](https://hub.docker.com/r/crazymax/qbittorrent) , 参考了Dockerfile; 
   
-- [80x86/qbittorrent](https://hub.docker.com/r/80x86/qbittorrent), 借鉴了标签和分类的理念，正因为此镜像源码未公开，且长期不更新，这才催生我重写代码；
+- [80x86/qbittorrent](https://hub.docker.com/r/80x86/qbittorrent), 借鉴了标签和分类的理念。
 
 ## 源代码、问题反馈、意见建议
 

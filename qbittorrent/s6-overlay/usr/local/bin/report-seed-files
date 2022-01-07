@@ -16,6 +16,9 @@ if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
         echo "$(( $i + 1)): ${hashes[i]}"
         torrent_properties=$($cmd_curl "${api_url_base}/torrents/properties?hash=${hashes[i]}")
         save_path=$(echo "$torrent_properties" | jq -r .save_path)
+        if [[ "$save_path" != */ ]]; then
+            save_path="$save_path/"
+        fi
         torrent_files=$($cmd_curl "${api_url_base}/torrents/files?hash=${hashes[i]}")
         echo "$torrent_files" | jq -r .[].name | while read file; do
             echo "${save_path}${file}" >> $tmplist1
