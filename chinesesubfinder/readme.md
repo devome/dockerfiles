@@ -10,12 +10,14 @@
 
 ```
 docker run -d \
-    --name chinesesubfinder \
-    --hostname chinesesubfinder \
     -v $(pwd)/config:/config   `# 冒号左边请修改为你想在主机上保存配置、日志等文件的路径` \
     -v $(pwd)/media:/media     `# 冒号左边请修改为需要下载字幕的媒体目录` \
     -e PUID=1000 \
     -e PGID=100 \
+    --name chinesesubfinder \
+    --hostname chinesesubfinder \
+    --log-driver "json-file" \
+    --log-opt "max-size=100m" `# 限制日志大小，可自行调整` \
     nevinee/chinesesubfinder
 ```
 
@@ -38,6 +40,10 @@ services:
     network_mode: bridge
     hostname: chinesesubfinder
     container_name: chinesesubfinder
+    logging:
+        driver: "json-file"
+        options:
+          max-size: "100m" # 限制日志大小，可自行调整
 ```
 
 **如果是首次创建，请在创建后立即关闭容器，并按照[官方配置教程](https://github.com/allanpk716/ChineseSubFinder)配置好`config/config.yaml`后，再启动容器。**
