@@ -1,0 +1,38 @@
+name: 同步仓库：pve-kernel
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [mirror, pve-kernel]
+
+concurrency:
+  group: git-mirror
+
+jobs:
+  git-mirror:
+    runs-on: ubuntu-latest
+    name: 同步仓库：pve-kernel
+    steps:
+      - 
+        uses: wearerequired/git-mirror-action@v1
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+        with:
+          source-repo: "https://github.com/proxmox/pve-kernel.git"
+          destination-repo: "git@gitee.com:evine/pve-kernel.git"
+      
+      - 
+        uses: wearerequired/git-mirror-action@v1
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+        with:
+          source-repo: "https://github.com/proxmox/mirror_ubuntu-focal-kernel.git"
+          destination-repo: "git@gitee.com:evine/mirror_ubuntu-focal-kernel.git"
+      
+      - 
+        uses: wearerequired/git-mirror-action@v1
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_RSA_PRIVATE_KEY }}
+        with:
+          source-repo: "git://git.proxmox.com/git/zfsonlinux.git"
+          destination-repo: "git@gitee.com:evine/zfsonlinux.git"
