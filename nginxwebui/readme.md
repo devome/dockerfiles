@@ -8,7 +8,7 @@
 
   `x.x.x`  , `latest`
 
-  基于alpine制作的镜像，相比v2版本，因作者大佬更换了依赖，可以基于alpine来制作镜像了，大大减小了镜像体积，支持平台：`linux/386` , `linux/amd64` , `linux/arm64` , `linux/arm/v7`。
+  基于alpine制作的镜像，相比于v2版本，v3版本因作者大佬更换了依赖，可以基于alpine来制作镜像了，大大减小了镜像体积（大约减少一半），也大大减少了内存占用（也大约减少一半），支持平台：`linux/386` , `linux/amd64` , `linux/arm64` , `linux/arm/v7`。
 
 ### 2.9.4版本及以下
 
