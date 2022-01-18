@@ -1,10 +1,9 @@
-FROM ubuntu
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update \
-    && apt install -y --no-install-recommends \
+FROM alpine
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk add --update --no-cache \
        nginx \
-       libnginx-mod-stream \
-       openjdk-8-jre \
+       nginx-mod-stream \
+       openjdk8-jre \
        net-tools \
        curl \
        wget \
@@ -12,11 +11,8 @@ RUN apt update \
        fontconfig \
        tzdata \
        tini \
-       sqlite3 \
+       acme.sh \
     && fc-cache -f -v \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
-    && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* \
-    && sed -i "s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g" /etc/apt/sources.list \
-    && sed -i "s@/security.ubuntu.com/@/mirrors.aliyun.com/@g" /etc/apt/sources.list \
-    && sed -i "s@/ports.ubuntu.com/@/mirrors.aliyun.com/@g" /etc/apt/sources.list
+    && rm -rf /var/cache/apk/* /tmp/*

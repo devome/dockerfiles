@@ -1,11 +1,11 @@
-name: 构建镜像：nginxwebui-base(ubuntu)
+name: 构建镜像：nginxwebui-base
 on:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: 构建镜像：nginxwebui-base(ubuntu)
+    name: 构建镜像：nginxwebui-base
     env:
       IMAGE_NAME: nginxwebui-base
     steps:
@@ -43,11 +43,11 @@ jobs:
           context: ${{ env.IMAGE_NAME }}
           file: ${{ env.IMAGE_NAME }}/Dockerfile
           platforms: |
+            linux/386
             linux/amd64
             linux/arm64
             linux/arm/v7
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-ubuntu
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
             
