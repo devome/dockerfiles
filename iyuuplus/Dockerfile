@@ -3,10 +3,15 @@ FROM alpine:${ALPINE_VERSION}
 ENV APP_ENV=prod \
     LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \
+    PUID=1000 \
+    PGID=100 \
     PS1="\u@\h:\w \$ "
 WORKDIR /IYUU
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories \
     && apk add --update --no-cache \
+        su-exec \
+        busybox-suid \
+        shadow \
         ca-certificates \
         curl \
         tar \
@@ -42,6 +47,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories 
     && echo -e "upload_max_filesize=100M\npost_max_size=108M\nmemory_limit=1024M\ndate.timezone=${TZ}" > /etc/php7/conf.d/99-overrides.ini \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
+    && useradd iyuu -u ${PUID} -U -M -d /IYUU -s /sbin/nologin \
     && rm -rf /var/cache/apk/* /tmp/* /usr/share/man /usr/share/php7
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 EXPOSE 8787
