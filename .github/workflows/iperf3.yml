@@ -17,7 +17,7 @@ jobs:
         name: Prepare
         id: prepare
         run: |
-          version=$(curl -s https://api.github.com/repos/esnet/iperf/tags | jq -r .[].name | grep -m1 -P "(\d+\.){2}\d+")
+          version=$(curl -s https://api.github.com/repos/esnet/iperf/tags | jq -r .[].name | grep -m1 -P "^[\d\.]+$")
           echo ::set-output name=version::${version}
 
       - 

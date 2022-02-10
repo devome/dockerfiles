@@ -2,7 +2,7 @@
 
 repo="nevinee/iperf3"
 arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x"
-ver=$(curl -s https://api.github.com/repos/esnet/iperf/tags | jq -r .[].name | grep -m1 -P "(\d+\.){2}\d+")
+ver=$(curl -s https://api.github.com/repos/esnet/iperf/tags | jq -r .[].name | grep -m1 -P "^[\d\.]+$")
 alpine_ver=${1:-latest}
 
 buildx() {
