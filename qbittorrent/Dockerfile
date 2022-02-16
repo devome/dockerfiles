@@ -2,7 +2,7 @@ ARG LIBTORRENT_VERSION
 ARG ALPINE_VERSION=latest
 FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
-    && apk add --update --no-cache \
+    && apk add --no-cache \
        boost-dev \
        build-base \
        qt5-qttools-dev \
@@ -50,8 +50,8 @@ ENV S6_SERVICES_GRACETIME=30000 \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ "
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
-    && apk add --update --no-cache \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk add --no-cache \
        curl \
        openssl \
        qt5-qtbase \
