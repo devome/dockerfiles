@@ -53,8 +53,6 @@ services:
           max-size: "100m" # 限制日志大小，可自行调整
 ```
 
-**如果是首次创建，请在创建后立即关闭容器，并按照[官方配置教程](https://github.com/allanpk716/ChineseSubFinder)配置好`config/config.yaml`后，再启动容器。**
-
 ## 关于PUID/PGID的说明
 
 如在使用诸如emby、jellyfin、plex、qbittorrent、transmission、deluge、jackett、sonarr、radarr等等的docker镜像，请在创建本容器时的设置和它们的PUID/PGID和它们一样，如若真的不想设置为一样，至少要保证本容器PUID/PGID所定义的用户拥有你设置的媒体目录（示例中是`/media`）的读取和写入权限。
