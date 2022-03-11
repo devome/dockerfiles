@@ -4,7 +4,7 @@
 
 基于alpine实现，比官方镜像体积小、层数少，日志和设置文件全部和配置文件保存在一起，支持 386/amd64/arm64/armv7。
 
-**注意：本镜像未安装chromium，可能无法从subhd下载字幕，如有此需要，请使用官方原版镜像allanpk716/chinesesubfinder。**
+**注意：本镜像未安装chromium及其运行依赖，无法从subhd下载字幕，如有此需要，请使用官方原版镜像allanpk716/chinesesubfinder。**
 
 ## 创建
 
@@ -25,6 +25,8 @@ docker run -d \
     --log-opt "max-size=100m" `# 限制日志大小，可自行调整` \
     nevinee/chinesesubfinder
 ```
+
+创建好后访问`http://<ip>:19035`来进行下一步设置。
 
 **docker-compose**
 
@@ -52,6 +54,8 @@ services:
         options:
           max-size: "100m" # 限制日志大小，可自行调整
 ```
+
+创建好后访问`http://<ip>:19035`来进行下一步设置。
 
 ## 关于PUID/PGID的说明
 
