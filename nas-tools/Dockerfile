@@ -5,7 +5,8 @@ ENV LANG="C.UTF-8" \
     NASTOOL_AUTO_UPDATE=1 \
     PS1="\u@\h:\w \$ " \
     PUID=0 \
-    PGID=0
+    PGID=0 \
+    UMASK=000
 WORKDIR /nas-tools
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --no-cache \

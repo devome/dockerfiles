@@ -30,4 +30,5 @@ fi
 
 echo "以PUID=${PUID}，PGID=${PGID}的身份启动程序..."
 chown -R ${PUID}:${PGID} /config /nas-tools
+umask $UMASK
 exec su-exec ${PUID}:${PGID} python3 run.py
