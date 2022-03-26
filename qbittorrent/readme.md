@@ -557,13 +557,13 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 
 ## 效果图
 
-![notify](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/notify.png)
+![notify](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/notify.png)
 
-![iyuu-help](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/iyuu-help.png)
+![iyuu-help](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/iyuu-help.png)
 
-![change-tracker](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/change-tracker.png)
+![change-tracker](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/change-tracker.png)
 
-![del-unseed-dir](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/del-unseed-dir.png)
+![del-unseed-dir](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/del-unseed-dir.png)
 
 
 ## 参考
