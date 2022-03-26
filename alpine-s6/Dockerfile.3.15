@@ -2,7 +2,6 @@ ARG ALPINE_VERSION=latest
 FROM alpine:${ALPINE_VERSION}
 ARG S6_OVERLAY_VERSION
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-    && apk add --no-cache --update bash \
     && s6_arch=$(cat /etc/apk/arch | sed "{s/x86_64/amd64/; s/armv7/arm/}") \
     && wget https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${s6_arch}-installer -O /tmp/s6-overlay-installer \
     && chmod +x /tmp/s6-overlay-installer \

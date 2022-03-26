@@ -1,0 +1,4 @@
+FROM alpine:3.14
+RUN apk add --no-cache s6-overlay
+ENV PS1="\u@\h:\w \$ "
+ENTRYPOINT ["/init"]
