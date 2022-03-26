@@ -1,11 +1,12 @@
 ARG LIBTORRENT_VERSION
 ARG ALPINE_VERSION=latest
 FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
-    && apk add --no-cache \
+RUN apk add --no-cache \
        boost-dev \
-       build-base \
+       openssl-dev \
+       qt5-qtbase-dev \
        qt5-qttools-dev \
+       g++ \
        cmake \
        curl \
        tar \
@@ -18,11 +19,14 @@ RUN mkdir -p /tmp/qbittorrent \
     && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xz --strip-components 1 \
     && cmake \
        -DCMAKE_BUILD_TYPE=Release \
+       -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
        -DCMAKE_CXX_STANDARD=17 \
+       -DWEBUI=ON \
        -DVERBOSE_CONFIGURE=OFF \
        -DSTACKTRACE=OFF \
        -DDBUS=OFF \
        -DGUI=OFF \
+       -DQT6=OFF \
        -Brelease \
        -GNinja \
     && cd release \
@@ -50,7 +54,7 @@ ENV S6_SERVICES_GRACETIME=30000 \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ "
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
     && apk add --no-cache \
        curl \
        openssl \

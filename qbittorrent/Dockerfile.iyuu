@@ -1,6 +1,6 @@
 FROM nevinee/qbittorrent
 ENV IYUU_REPO_URL=https://gitee.com/ledc/iyuuplus.git
-RUN apk add --update --no-cache \
+RUN apk add --no-cache \
        tar \
        libressl \
        zip \
