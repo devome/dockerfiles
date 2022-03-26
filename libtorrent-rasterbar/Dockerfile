@@ -2,16 +2,14 @@ ARG ALPINE_VERSION=latest
 FROM alpine:${ALPINE_VERSION}
 ARG LIBTORRENT_VERSION
 ARG JNPROC=1
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-    && apk update \
-    && apk add --no-cache --virtual .build \
+RUN apk add --no-cache --virtual .build \
        boost-dev \
-       build-base \
        openssl-dev \
        cmake \
+       g++ \
+       samurai \
        curl \
        tar \
-       samurai \
     && mkdir -p /tmp/libtorrent-rasterbar \
     && cd /tmp/libtorrent-rasterbar \
     && curl -sSL https://github.com/arvidn/libtorrent/releases/download/v${LIBTORRENT_VERSION}/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz | tar xz --strip-components 1 \
@@ -26,4 +24,5 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && ninja install \
     && ls -al /usr/local/lib \
     && apk del --purge .build \
+    && apk add libcrypto1.1 libgcc libssl1.1 libstdc++ \
     && rm -rf /tmp/* /var/cache/apk/*
