@@ -3,8 +3,7 @@ FROM golang:alpine AS builder
 ARG VERSION
 ENV CGO_ENABLED=1 \
     GO111MODULE=on \
-    GOOS=linux \
-    GOPROXY=https://goproxy.cn,direct
+    GOOS=linux
 WORKDIR /build
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --no-cache \
