@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.15.3
 ENV LANG=zh_CN.UTF-8 \
     PS1="\u@\h:\w \$ "
 RUN apk add --update --no-cache \
