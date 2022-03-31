@@ -1,4 +1,4 @@
-FROM alpine
-RUN sed -i 's/v\d\.\d*/edge/g' /etc/apk/repositories && apk add --no-cache s6-overlay
+FROM alpine:edge
+RUN apk add --no-cache s6-overlay
 ENV PS1="\u@\h:\w \$ "
 ENTRYPOINT ["/init"]
