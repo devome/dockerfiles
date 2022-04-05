@@ -32,6 +32,10 @@
 
   标签中带有`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。此标签仅供测试使用及向qBittorrent官方反馈bug使用。
 
+4. **`edge`**
+
+  基于`alpine:edge`制作的镜像，也是测试版，会提供`riscv64`版本镜像。
+
 ## 更新日志（仅列出稳定版）
 
 | Date     | qBittorrent | libtorrent | alpine | 备注 |
