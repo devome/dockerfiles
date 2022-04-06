@@ -27,8 +27,6 @@ services:
       - DB_NAME=tiebacloud        # 数据库名
       - CSRF=true
       - CRON_TASK=* * * * *       # 执行do.php的cron，默认每分钟执行，明白这是何含义的可以自己改
-    volumes:
-      - ./www:/var/www
     ports:
       - 8080:8080
     links:
