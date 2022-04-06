@@ -1,4 +1,4 @@
-FROM python:alpine
+FROM nevinee/alpine-s6
 LABEL maintainer="Evine Deng <evinedeng@foxmail.com>"
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     HOME=/root \
@@ -8,8 +8,9 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk update -f \
     && apk --no-cache add -f \
+       python3-dev \
+       py3-pip \
        bash \
-       s6-overlay \
        openssl \
        coreutils \
        moreutils \
@@ -20,7 +21,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
        tzdata \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "Asia/Shanghai" > /etc/timezone \
-    && pip config set global.index-url https://mirrors.bfsu.edu.cn/pypi/web/simple \
+    && ln -s /usr/bin/python3 /usr/bin/python \
     && python -m pip install --upgrade pip \
     && rm -rf \
        /tmp/* \
