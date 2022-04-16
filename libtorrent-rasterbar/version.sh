@@ -46,10 +46,10 @@ if [[ $ver_lib2_official ]]; then
 fi
 
 ## 需要更新时则重新构建
-if [[ $build_mark_1 -eq 1 ]]; then
-    ./buildx.sh -v$ver_lib1_official
-fi
+# if [[ $build_mark_1 -eq 1 ]]; then
+#     ./buildx.sh -v$ver_lib1_official
+# fi
 
-if [[ $build_mark_2 -eq 1 ]]; then
-    ./buildx.sh -v$ver_lib2_official
-fi
+# if [[ $build_mark_2 -eq 1 ]]; then
+#     ./buildx.sh -v$ver_lib2_official
+# fi
