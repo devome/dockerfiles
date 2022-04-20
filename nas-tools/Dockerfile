@@ -2,7 +2,7 @@ FROM alpine
 ENV LANG="C.UTF-8" \
     TZ="Asia/Shanghai" \
     NASTOOL_CONFIG="/config/config.yaml" \
-    NASTOOL_AUTO_UPDATE=1 \
+    NASTOOL_AUTO_UPDATE=false \
     PS1="\u@\h:\w \$ " \
     REPO_URL="https://github.com/jxxghp/nas-tools.git" \
     PUID=0 \
@@ -12,18 +12,14 @@ WORKDIR /nas-tools
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
     && apk add --no-cache \
        git \
-       python3 \
-       py3-pip \
-       libxml2 \
-       libxslt \
-       tzdata \
-       su-exec \
-    && apk add --no-cache --virtual .build \
        gcc \
        musl-dev \
        python3-dev \
+       py3-pip \
        libxml2-dev \
        libxslt-dev \
+       tzdata \
+       su-exec \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
     && ln -sf /usr/bin/python3 /usr/bin/python \
@@ -32,15 +28,15 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && echo 'fs.inotify.max_user_watches=524288' >> /etc/sysctl.conf \
     && echo 'fs.inotify.max_user_instances=524288' >> /etc/sysctl.conf \
     && git config --global pull.ff only \
-    && git clone -b master ${REPO_URL} . \
-    && pip config set global.index-url https://mirrors.bfsu.edu.cn/pypi/web/simple \
-    && pip install pip -U \
+    && git clone -b master ${REPO_URL} --depth=1 . \
+    && pip install --upgrade pip setuptools wheel \
     && pip install -r requirements.txt \
-    && apk del --purge .build \
+    && pip install git+https://github.com/coderanger/supervisor-stdout \
+    && cp supervisor_stdout.py /usr/lib/python${python_ver%.*}/site-packages/ \
+    && mkdir -p /var/log/supervisor \
     && rm -rf \
        /tmp/* \
        /root/.cache \
        /var/cache/apk/*
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 VOLUME ["/config"]
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/nas-tools/docker/entrypoint.sh"]
