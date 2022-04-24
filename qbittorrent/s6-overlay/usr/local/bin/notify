@@ -115,4 +115,4 @@ desp=$(echo "$2" | sed "s!&!%26!g")
 [[ $SCKEY ]] && notify_serverchan "$title" "$desp"
 [[ $PUSHPLUS_TOKEN ]] && notify_pushplus "$title" "$desp"
 [[ $WORK_WECHAT_BOT_KEY ]] && notify_work_wechat_bot "$title\n\n$desp"
-[[ -z $DD_BOT_TOKEN && -z $DD_BOT_SECRET && -z $TG_BOT_TOKEN && -z $TG_USER_ID && -z $IYUU_TOKEN && -z $SCKEY && -z $PUSHPLUS_TOKEN ]] && echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 没有有效的通知渠道，不发送通知消息..."
+[[ -z $DD_BOT_TOKEN && -z $DD_BOT_SECRET && -z $TG_BOT_TOKEN && -z $TG_USER_ID && -z $IYUU_TOKEN && -z $SCKEY && -z $PUSHPLUS_TOKEN && -z $WORK_WECHAT_BOT_KEY ]] && echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 没有有效的通知渠道，不发送通知消息..."
