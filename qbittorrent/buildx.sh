@@ -27,9 +27,11 @@ docker_build() {
 
 ## 推送
 docker_push() {
-    for arch in ${BUILDX_ARCH}; do
-        docker push ${DOCKERHUB_REPOSITORY}:${QBITTORRENT_VERSION}-${arch//\//-}
-    done
+    if [[ ${OUTPUT} == docker ]]; then
+        for arch in ${BUILDX_ARCH}; do
+            docker push ${DOCKERHUB_REPOSITORY}:${QBITTORRENT_VERSION}-${arch//\//-}
+        done
+    fi
 }
 
 ## 维护标签
