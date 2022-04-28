@@ -27,9 +27,11 @@ docker_build() {
 
 ## 推送
 docker_push() {
-    for arch in ${BUILDX_ARCH}; do
-        docker push ${DOCKERHUB_REPOSITORY}:${LIBTORRENT_VERSION}-${arch//\//-}
-    done
+    if [[ ${OUTPUT} == docker ]]; then
+        for arch in ${BUILDX_ARCH}; do
+            docker push ${DOCKERHUB_REPOSITORY}:${QBITTORRENT_VERSION}-${arch//\//-}
+        done
+    fi
 }
 
 ## 维护标签
@@ -37,8 +39,8 @@ docker_manifest() {
     for ((n=1; n<=${MANIFEST_COUNT}; n++)); do
         echo "============================= 第 $n 次信息维护 ============================="
         for tag in ${MULTITAGS}; do
-            docker manifest create "${DOCKERHUB_REPOSITORY}:${tag}" "${IMAGES[@]}"
-            docker manifest push --purge "${DOCKERHUB_REPOSITORY}:${tag}"
+            docker manifest create --insecure "${DOCKERHUB_REPOSITORY}:${tag}" "${IMAGES[@]}"
+            docker manifest push --insecure --purge "${DOCKERHUB_REPOSITORY}:${tag}"
         done
     done
 }
@@ -66,6 +68,7 @@ base_func() {
     [[ $bcount ]] && export BUILD_COUNT=$bcount || export BUILD_COUNT=20
     [[ $mcount ]] && export MANIFEST_COUNT=$mcount || export MANIFEST_COUNT=1
     [[ $jnproc ]] && export JNPROC=$jnproc || export JNPROC=1
+    [[ $output ]] && export OUTPUT=$ourput || export OUTPUT=registry
     [[ $archtech ]] && export BUILDX_ARCH="$archtech" || export BUILDX_ARCH="386 amd64 arm64 arm/v6 arm/v7 ppc64le s390x"
 
     ## 标签
@@ -89,6 +92,7 @@ echo_console() {
     echo "BUILDX_ARCH='${BUILDX_ARCH}'"
     echo "MULTITAGS='${MULTITAGS}'"
     echo "JNPROC=${JNPROC}"
+    echo "OUTPUT=${OUTPUT}"
     echo "IMAGES[@]='${IMAGES[@]}'"
 }
 
@@ -102,6 +106,7 @@ usage() {
     echo "-j <jnproc>    # 用来编译的核心数，默认1"
     echo "-l <yes/no>    # 是否记录日志[YES|Yes|yes|y / NO|No|no|n]，默认yes"
     echo "-n <mcount>    # 信息维护次数，默认1"
+    echo "-o <ourput>    # 输出到镜像(docker)还是直接推送到hub(registry)，默认registry"
     echo "-p <alpine>    # 基础镜像alpine版本，默认latest"
     echo "-r <hubrepo>   # 构建镜像名（不含标签），默认nevinee/libtorrent-rasterbar"
     echo "-t <archtech>  # 构建架构，默认全构架"
@@ -205,6 +210,7 @@ main() {
             j) jnproc=$OPTARG;;
             l) log=$OPTARG;;
             n) mcount=$OPTARG;;
+            o) output=$OPTARG;;
             p) alpine_ver=$OPTARG;;
             r) repo=$OPTARG;;
             t) archtech=$OPTARG;;
