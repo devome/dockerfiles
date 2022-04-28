@@ -10,7 +10,7 @@ for arch in ${BUILDX_ARCH}; do
         --tag ${DOCKERHUB_REPOSITORY}:${QBITTORRENT_VERSION}-${arch//\//-} \
         --cache-from "type=local,src=/tmp/.buildx-cache" \
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
-        --output "type=docker" \
+        --output "type=${OUTPUT}" \
         --platform linux/${arch} \
         --build-arg "ALPINE_VERSION=${ALPINE_VERSION}" \
         --build-arg "QBITTORRENT_VERSION=${QBITTORRENT_VERSION}" \
