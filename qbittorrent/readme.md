@@ -10,6 +10,8 @@
 
 - **一些辅助功能：批量修改tracker；检测指定文件夹下未做种的子文件夹/文件；生成做种文件清单；生成未做种文件清单；配合IYUU自动重新校验和自动恢复做种；指定设备上线时自动限速；多时段限速等等。**
 
+- **如需要下载完成后自动触发EMBY/JELLYFIN扫描媒体库，触发ChineseSubFinder自动为刚刚下载完成的视频自动下载字幕，请按照 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent/diy) 操作。**
+
 - 日志输出到docker控制台，可从portainer查看。
 
 - `python`为可选安装项，设置为`true`就自动安装。
@@ -34,7 +36,7 @@
 
 4. **`edge`**
 
-  基于`alpine:edge`制作的镜像，也是测试版，会提供`riscv64`版本镜像。
+  基于`alpine:edge`制作的镜像，也是测试版，会提供`riscv64`版本镜像。**所有新功能或者BUG修复都会第一时间更新到此标签。**
 
 ## 更新日志（仅列出稳定版）
 
@@ -49,6 +51,7 @@
 | 20220107 | 4.4.0       | 2.0.5      | 3.14.3 | 1. 增加环境变量`EXTRA_PACKAGES`，详见[环境变量清单](#环境变量清单)；<br>2. 默认运行自动分类程序时仅对未分类的种子进行分类，如需要强制对所有种子进行分类，请参考[命令](#命令)；<br>3. 增加两个需要手动运行的脚本`report-seed-files`(导出所有做种文件清单)和`report-unseed-files`(导出指定文件夹下未做种文件清单)，详见[命令](#命令)。 |
 | 20220216 | 4.4.1       | 2.0.5      | 3.14.3 |      |
 | 20220325 | 4.4.2       | 2.0.5      | 3.14.4 |      |
+| 20220524 | 4.4.3       | 2.0.6      | 3.16.0 | 1. 修复存在多个标签时无法移除`TrackerError`标签的bug；</br>2. 增加企业微信群机器人的通知渠道。</br>3. 升级openssl到1.1.1o，boost到1.78，alpine到3.16.0，升级iyuu镜像中的php7为php8。 |
 
 ## 环境变量清单
 
@@ -88,13 +91,14 @@
 |  18 | IYUU_TOKEN              |               | 通知渠道爱语飞飞，通过 [这里](http://iyuu.cn) 获取，爱语飞飞的TOKEN。 |
 |  19 | SCKEY                   |               | 通知渠道ServerChan，通过 [这里](http://sc.ftqq.com/3.version) 获取。 |
 |  20 | PUSHPLUS_TOKEN          |               | 4.3.7+可用。通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)。 |
-|  21 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
-|  22 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron将所有种子按tracker分类。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。 |
-|  23 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
-|  24 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
-|  25 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
-|  26 | CRON_IYUU_HELP          |               | 4.3.8+可用。IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。 |
-|  27 | EXTRA_PACKAGES          |               | 4.4.0+可用。你需要安装的其他软件包，形如`htop nano nodejs`，多个软件包用半角空格分开，在docker cli中请用一对双引号引起来，在docker-compose中不要增加引号。 |
+|  21 | WORK_WECHAT_BOT_KEY     |               | 4.4.3+可用。通知渠道企业微信群机器人，填入机器人设置webhook链接中`key=`后面的字符串，不含`key=`。 |
+|  22 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
+|  23 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron将所有种子按tracker分类。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。 |
+|  24 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
+|  25 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
+|  26 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
+|  27 | CRON_IYUU_HELP          |               | 4.3.8+可用。IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。 |
+|  28 | EXTRA_PACKAGES          |               | 4.4.0+可用。你需要安装的其他软件包，形如`htop nano nodejs`，多个软件包用半角空格分开，在docker cli中请用一对双引号引起来，在docker-compose中不要增加引号。 |
 
 **以下是仅`iyuu`标签额外可用的环境变量：**
 
@@ -288,6 +292,8 @@ networks:
 
 - 假如你要调用其他语言的脚本，比如python，可以在`diy.sh`中写上`python3 /data/diy/your_python_scripts.py $torrent_hash`即可。如需要传入更多参数，请参考上一条在“Torrent 完成时运行外部程序”填入形如`dl-finish "%I" "%N" "%L" "%F"`的形式，然后在`diy.sh`中写上`python3 /data/diy/your_python_scripts.py "$2" "$3" "$4"`。
 
+- 如需要下载完成后自动触发EMBY/JELLYFIN扫描媒体库，触发ChineseSubFinder自动为刚刚下载完成的视频自动下载字幕，请按照 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent/diy) 操作。
+
 </details>
 
 <details>
@@ -477,6 +483,23 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 - 如果你发现容器在关闭/重启/重建时所花费的时间已经比较接近，甚至是超过`S6_SERVICES_GRACETIME`所设置的时间时，就建议将`S6_SERVICES_GRACETIME`设置得再大一些，大到远远超过关闭/重启/重建时所花费的时间。
 
 - 在4.4.0及以后，本镜像将重设`S6_SERVICES_GRACETIME`的值为`30000`毫秒，但仍然可以由用户指定其他值。
+
+</details>
+
+<details>
+
+<summary markdown="span"><b> ▶ 17. qBittorrent使用https的webui时，iyuu如何连接</b></summary>
+
+- 当qBittorrent使用https的webui时，iyuu连接qBittorrent需要使用`https://<域名>:<端口>`的形式，不能使用`https://<IP>:<端口>`，所以需要在创建iyuu容器（使用nevinee/qbittorrent:iyuu时同样也需要）指定域名和ip的对应关系。
+
+- 命令行创建iyuu容器时时，增加`--add-host <域名>:<qBittorrent容器的IP>`，其中域名是你在公网上访问qBittorrent的webui的域名，如果直接使用的`nevinee/qbittorrent:iyuu`标签，就是`--add-host <域名>:127.0.0.1`。
+
+- docker compose创建时，增加以下内容：
+
+    ```
+        extra_hosts:
+          - "<域名>:<qBittorrent容器的IP>"  ## 如果直接使用的`nevinee/qbittorrent:iyuu`标签，IP就是127.0.0.1
+    ```
 
 </details>
 
