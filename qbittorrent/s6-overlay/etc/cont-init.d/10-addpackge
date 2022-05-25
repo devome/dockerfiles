@@ -12,4 +12,4 @@ add_package() {
     fi
 }
 
-add_package 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
+add_package 2>&1 | sed "s#^#cont-init: info: $(realpath $0): \1#g"

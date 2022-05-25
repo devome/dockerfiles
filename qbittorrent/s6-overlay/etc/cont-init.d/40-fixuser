@@ -11,4 +11,4 @@ fix_user() {
     chown -R qbittorrent:qbittorrent "${QBITTORRENT_HOME}" /data
 }
 
-fix_user 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
+fix_user 2>&1 | sed "s#^#cont-init: info: $(realpath $0): \1#g"

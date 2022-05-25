@@ -1,6 +1,8 @@
 FROM alpine:edge
 ENV S6_SERVICES_GRACETIME=30000 \
     S6_KILL_GRACETIME=60000 \
+    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
+    S6_SYNC_DISKS=1 \
     QBITTORRENT_HOME=/var/lib/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \

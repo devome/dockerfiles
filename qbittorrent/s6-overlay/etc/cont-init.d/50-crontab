@@ -57,4 +57,4 @@ set_crontab() {
     rm -f /tmp/crontab.list
 }
 
-set_crontab 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
+set_crontab 2>&1 | sed "s#^#cont-init: info: $(realpath $0): \1#g"

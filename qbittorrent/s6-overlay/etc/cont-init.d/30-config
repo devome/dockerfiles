@@ -42,4 +42,4 @@ EOF
     }" /data/config/qBittorrent.conf
 }
 
-fix_config 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
+fix_config 2>&1 | sed "s#^#cont-init: info: $(realpath $0): \1#g"

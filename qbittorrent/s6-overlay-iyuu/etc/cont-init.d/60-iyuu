@@ -61,4 +61,4 @@ set_iyuu() {
     php start.php start -d
 }
 
-set_iyuu 2>&1 | sed "s#^#[cont-init.d] $(basename $0): \1#g"
+set_iyuu 2>&1 | sed "s#^#cont-init: info: $(realpath $0): \1#g"
