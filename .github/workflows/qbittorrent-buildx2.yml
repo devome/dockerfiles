@@ -113,14 +113,14 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:iyuu
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest-iyuu
 
-      - 
-        name: Update DockerHub Description
-        uses: christian-korneck/update-container-description-action@v1
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASSPWORD }}
-        with:
-          destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
-          provider: dockerhub
-          readme_file: ./${{ env.IMAGE_NAME }}/readme.md
-          short_description: ${{ env.IMAGE_NAME }} ${{ steps.prepare.outputs.QBITTORRENT_VERSION }}：下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等
+      # - 
+      #   name: Update DockerHub Description
+      #   uses: christian-korneck/update-container-description-action@v1
+      #   env:
+      #     DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+      #     DOCKER_PASS: ${{ secrets.DOCKER_PASSPWORD }}
+      #   with:
+      #     destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+      #     provider: dockerhub
+      #     readme_file: ./${{ env.IMAGE_NAME }}/readme.md
+      #     short_description: ${{ env.IMAGE_NAME }} ${{ steps.prepare.outputs.QBITTORRENT_VERSION }}：下载完成通知,自动分类,IYUU辅助,tracker错误标记,批量修改tracker,设备上线自动限速,多时段限速等等
