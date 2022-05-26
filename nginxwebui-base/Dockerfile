@@ -1,7 +1,5 @@
 FROM alpine
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-    && apk upgrade \
-    && apk add --no-cache \
+RUN apk add --no-cache \
        nginx \
        nginx-mod-stream \
        nginx-mod-http-headers-more \
@@ -17,4 +15,5 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
     && fc-cache -f -v \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
-    && rm -rf /var/cache/apk/* /tmp/*
+    && rm -rf /var/cache/apk/* /tmp/* \
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
