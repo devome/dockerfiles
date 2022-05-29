@@ -58,6 +58,10 @@ qb2csf_dir_match=(
     ""
 )
 
+## 如果刚刚下载的视频中存在中文字幕，是否将chinesusubfinder中对应的任务设置为忽略，即取消字幕下载，如需要取消，请设置为true。
+## 需要qbittorrent的所处的环境中含有mediainfo，如使用 nevinee/qbittorrent 镜像只需要将环境变量 EXTRA_PACKAGES 中增加一个 mediainfo 即可，其他环境请自行处理。
+cancel_has_subtitle=false
+
 
 ########################## 以上为配置部分，以下为运行部分  ########################## 
 
@@ -122,6 +126,25 @@ cat $tmplist | grep -Evi "$ignore_keyword" | while read file; do
             csf_job_id=$(echo $csf_result | jq -r .job_id)
             csf_message=$(echo $csf_result | jq -r .message)
             echo "视频类型：${video_type}，qB的文件：${file}，对应CSF的文件：${csf_file}，CSF任务ID：${csf_job_id}，CSF任务消息：${csf_message}"
+
+            ## 检测是否有中文字幕，如果有中文字幕，向csf设置ignore
+            if [[ $cancel_has_subtitle == true ]]; then
+                if ! type mediainfo &>/dev/null; then
+                    echo "未安装mediainfo，无法检测字幕，退出..."
+                    exit 1
+                fi
+
+                if [[ -n $(mediainfo --Output=JSON "$file" | jq '.media.track[] | select(."@type" == "Text")' | jq 'select(.Language == "zh")') ]]; then
+                    csf_result2=$(curl -sSk \
+                        -H "Content-Type: application/json" \
+                        -H "Authorization: Bearer $csf_token" \
+                        -X POST \
+                        -d "{\"id\":\"$csf_job_id\",\"job_status\":5}" \
+                        "${csf_url}/api/v1/change-job-status"
+                    )
+                    echo "检测到本视频含有中文字幕，取消字幕下载任务，取消结果：$(echo $csf_result2 | jq -r .message)"
+                fi
+            fi
             break
         fi
     done
