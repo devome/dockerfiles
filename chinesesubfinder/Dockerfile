@@ -5,13 +5,13 @@ ENV CGO_ENABLED=1 \
     GO111MODULE=on \
     GOOS=linux
 WORKDIR /build
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-    && apk add --no-cache \
-       build-base \
+RUN apk add --no-cache \
        curl \
-       tar \
-       nodejs \
+       gcc \
+       g++ \
+       musl-dev \
        npm \
+       tar \
     && curl -sSL https://github.com/allanpk716/ChineseSubFinder/archive/refs/tags/v${VERSION}.tar.gz | tar xvz --strip-components 1 \
     && npm --prefix frontend ci \
     && npm --prefix frontend run build \
@@ -25,7 +25,7 @@ ENV TZ=Asia/Shanghai \
     PGID=100 \
     UMASK=022 \
     PS1="\u@\h:\w \$ "
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
     && apk add --no-cache \
        ffmpeg \
        ca-certificates \
