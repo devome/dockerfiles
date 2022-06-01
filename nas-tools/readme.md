@@ -2,6 +2,8 @@
 
 这个项目的Docker实现：https://github.com/jxxghp/nas-tools
 
+本镜像已经维护到官方镜像，请使用官方镜像，本镜像不再更新。
+
 ## 特点
 
 - 基于alpine实现，镜像体积小；
