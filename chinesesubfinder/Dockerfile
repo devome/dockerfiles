@@ -4,18 +4,10 @@ ARG VERSION
 ENV CGO_ENABLED=1 \
     GO111MODULE=on \
     GOOS=linux
-WORKDIR /build
-RUN apk add --no-cache \
-       curl \
-       gcc \
-       g++ \
-       musl-dev \
-       npm \
-       tar \
-    && curl -sSL https://github.com/allanpk716/ChineseSubFinder/archive/refs/tags/v${VERSION}.tar.gz | tar xvz --strip-components 1 \
-    && npm --prefix frontend ci \
-    && npm --prefix frontend run build \
-    && go build -ldflags="-s -w --extldflags '-static -fpic' -X main.AppVersion=v${VERSION}" -o /out/usr/local/bin/chinesesubfinder ./cmd/chinesesubfinder
+COPY go /go
+WORKDIR /go/src
+RUN apk add --no-cache gcc g++ musl-dev && \
+    go build -ldflags="-s -w --extldflags '-static -fpic' -X main.AppVersion=v${VERSION}" -o /out/usr/local/bin/chinesesubfinder ./cmd/chinesesubfinder
 COPY entrypoint.sh /out/usr/local/bin/entrypoint.sh
 
 ARG ALPINE_VERSION

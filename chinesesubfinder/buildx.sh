@@ -25,7 +25,14 @@ buildx() {
 
 if [[ $ver ]]; then
     [[ ! -d logs ]] && mkdir logs
+    [[ -d go/src ]] && rm -rf go/src
     echo "alpine_ver=${1:-latest}"
+    docker run --rm \
+        --env VERSION=${{ steps.prepare.outputs.version }} \
+        --volume $(pwd)/go:/go \
+        --volume $(pwd)/init.sh:/init.sh \
+        --entrypoint "/init.sh" \
+        golang:alpine
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
 else
     echo "未获取到最新版本号"
