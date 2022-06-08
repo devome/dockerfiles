@@ -18,6 +18,8 @@ docker run -d \
     -v $(pwd)/media:/media     `# 请修改为需要下载字幕的媒体目录，冒号右边可以改成你方便记忆的目录，多个媒体目录需要添加多个-v映射` \
     -e PUID=1000 \
     -e PGID=100 \
+    -e UMASK=022 \
+    -e TZ=Asia/Shanghai \
     -p 19035:19035 `# 从0.20.0版本开始，通过webui来设置` \
     --name chinesesubfinder \
     --hostname chinesesubfinder \
@@ -43,6 +45,8 @@ services:
     environment:
       - PUID=1000
       - PGID=100
+      - UMASK=022
+      - TZ=Asia/Shanghai
     restart: always
     network_mode: bridge
     hostname: chinesesubfinder
