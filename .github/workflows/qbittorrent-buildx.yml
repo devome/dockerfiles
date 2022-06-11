@@ -182,7 +182,7 @@ jobs:
         uses: christian-korneck/update-container-description-action@v1
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASSPWORD }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
         with:
           destination_container_repo: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
           provider: dockerhub
