@@ -46,10 +46,10 @@ if [[ $ver_qbbeta_official ]]; then
 fi
 
 ## 需要更新时则重新构建
-# if [[ $stable_build_mark -eq 1 ]]; then
-#     ./buildx.sh -v$ver_qb_official -p3.14
-# fi
+if [[ $stable_build_mark -eq 1 ]]; then
+    gh workflow run qbittorrent-buildx2.yml -f version=$ver_qb_official
+fi
 
 # if [[ $unstable_build_mark -eq 1 ]]; then
-#     ./buildx.sh -v$ver_qbbeta_official -p3.14
+#     gh workflow run qbittorrent-buildx2.yml -f version=$ver_qbbeta_official
 # fi
