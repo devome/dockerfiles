@@ -8,12 +8,8 @@ export GOOS=linux
 export MUSL=/musl
 
 ## 准备必要的环境
-if [ ! -d ~/go/src ]; then
-    mkdir -p ~/go/src
-fi
-if [ ! -d ~/go/bin ]; then
-    mkdir -p ~/go/bin
-fi
+[[ ! -d ~/go/src ]] && mkdir -p ~/go/src
+[[ ! -d ~/go/bin ]] && mkdir -p ~/go/bin
 
 ## 下载源码并下载go mod
 cd ~/go/src
@@ -24,54 +20,36 @@ go mod tidy
 
 ## 编译共用函数
 cross_make() {
+    export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     if [[ -n ${CROSS_NAME} ]]; then
-        export GPP_VERSION=$(${MUSL}/${CROSS_NAME}-cross/bin/${CROSS_NAME}-g++ --version | grep -oE '\d+\.\d+\.\d+' | head -1)
+        export CPLUS_VERSION=$(${MUSL}/${CROSS_NAME}-cross/bin/${CROSS_NAME}-g++ --version | grep -oE '\d+\.\d+\.\d+' | head -1)
         export PATH=${MUSL}/${CROSS_NAME}-cross/bin:${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         export C_INCLUDE_PATH=${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/include
-        export CPLUS_INCLUDE_PATH=${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/include/c++/${GPP_VERSION}
+        export CPLUS_INCLUDE_PATH=${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/include/c++/${CPLUS_VERSION}
         export LIBRARY_PATH=${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/lib
         export CC=${CROSS_NAME}-gcc
         export CXX=${CROSS_NAME}-g++
         export AR=${CROSS_NAME}-ar
     fi
     echo "[$(date +'%H:%M:%S')] 开始编译 ${GOARCH} 平台..."
-    go build \
-        -ldflags="-s -w --extldflags '-static -fpic' -X main.AppVersion=v${VERSION}" \
-        -o ~/go/out/${GOARCH}/chinesesubfinder \
-        ./cmd/chinesesubfinder
+    go build -ldflags="-s -w --extldflags '-static -fpic' -X main.AppVersion=v${VERSION}" -o ~/go/out/${GOARCH}/chinesesubfinder ./cmd/chinesesubfinder
+    if [[ -n ${CROSS_NAME} ]]; then
+        unset -v CPLUS_VERSION PATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH LIBRARY_PATH CC CXX AR
+    fi
+    export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 }
 
-## 编译amd64平台
-export CROSS_NAME=
-export GOARCH=amd64
-export GOAMD64=v1
-cross_make
-unset -v CROSS_NAME
-unset -v GOARCH
-unset -v GOAMD64
-
-## 编译386平台
-export CROSS_NAME=i686-linux-musl
-export GOARCH=386
-cross_make
-unset -v CROSS_NAME
-unset -v GOARCH
-
-## 编译arm64平台
-export CROSS_NAME=aarch64-linux-musl
-export GOARCH=arm64
-cross_make
-unset -v CROSS_NAME
-unset -v GOARCH
-
-## 编译arm/v7平台
-export CROSS_NAME=armv7l-linux-musleabihf
-export GOARCH=arm
-export GOARM=7
-cross_make
-unset -v CROSS_NAME
-unset -v GOARCH
-unset -v GOARM
+## 开始交叉编译
+arches=( amd64 386 arm64 arm )
+crosses=( "" i686-linux-musl aarch64-linux-musl armv7l-linux-musleabihf )
+for ((i=0; i<${#arches[@]}; i++)); do
+    export GOARCH=${arches[i]}
+    export CROSS_NAME=${crosses[i]}
+    [[ ${GOARCH} == amd64 ]] && export GOAMD64=v1
+    [[ ${GOARCH} == arm ]] && export GOARM=7
+    cross_make
+    unset -v GOARCH CROSS_NAME GOAMD64 GOARM
+done
 
 ## 列出文件
 ls -lR ~/go/out
