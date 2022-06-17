@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -24,8 +24,8 @@ go mod tidy
 
 ## 编译共用函数
 cross_make() {
-    if [ -n ${CROSS_NAME} ]; then
-        export GPP_VERSION=$(${MUSL}/${CROSS_NAME}/bin/g++ --version | grep -oE '\d+\.\d+\.\d+' | head -1)
+    if [[ -n ${CROSS_NAME} ]]; then
+        export GPP_VERSION=$(${MUSL}/${CROSS_NAME}-cross/bin/${CROSS_NAME}-g++ --version | grep -oE '\d+\.\d+\.\d+' | head -1)
         export PATH=${MUSL}/${CROSS_NAME}-cross/bin:${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         export C_INCLUDE_PATH=${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/include
         export CPLUS_INCLUDE_PATH=${MUSL}/${CROSS_NAME}-cross/${CROSS_NAME}/include/c++/${GPP_VERSION}
@@ -42,9 +42,11 @@ cross_make() {
 }
 
 ## 编译amd64平台
+export CROSS_NAME=
 export GOARCH=amd64
 export GOAMD64=v1
 cross_make
+unset -v CROSS_NAME
 unset -v GOARCH
 unset -v GOAMD64
 
