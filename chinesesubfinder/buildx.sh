@@ -15,7 +15,6 @@ buildx() {
         --cache-to "type=local,dest=/tmp/.buildx-cache" \
         --platform "$arch" \
         --build-arg "VERSION=${ver}" \
-        --build-arg "ALPINE_VERSION=${alpine_ver}" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
         --push \
@@ -28,11 +27,11 @@ if [[ $ver ]]; then
     [[ -d go/src ]] && rm -rf go/src
     echo "alpine_ver=${1:-latest}"
     docker run --rm \
-        --env VERSION=${{ steps.prepare.outputs.version }} \
-        --volume $(pwd)/go:/go \
+        --env VERSION=${ver} \
+        --volume $(pwd)/go:/root/go \
         --volume $(pwd)/init.sh:/init.sh \
         --entrypoint "/init.sh" \
-        golang:alpine
+        nevinee/csf-cross-builder
     buildx 2>&1 | ts "[%Y-%m-%d %H:%M:%.S]" | tee -a logs/${ver}.log
 else
     echo "未获取到最新版本号"
