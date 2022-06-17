@@ -44,13 +44,13 @@ jobs:
           key: ${{ runner.os }}-buildx
       
       -
-        name: Go Download
+        name: Go Build
         working-directory: ${{ env.IMAGE_NAME }}
         run: |
           docker run --rm -e VERSION=${{ steps.prepare.outputs.version }} -v $(pwd)/go:/root/go -v $(pwd)/init.sh:/init.sh --entrypoint "/init.sh" nevinee/csf-cross-builder
 
       - 
-        name: Buildx
+        name: Docker Buildx
         uses: docker/build-push-action@v3
         with:
           context: ${{ env.IMAGE_NAME }}
@@ -62,7 +62,6 @@ jobs:
             linux/arm/v7
           push: true
           build-args: |
-            ALPINE_VERSION=latest
             VERSION=${{ steps.prepare.outputs.version }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.prepare.outputs.version }}
