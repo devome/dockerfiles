@@ -17,7 +17,7 @@ jobs:
         name: Prepare
         id: prepare
         run: |
-          version=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/releases/latest | jq -r .tag_name | sed "s/v//")
+          version=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/tags | jq -r '.[].name' | grep -Evi 'Beta|Docker' | head -1 | sed 's|v||')
           echo ::set-output name=version::${version}
 
       - 

@@ -2,7 +2,7 @@
 
 repo="nevinee/chinesesubfinder"
 arch="linux/386,linux/amd64,linux/arm64,linux/arm/v7"
-ver=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/releases/latest | jq -r .tag_name | sed "s/v//")
+ver=$(curl -s https://api.github.com/repos/allanpk716/ChineseSubFinder/tags | jq -r '.[].name' | grep -Evi 'Beta|Docker' | head -1 | sed 's|v||')
 alpine_ver=${1:-latest}
 
 buildx() {
