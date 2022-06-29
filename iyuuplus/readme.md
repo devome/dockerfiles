@@ -1,8 +1,10 @@
 ## 简介
 
-https://github.com/ledccn/IYUUPlus ，官方提供了Docker镜像的，建议选择官方的镜像。
+本镜像测试通过以后就把代码PR到了官方仓库中：https://github.com/ledccn/IYUUPlus 
 
-本镜像测试通过以后就把代码PR到了官方仓库中。**但2022年1月18日，本镜像增加了一项功能：允许用户以非root用户权限运行iyuuplus，修改PUID，PGID两个环境变量即可。未推送到官方。**
+**2022年1月18日，本镜像增加了一项功能：允许用户以非root用户权限运行iyuuplus，修改PUID，PGID两个环境变量即可。未推送到官方。**
+
+**2022年6月29日，先合并官方未合并的[#57](https://github.com/ledccn/IYUUPlus/pull/57)，本镜像已经可以用于qBittorrent 4.4.x版本转移种子了。**
 
 ## 创建
 
@@ -39,18 +41,3 @@ docker run -d \
   --env PGID=100  `# 以什么用记运行iyuuplus，该用户的gid` \
   nevinee/iyuuplus
 ```
-
-## 关于armv7设备的补充说明
-
-armv7设备如若无法使用网络，可能是seccomp问题，详见 [这里](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0)。
-
-解决办法如下：
-
-- docker cli方式可以在创建命令中增加一行`--security-opt seccomp=unconfined \`。
-
-- docker-compose方式请在`docker-compose.yml`最后增加两行：
-
-    ```
-    security_opt:
-      - seccomp=unconfined
-    ```

@@ -3,16 +3,16 @@
 cd /IYUU
 
 ## 更新
-if [[ ! -d .git ]]; then
-    git clone https://github.com/ledccn/IYUUPlus.git /tmp/IYUU
-    #git clone https://gitee.com/ledc/iyuuplus.git /tmp/IYUU
-    find /tmp/IYUU -mindepth 1 -maxdepth 1 | xargs -I {} cp -r {} /IYUU
-    rm -rf /tmp/IYUU
-else
-    git fetch --all
-    git reset --hard origin/master
-    git pull
-fi
+# if [[ ! -d .git ]]; then
+#     git clone https://github.com/ledccn/IYUUPlus.git /tmp/IYUU
+#     #git clone https://gitee.com/ledc/iyuuplus.git /tmp/IYUU
+#     find /tmp/IYUU -mindepth 1 -maxdepth 1 | xargs -I {} cp -r {} /IYUU
+#     rm -rf /tmp/IYUU
+# else
+#     git fetch --all
+#     git reset --hard origin/master
+#     git pull
+# fi
 
 if [[ ! -s .env ]]; then
     cp -f .env.example .env
@@ -31,14 +31,14 @@ if [[ -z "${CRON_UPDATE}" ]]; then
 fi
 crontmp=$(mktemp)
 echo  "${CRON_UPDATE} cd /IYUU && git fetch --all && git reset --hard origin/master && git pull && php start.php restart -d" > $crontmp
-echo "设置crontab如下："
-cat $crontmp
+#echo "设置crontab如下："
+#cat $crontmp
 
 ## 重置权限
 groupmod -o -g "${PGID}" iyuu
 usermod -o -u "${PUID}" iyuu
 chown -R ${PUID}:${PGID} $crontmp /IYUU
-su-exec ${PUID}:${PGID} crontab $crontmp
+#su-exec ${PUID}:${PGID} crontab $crontmp
 rm $crontmp
 
 ## 启动
