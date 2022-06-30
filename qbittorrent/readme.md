@@ -333,7 +333,7 @@ networks:
 
 <summary markdown="span"><b> ▶ 05. 可不可以不使用默认下载目录</b></summary>
 
-如不想使用默认下载目录，可以额外映射其他路径，比如映射`/volume1/media:/media`，然后在qbittorrent中设置默认下载目录为`/media`，也可以在每次下载时自己输入下载目录为`/media`。
+默认下载目录是`/data/downloads`，如不想使用默认下载目录，可以额外映射其他路径，比如映射`/volume1/media:/media`，然后在qbittorrent中设置默认下载目录为`/media`，也可以在每次下载时自己输入下载目录为`/media`。
 
 </details>
 
