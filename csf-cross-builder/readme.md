@@ -1,1 +1,1 @@
-本镜像用于使用musl-libc交叉编译docker镜像[allanpk716/chinesesubfinder:latest-lite](https://github.com/allanpk716/ChineseSubFinder
+本镜像用于使用musl-libc交叉编译docker镜像[allanpk716/chinesesubfinder:latest-lite](https://github.com/allanpk716/ChineseSubFinder)
