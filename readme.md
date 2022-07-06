@@ -11,7 +11,6 @@ Dockerfile List:
 - iyuuplus
 - jre
 - libtorrent-rasterbar
-- license
 - loop
 - nas-tools
 - nas-tools-base-image
