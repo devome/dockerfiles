@@ -6,6 +6,16 @@
 
 **2022年6月29日，先合并官方未合并的[#57](https://github.com/ledccn/IYUUPlus/pull/57)，本镜像已经可以用于qBittorrent 4.4.x版本转移种子了。**
 
+## 说明
+
+因为从php7升级到了php8，如果要使用旧的配置文件，需要作些修改工作，请从下列方式中**选择其一进行**：
+
+- 修改配置文件夹db下的`crontab.php`和`crontab.json`，将其中的`php7`改为`php`；
+
+- 删除配置文件夹db下的`crontab.php`和`crontab.json`，然后重新设置定时任务；
+
+- 删除原有所有配置文件，全新创建容器。
+
 ## 创建
 
 ### docker compose
