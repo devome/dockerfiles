@@ -62,6 +62,7 @@ jobs:
             linux/arm/v7
             linux/arm/v6
             linux/ppc64le
+            liniux/s390x
           build-args: |
             ALPINE_VERSION=${{ github.event.inputs.alpine_version }}
             S6_OVERLAY_VERSION=${{ steps.prepare.outputs.version }}
