@@ -65,7 +65,6 @@ jobs:
             liniux/s390x
           build-args: |
             ALPINE_VERSION=${{ github.event.inputs.alpine_version }}
-            S6_OVERLAY_VERSION=${{ steps.prepare.outputs.version }}
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.alpine_version }}
