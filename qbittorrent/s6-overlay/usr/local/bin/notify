@@ -106,6 +106,22 @@ notify_work_wechat_bot() {
     fi
 }
 
+## Gotify通知，$1：标题；$2：内容
+notify_gotify() {
+    local title="$1"
+    local desp="$(echo -e $2)"
+    local send_result err_code err_message
+
+    send_result=$(curl "${GOTIFY_URL}/message?token=${GOTIFY_APP_TOKEN}" -F "title=$title" -F "message=$desp")
+    if [[ $(echo $send_result | jq -r .date) != null ]]; then
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送GOTIFY通知成功\n"
+    elif [[ $(echo $send_result | jq -r .errorCode) != null ]]; then
+        err_code=$(echo "$send_result" | jq -r .errorCode)
+        err_message=$(echo "$send_result" | jq -r .errorDescription)
+        echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送GOTIFY通知失败，错误代码：$err_code，错误消息：$err_message\n"
+    fi
+}
+
 ## 发送通知，$1：标题；$2：内容
 title=$(echo "$1" | sed "s!&!%26!g")
 desp=$(echo "$2" | sed "s!&!%26!g")
@@ -115,4 +131,5 @@ desp=$(echo "$2" | sed "s!&!%26!g")
 [[ $SCKEY ]] && notify_serverchan "$title" "$desp"
 [[ $PUSHPLUS_TOKEN ]] && notify_pushplus "$title" "$desp"
 [[ $WORK_WECHAT_BOT_KEY ]] && notify_work_wechat_bot "$title\n\n$desp"
-[[ -z $DD_BOT_TOKEN && -z $DD_BOT_SECRET && -z $TG_BOT_TOKEN && -z $TG_USER_ID && -z $IYUU_TOKEN && -z $SCKEY && -z $PUSHPLUS_TOKEN && -z $WORK_WECHAT_BOT_KEY ]] && echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 没有有效的通知渠道，不发送通知消息..."
+[[ $GOTIFY_URL ]] $$ [[ $GOTIFY_APP_TOKEN ]] && notify_gotify "$title" "$desp"
+[[ -z $DD_BOT_TOKEN && -z $DD_BOT_SECRET && -z $TG_BOT_TOKEN && -z $TG_USER_ID && -z $IYUU_TOKEN && -z $SCKEY && -z $PUSHPLUS_TOKEN && -z $WORK_WECHAT_BOT_KEY && -z $GOTIFY_URL && -z $GOTIFY_APP_TOKEN ]] && echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 没有有效的通知渠道，不发送通知消息..."
