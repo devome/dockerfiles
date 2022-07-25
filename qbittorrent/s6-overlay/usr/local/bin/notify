@@ -112,7 +112,7 @@ notify_gotify() {
     local desp="$(echo -e $2)"
     local send_result err_code err_message
 
-    send_result=$(curl -Ssk "${GOTIFY_URL}/message?token=${GOTIFY_APP_TOKEN}" -F "title=$title" -F "message=$desp")
+    send_result=$(curl -Ssk "${GOTIFY_URL}/message?token=${GOTIFY_APP_TOKEN}" -F "title=$title" -F "message=$desp" -F "priority=${GOTIFY_PRIORITY:-5}")
     if [[ $(echo $send_result | jq -r .date) != null ]]; then
         echo -e "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 发送GOTIFY通知成功\n"
     elif [[ $(echo $send_result | jq -r .errorCode) != null ]]; then
