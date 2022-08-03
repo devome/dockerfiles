@@ -2,8 +2,6 @@
 
 官方镜像也是本人维护的，现在可以直接使用官方镜像。https://hub.docker.com/r/moenetwork/tieba-cloud-sign
 
-2021-11-28，本镜像增加了一个小功能：每天会自动更新一下源代码。
-
 ## 创建
 
 `docker-compose.yml`文件如下，**除了镜像名称不同外，其余同 [官方教程](https://github.com/MoeNetwork/Tieba-Cloud-Sign) 一致。**
