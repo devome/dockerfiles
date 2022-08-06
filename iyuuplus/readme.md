@@ -35,6 +35,8 @@ services:
     environment:
       - PUID=1000  # 以什么用记运行iyuuplus，该用户的uid
       - PGID=100   # 以什么用记运行iyuuplus，该用户的gid
+    ports:
+      - 8787:8787
 ```
 
 ### docker cli
@@ -49,5 +51,6 @@ docker run -d \
   --volume /tr种子路径/:/torrent \
   --env PUID=1000 `# 以什么用记运行iyuuplus，该用户的uid` \
   --env PGID=100  `# 以什么用记运行iyuuplus，该用户的gid` \
+  --publish 8787:8787 \
   nevinee/iyuuplus
 ```
