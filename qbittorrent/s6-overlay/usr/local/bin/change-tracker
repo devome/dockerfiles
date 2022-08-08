@@ -37,7 +37,48 @@ handle_all_match_torrents() {
     echo -e "\n共修改了${change_count}个种子的tracker，程序运行完成"
 }
 
-main() {
+usage() {
+    echo "用法1：change-tracker -m <mode> -o <原来的url或字符> -n <修改后的url或字符>"
+    echo "  命令中直接带上参数，此用法支持由cron定时任务自动运行"
+    echo "  mode允许的值为：1或2，1指精确匹配，匹配整个tracker才进行替换；2指模糊匹配，只要tracker中含有所提供的字符，就进行替换，将tracker中这一部分字符替换为指定字符，其余字符不变"
+    echo "  当mode为1时，-o后面为原来的完整tracker地址，-n后面为修改后的完整tracker地址；当mode为2时，-o后面为替换前tracker地址中的一段字符串，-n后面为替换后的字符串，请务必确保输入的字符串满足预期！！！"
+    echo "  示例：change-tracker -m 1 -o http://tracker.example.com/passkey=qwertyuiopasdfghjkll -n https://tracker.example.com/passkey=asdfghjkllqwertyuiop"
+    echo "  示例：change-tracker -m 2 -o http:// -n https://"
+    echo 
+    echo "用法2：change-tracker"
+    echo "  命令中不带参数，这种用法由用户随后根据提示主动输入模式选择和要修改的tracker信息"
+}
+
+main_1() {
+    while getopts :m:o:n: OPT; do
+        case $OPT in
+            m) mode="$OPTARG";;
+            o) stro="$OPTARG";;
+            n) strn="$OPTARG";;
+            ?) usage && exit 2;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    [[ -z $stro || -z $strn ]] && usage && exit 3
+    case $mode in
+        1)
+            tracker_orig_url="$stro"
+            tracker_new_url="$strn"
+            handle_all_match_torrents exact
+            ;;
+        2)
+            orig_string="$stro"
+            new_string="$strn"
+            handle_all_match_torrents blur
+            ;;
+        *)
+            usage
+            exit 4
+            ;;
+    esac
+}
+
+main_2() {
     echo -e "匹配模式：\n"
     echo -e "1. 精确匹配：匹配整个tracker才进行替换。\n"
     echo -e "2. 模糊匹配：只要tracker中含有所提供的字符，就进行替换，只将tracker中这一部分字符替换为指定字符，其余字符不变。\n"
@@ -75,4 +116,8 @@ main() {
     esac
 }
 
-main "$@"
+if [[ -n "$@" ]]; then
+    main_1 "$@"
+else
+    main_2
+fi

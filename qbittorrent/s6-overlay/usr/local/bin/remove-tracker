@@ -1,0 +1,100 @@
+#!/bin/bash
+
+handle_all_match_torrents() {
+    local method=$1
+
+    . /usr/local/bin/share
+    echo -e "\n检测种子清单...\n"
+    hashes=( $($cmd_curl ${api_url_base}/torrents/info | jq -r .[].hash) )
+    echo -e "开始删除指定的tracker...\n\n搜索过程可能较慢，请等待程序运行完成...\n\n有以下种子匹配所提供的信息，并完成删除：\n"
+    local change_count=0
+    for hash in ${hashes[@]}; do
+        trackers_url=( $($cmd_curl $api_url_base/torrents/trackers?hash=$hash | jq -r .[].url | sed "s# #_#g") )
+        for ((n = $((${#trackers_url[*]} - 1)); n >= 0; n--)); do
+            if [[ $method == exact && ${trackers_url[n]} == ${tracker_orig_url} ]] || [[ $method == blur && ${trackers_url[n]} == *${orig_string}* ]]; then
+                local torrent_name=$($cmd_curl "${api_url_base}/torrents/info?hashes=${hash}" | jq -r .[0].name)
+                echo "hash: ${hash}, torrent_name: ${torrent_name}"
+                $cmd_curl_post $api_url_base/torrents/removeTrackers -d "hash=${hash}&urls=${trackers_url//&/%26}"
+                let change_count++
+                break
+            fi
+        done
+    done
+    echo -e "\n共删除了${change_count}个种子的tracker，程序运行完成"
+}
+
+usage() {
+    echo "用法1：remove-tracker -m <mode> -s <string>"
+    echo "  命令中直接带上参数，此用法支持由cron定时任务自动运行"
+    echo "  mode允许的值为：1或2，1指精确匹配，匹配整个tracker才进行删除；2指模糊匹配，只要tracker中含有所提供的字符，就进行删除，使用此模式一定要慎重，务必确保输入的字符满足预期！！！"
+    echo "  当mode为1时，string为完整的tracker地址；当mode为2时，string为要删除的tracker含有的字符，请务必确保输入的字符满足预期！！！"
+    echo "  示例：remove-tracker -m 1 -s https://tracker.example.com/passkey=qwertyuiopasdfghjkll"
+    echo "  示例：remove-tracker -m 2 -s tracker.example.com"
+    echo
+    echo "用法2：remove-tracker"
+    echo "  命令中不带参数，这种用法由用户随后根据提示主动输入模式选择和要删除的tracker信息"
+}
+
+main_1() {
+    while getopts :m:s: OPT; do
+        case $OPT in
+            m) mode="$OPTARG";;
+            s) str="$OPTARG";;
+            ?) usage && exit 2;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    [[ -z $str ]] && usage && exit 3
+    case $mode in
+        1)
+            tracker_orig_url="$str"
+            handle_all_match_torrents exact
+            ;;
+        2)
+            orig_string="$str"
+            handle_all_match_torrents blur
+            ;;
+        *)
+            usage
+            exit 4
+            ;;
+    esac
+}
+
+main_2() {
+    echo -e "匹配模式：\n"
+    echo -e "1. 精确匹配：匹配整个tracker才进行删除。\n"
+    echo -e "2. 模糊匹配：只要tracker中含有所提供的字符，就进行删除，使用此模式一定要慎重，务必确保输入的字符满足预期！！！\n"
+    read -p "请选择匹配模式 [1/2]：" match_method
+    echo
+    case $match_method in
+        1)
+            read -p "请输入要删除的tracker：" tracker_orig_url
+            echo
+            echo -e "要删除的tracker为：$tracker_orig_url\n"
+            read -p "请确认信息无误 [y/N]：" choice1
+            if [[ $choice1 == [Yy] || $choice1 == [Yy][Ee][Ss] ]]; then
+                handle_all_match_torrents exact
+            fi
+            ;;
+        2)
+            read -p "请输入要删除含有什么字符的tracker：" orig_string
+            echo
+            echo -e "若tracker中含有以下字符就删除：'$orig_string'\n"
+            read -p "请确认信息无误 [y/N]：" choice2
+            if [[ $choice2 == [Yy] || $choice2 == [Yy][Ee][Ss] ]]; then
+                handle_all_match_torrents blur
+            fi
+            ;;
+        *)
+            echo "输入错误，退出脚本（请输入'1'或'2'）"
+            exit 1
+            ;;
+    esac
+}
+
+if [[ -n "$@" ]]; then
+    main_1 "$@"
+else
+    main_2
+fi
