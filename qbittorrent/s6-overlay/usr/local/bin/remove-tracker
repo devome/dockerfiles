@@ -14,7 +14,7 @@ handle_all_match_torrents() {
             if [[ $method == exact && ${trackers_url[n]} == ${tracker_orig_url} ]] || [[ $method == blur && ${trackers_url[n]} == *${orig_string}* ]]; then
                 local torrent_name=$($cmd_curl "${api_url_base}/torrents/info?hashes=${hash}" | jq -r .[0].name)
                 echo "hash: ${hash}, torrent_name: ${torrent_name}"
-                $cmd_curl_post $api_url_base/torrents/removeTrackers -d "hash=${hash}&urls=${trackers_url//&/%26}"
+                $cmd_curl_post $api_url_base/torrents/removeTrackers -d "hash=${hash}&urls=${trackers_url[n]//&/%26}"
                 let change_count++
                 break
             fi
