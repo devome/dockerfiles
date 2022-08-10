@@ -29,7 +29,7 @@ services:
     network_mode: bridge
     hostname: iyuuplus
     volumes:
-      - ./IYUU:/IYUU
+      - ./db:/IYUU/db
       - /qb种子路径/:/BT_backup
       - /tr种子路径/:/torrent
     environment:
@@ -46,7 +46,7 @@ docker run -d \
   --hostname iyuuplus \
   --restart always \
   --network bridge \
-  --volume $(pwd)/IYUU:/IYUU \
+  --volume $(pwd)/db:/IYUU/db \
   --volume /qb种子路径/:/BT_backup \
   --volume /tr种子路径/:/torrent \
   --env PUID=1000 `# 以什么用记运行iyuuplus，该用户的uid` \
