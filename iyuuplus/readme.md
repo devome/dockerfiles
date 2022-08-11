@@ -54,3 +54,9 @@ docker run -d \
   --publish 8787:8787 \
   nevinee/iyuuplus
 ```
+
+## 源代码、问题反馈、意见建议
+
+全套代码见 [Github](https://github.com/devome/dockerfiles/tree/master/iyuuplus) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/iyuuplus)。
+
+如有使用上的问题，或者有其他好的功能建议，请在 [Github这里](https://github.com/devome/dockerfiles/issues) 或 [Gitee这里](https://gitee.com/evine/dockerfiles/issues) 提交。
