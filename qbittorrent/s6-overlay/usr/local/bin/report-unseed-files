@@ -28,12 +28,12 @@ if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
     read -p "请输入所有检测路径：" detect_pathes
     echo
     detect_pathes=$(echo $detect_pathes | sed 's|:|\n|g')
-    echo "$detect_pathes" | while read path; do
+    while read path; do
         if [[ ! -d "$path" ]]; then
             echo -e "路径 '$path' 不存在，退出脚本"
             exit 3
         fi
-    done
+    done <<< $(echo "$detect_pathes")
 
     [[ -f $unseed_files ]] && rm $unseed_files
     echo "$detect_pathes" | while read path; do
