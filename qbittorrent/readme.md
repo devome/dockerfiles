@@ -24,7 +24,7 @@
 
 1. **`4.x.x` , `latest`**
 
-  `Qt: 5.15.4` `Libtorrent: 2.0.7.0` `Boost: 1.78.0` `OpenSSL:	1.1.1q r0` `zlib: 1.2.12 r3`
+  `Qt: 5.15.4` `Libtorrent: 2.0.7` `Boost: 1.78.0` `OpenSSL:	1.1.1q` `zlib: 1.2.12`
   标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。
 
 2. **`4.x.x-iyuu` , `latest-iyuu` , `iyuu`**
@@ -37,7 +37,7 @@
 
 4. **`edge`**
 
-  `Qt: 6.3.1` `Libtorrent: 2.0.7.0` `Boost: 1.80.0` `OpenSSL:	3.0.5 r1` `zlib: 1.2.12 r3`
+  `Qt: 6.3.1` `Libtorrent: 2.0.7` `Boost: 1.80.0` `OpenSSL:	3.0.5` `zlib: 1.2.12`
   基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**
 
 ## 更新日志（仅列出稳定版）

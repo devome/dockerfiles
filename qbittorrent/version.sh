@@ -3,7 +3,7 @@
 set -o pipefail
 
 dir_shell=$(cd $(dirname $0); pwd)
-dir_myscripts=$(cd $(dirname $0); cd ../../myscripts; pwd)
+dir_myscripts=$(cd $(dirname $0); cd ../../info; pwd)
 
 cd $dir_shell
 
@@ -17,15 +17,14 @@ ver_qb_local=$(cat qbittorrent.version)
 ver_qbbeta_local=$(cat qbittorrent-beta.version)
 
 ## 导入配置
-. $dir_myscripts/notify.sh
-. $dir_myscripts/my_config.sh
+. $dir_myscripts/config.sh
 
 ## 检测官方版本与本地版本是否一致，如不一致则发出通知
 stable_build_mark=0
 if [[ $ver_qb_official ]]; then
     if [[ $ver_qb_official != $ver_qb_local ]]; then
         echo "官方已升级qBittorrent版本至：$ver_qb_official"
-        notify "qBittorrent已经升级" "当前官方版本: ${ver_qb_official}\n当前本地版本: ${ver_qb_local}"
+        $dir_myscripts/notify.sh "qBittorrent已经升级" "当前官方版本: ${ver_qb_official}\n当前本地版本: ${ver_qb_local}"
         echo "$ver_qb_official" > qbittorrent.version
         stable_build_mark=1
     else
@@ -37,7 +36,7 @@ unstable_build_mark=0
 if [[ $ver_qbbeta_official ]]; then
     if [[ $ver_qbbeta_official != $ver_qbbeta_local ]]; then
         echo "官方已升级qBittorrent beta版本至：$ver_qbbeta_official"
-        notify "qBittorrent beta已经升级" "当前官方版本: ${ver_qbbeta_official}\n当前本地版本: ${ver_qbbeta_local}"
+        $dir_myscripts/notify.sh "qBittorrent beta已经升级" "当前官方版本: ${ver_qbbeta_official}\n当前本地版本: ${ver_qbbeta_local}"
         echo "$ver_qbbeta_official" > qbittorrent-beta.version
         unstable_build_mark=1
     else
@@ -47,9 +46,21 @@ fi
 
 ## 需要更新时则重新构建
 if [[ $stable_build_mark -eq 1 ]]; then
-    gh workflow run qbittorrent-buildx2.yml -f version=$ver_qb_official
+    #gh workflow run qbittorrent-buildx2.yml -f version=$ver_qb_official
+    curl \
+        -X POST \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: token $GITHUB_WORKFLOW_TOKEN" \
+        -d "{\"ref\":\"master\",\"inputs\":{\"qbittorrent_version\":\"$ver_qb_official\"}}" \
+        "https://api.github.com/repos/devome/dockerfiles/actions/workflows/qbittorrent-buildx2.yml/dispatches"
 fi
 
 # if [[ $unstable_build_mark -eq 1 ]]; then
 #     gh workflow run qbittorrent-buildx2.yml -f version=$ver_qbbeta_official
+#     curl \
+#         -X POST \
+#         -H "Accept: application/vnd.github+json" \
+#         -H "Authorization: token $GITHUB_WORKFLOW_TOKEN" \
+#         -d "{\"ref\":\"master\",\"inputs\":{\"qbittorrent_version\":\"$ver_qbbeta_official\"}}" \
+#         "https://api.github.com/repos/devome/dockerfiles/actions/workflows/qbittorrent-buildx2.yml/dispatches"
 # fi
