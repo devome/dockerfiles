@@ -7,8 +7,7 @@ ENV APP_ENV=prod \
     PGID=100 \
     PS1="\u@\h:\w \$ "
 WORKDIR /IYUU
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories \
-    && apk add --update --no-cache \
+RUN apk add --no-cache \
         su-exec \
         busybox-suid \
         shadow \
@@ -52,8 +51,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/' /etc/apk/repositories 
     && git clone https://github.com/ledccn/IYUUPlus.git . \
     && wget https://patch-diff.githubusercontent.com/raw/ledccn/IYUUPlus/pull/57.patch \
     && git apply 57.patch \
-    && rm 57.patch \
-    && rm -rf /var/cache/apk/* /tmp/* /usr/share/man /usr/share/php8
+    && rm -rf 57.patch /var/cache/apk/* /tmp/* /usr/share/man /usr/share/php8 \
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/' /etc/apk/repositories
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 EXPOSE 8787
 VOLUME ["/IYUU"]
