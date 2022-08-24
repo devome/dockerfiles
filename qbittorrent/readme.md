@@ -42,7 +42,7 @@
 
 <details>
 
-<summary markdown="span"><b><h2>更新日志（仅列出稳定版，点击展开）</h></b></summary>
+## 更新日志（仅列出稳定版）
 
 | Date     | qBittorrent | libtorrent | alpine | 备注 |
 | :-:      | :-:         | :-:        | :-:    | -    |
@@ -58,8 +58,6 @@
 | 20220524 | 4.4.3       | 2.0.6      | 3.16.0 | 1. 修复存在多个标签时无法移除`TrackerError`标签的bug；</br>2. 增加企业微信群机器人的通知渠道。</br>3. 升级openssl到1.1.1o，boost到1.78，alpine到3.16.0，升级iyuu镜像中的php7为php8。 |
 | 20220526 | 4.4.3.1     | 2.0.6      | 3.16.0 |      |
 | 20220824 | 4.4.4       | 2.0.7      | 3.16.2 | 1. 增加`remove-track`脚本，详见[命令](#命令)；</br>2. 优化`del-unseed-dir`脚本，现还可以一次性检测多个目录了；</br>3. 增加Gotity通知环境变量`GOTIFY_URL` `GOTIFY_APP_TOKEN` `GOTIFY_PRIORITY`，详见[环境变量清单](#环境变量清单)。 |
-
-</details>
 
 ## 环境变量清单
 
