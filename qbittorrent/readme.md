@@ -568,6 +568,7 @@ docker exec -it qbittorrent change-tracker -h
 docker exec -it qbittorrent remove-tracker -h
 
 # 检测指定文件夹下没有在qbittorrent客户端中做种或下载的子文件夹/子文件，由用户确认是否删除，详见下面效果图，4.3.8+可用
+# 从4.4.4起，更改成可以一次性检测多个目录
 docker exec -it qbittorrent del-unseed-dir
 
 # 对所有种子进行分类，请注意-A是大写，如果是小写的-a，则只对未分类的种子进行分类，4.4.0+可用
