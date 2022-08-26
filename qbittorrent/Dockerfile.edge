@@ -12,8 +12,7 @@ ENV S6_SERVICES_GRACETIME=30000 \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ "
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
-    && apk add --no-cache \
+RUN apk add --no-cache \
        curl \
        openssl \
        qbittorrent-nox \
@@ -24,7 +23,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositorie
        s6-overlay \
     && rm -rf /tmp/* /var/cache/apk/* \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
-    && echo "${TZ}" > /etc/timezone
+    && echo "${TZ}" > /etc/timezone \
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories
 COPY s6-overlay /
 WORKDIR /data
 VOLUME ["/data"]
