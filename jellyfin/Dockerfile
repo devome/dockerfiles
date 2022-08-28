@@ -25,7 +25,16 @@ RUN apt update \
     && sed -i 's|archive.ubuntu.com|mirrors.bfsu.edu.cn|g' /etc/apt/sources.list \
     && sed -i 's|security.ubuntu.com|mirrors.bfsu.edu.cn|g' /etc/apt/sources.list \
     && sed -i 's|http://|https://|g' /etc/apt/sources.list \
-    && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/* /etc/jellyfin
+    && rm -rf /tmp/* \
+       /var/lib/apt/lists/* \
+       /var/tmp/* \
+       /etc/default/jellyfin \
+       /etc/init/jellyfin.conf \
+       /etc/init.d/jellyfin \
+       /etc/jellyfin \
+       /etc/sudoers.d/jellyfin-sudoers \
+       /etc/systemd/system/jellyfin.service.d \
+       /lib/systemd/system/jellyfin.service
 VOLUME ["/cache", "/config"]
 WORKDIR /config
 ENTRYPOINT ["jellyfin", \
