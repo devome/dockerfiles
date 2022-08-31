@@ -3,7 +3,7 @@
 set -o pipefail
 
 dir_shell=$(cd $(dirname $0); pwd)
-dir_myscripts=$(cd $(dirname $0); cd ../../info; pwd)
+dir_myscripts=$(cd $dir_shell; cd ../../info; pwd)
 
 cd $dir_shell
 
@@ -18,13 +18,14 @@ ver_qbbeta_local=$(cat qbittorrent-beta.version)
 
 ## 导入配置
 . $dir_myscripts/config.sh
+. $dir_myscripts/notify.sh
 
 ## 检测官方版本与本地版本是否一致，如不一致则发出通知
 stable_build_mark=0
 if [[ $ver_qb_official ]]; then
     if [[ $ver_qb_official != $ver_qb_local ]]; then
         echo "官方已升级qBittorrent版本至：$ver_qb_official"
-        $dir_myscripts/notify.sh "qBittorrent已经升级" "当前官方版本: ${ver_qb_official}\n当前本地版本: ${ver_qb_local}"
+        notify "qBittorrent已经升级" "当前官方版本: ${ver_qb_official}\n当前本地版本: ${ver_qb_local}"
         echo "$ver_qb_official" > qbittorrent.version
         stable_build_mark=1
     else
