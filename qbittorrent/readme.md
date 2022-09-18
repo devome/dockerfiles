@@ -149,6 +149,7 @@ docker run -dit \
   -p 8080:8080          `# 冒号左右一样，要和WEBUI_PORT一致，命令中的3个8080要改一起改` \
   -p 34567:34567/tcp    `# 冒号左右一样，要和BT_PORT一致，命令中的5个34567要改一起改` \
   -p 34567:34567/udp    `# 冒号左右一样，要和BT_PORT一致，命令中的5个34567要改一起改` \
+  --tmpfs /tmp \
   --restart always \
   --name qbittorrent \
   --hostname qbittorrent \
@@ -165,6 +166,7 @@ docker run -dit \
   -p 34567:34567/tcp    `# 冒号左右一样，要和BT_PORT一致，命令中的5个34567要改一起改` \
   -p 34567:34567/udp    `# 冒号左右一样，要和BT_PORT一致，命令中的5个34567要改一起改` \
   -p 8787:8787          `# IYUUPlus的WebUI控制端口` \
+  --tmpfs /tmp \
   --restart always \
   --name qbittorrent \
   --hostname qbittorrent \
@@ -191,6 +193,8 @@ services:
     hostname: qbitorrent
     volumes:
       - ./data:/data      # 配置保存目录
+    tmpfs:
+      - /tmp
     environment:          # 下面未列出的其他环境变量请根据环境变量清单自行添加
       - WEBUI_PORT=8080   # WEBUI控制端口，可自定义
       - BT_PORT=34567     # BT监听端口，可自定义
@@ -227,6 +231,8 @@ services:
     hostname: qbitorrent
     volumes:
       - ./data:/data
+    tmpfs:
+      - /tmp
     environment:          # 下面未列出的其他环境变量请根据环境变量清单自行添加
       - WEBUI_PORT=8080   # WEBUI控制端口，可自定义
       - BT_PORT=34567     # BT监听端口，可自定义
@@ -508,6 +514,14 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
         extra_hosts:
           - "<域名>:<qBittorrent容器的IP>"  ## 如果直接使用的`nevinee/qbittorrent:iyuu`标签，IP就是127.0.0.1
     ```
+
+</details>
+
+<details>
+
+<summary markdown="span"><b> ▶ 18. qBittorrent占用了巨大的内存，如何调整</b></summary>
+
+试试按创建命令中的形式挂载tmpfs：/tmp。不过要注意内存使用中`used`和`buff/cache`的区别，`buff/cache`占用大是没有关系的。
 
 </details>
 
