@@ -49,9 +49,7 @@ RUN apk add --no-cache \
     && echo "${TZ}" > /etc/timezone \
     && useradd iyuu -u ${PUID} -U -M -d /IYUU -s /sbin/nologin \
     && git clone https://github.com/ledccn/IYUUPlus.git . \
-    && wget https://patch-diff.githubusercontent.com/raw/ledccn/IYUUPlus/pull/57.patch \
-    && git apply 57.patch \
-    && rm -rf 57.patch /var/cache/apk/* /tmp/* /usr/share/man /usr/share/php8 \
+    && rm -rf /var/cache/apk/* /tmp/* /usr/share/man /usr/share/php8 \
     && sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/' /etc/apk/repositories
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 EXPOSE 8787
