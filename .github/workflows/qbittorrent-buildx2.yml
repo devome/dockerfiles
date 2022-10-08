@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       qbittorrent_version:
-        description: '要构建的qBittorrent版本，可以为beta/rc版，如不输入则默认去检测最新的正式版'
+        description: '要构建的qBittorrent版本，只能为正式版，如不输入则默认去检测最新的正式版'
         required: false
         default: ''
       alpine_version:
