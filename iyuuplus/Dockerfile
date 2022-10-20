@@ -48,7 +48,7 @@ RUN apk add --no-cache \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
     && useradd iyuu -u ${PUID} -U -M -d /IYUU -s /sbin/nologin \
-    && git clone https://github.com/ledccn/IYUUPlus.git . \
+    && git clone --depth=1 https://github.com/ledccn/IYUUPlus.git . \
     && rm -rf /var/cache/apk/* /tmp/* /usr/share/man /usr/share/php8 \
     && sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/' /etc/apk/repositories
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
