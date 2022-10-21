@@ -1,19 +1,26 @@
 FROM alpine
+ENV LANG=zh_CN.UTF-8 \
+    TZ=Asia/Shanghai \
+    PUID=1000 \
+    PGID=1000 \
+    PS1="\u@\h:\w \$ "
 RUN apk add --no-cache \
+       acme.sh \
+       curl \
+       fontconfig \
+       net-tools \
        nginx \
        nginx-mod-stream \
        nginx-mod-http-headers-more \
        openjdk8-jre \
-       net-tools \
-       curl \
-       wget \
-       ttf-dejavu \
-       fontconfig \
-       tzdata \
+       shadow \
+       su-exec \
        tini \
-       acme.sh \
+       ttf-dejavu \
+       tzdata \
+       wget \
     && fc-cache -f -v \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
     && rm -rf /var/cache/apk/* /tmp/* \
-    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories
