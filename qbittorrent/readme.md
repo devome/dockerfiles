@@ -22,13 +22,13 @@
 
 ## 标签
 
-1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 5.15.4` `Libtorrent: 2.0.7` `Boost: 1.78.0` `OpenSSL:	1.1.1q` `zlib: 1.2.12`。
+1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 5.15.4` `Libtorrent: 2.0.8` `Boost: 1.78.0` `OpenSSL:1.1.1q` `zlib: 1.2.12`。
   
 2. **`4.x.x-iyuu` , `latest-iyuu` , `iyuu`**: 标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`latest-iyuu`和`iyuu`标签，自动安装好[IYUUPlus](https://github.com/ledccn/IYUUPlus)，自动设置好下载器，主要针对不会设置下载器的用户。
 
 3. **`4.x.xbetax` , `4.x.xrcx` , `unstable`**: 标签中带有`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。此标签仅供测试使用及向qBittorrent官方反馈bug使用。
 
-4. **`edge`**: 基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**`Qt: 6.4.0` `Libtorrent: 2.0.7` `Boost: 1.80.0` `OpenSSL:	3.0.5` `zlib: 1.2.13`。
+4. **`edge`**: 基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**`Qt: 6.4.0` `Libtorrent: 2.0.8` `Boost: 1.80.0` `OpenSSL:	3.0.5` `zlib: 1.2.13`。
   
 
 ## 更新日志（仅列出稳定版）
@@ -48,6 +48,7 @@
 | 20220526 | 4.4.3.1     | 2.0.6      | 3.16.0 |      |
 | 20220824 | 4.4.4       | 2.0.7      | 3.16.2 | 1. 增加`remove-track`脚本，详见[命令](#命令)；</br>2. 优化`del-unseed-dir`脚本，现还可以一次性检测多个目录了；</br>3. 增加Gotity通知环境变量`GOTIFY_URL` `GOTIFY_APP_TOKEN` `GOTIFY_PRIORITY`，详见[环境变量清单](#环境变量清单)。 |
 | 20220831 | 4.4.5       | 2.0.7      | 3.16.2 |       |
+| 20221024 | 4.4.5       | 2.0.8      | 3.16.2 | libtorrent-rasterbar v2.0.8 修复了内存溢出的问题，因此更新一下qbittorrent。 |
 
 ## 环境变量清单
 
@@ -512,7 +513,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <summary markdown="span"><b> ▶ 18. qBittorrent占用了巨大的内存，如何调整</b></summary>
 
-试试按创建命令中的形式挂载tmpfs：/tmp。不过要注意内存使用中`used`和`buff/cache`的区别，`buff/cache`占用大是没有关系的。
+试试依赖项libtorrent-rasterbar v2.0.8以及上的版本。
 
 </details>
 

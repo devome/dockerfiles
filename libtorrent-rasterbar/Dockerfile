@@ -1,5 +1,4 @@
-ARG ALPINE_VERSION=latest
-FROM alpine:${ALPINE_VERSION}
+FROM alpine:latest
 ARG LIBTORRENT_VERSION
 ARG JNPROC=1
 RUN apk add --no-cache --virtual .build \
@@ -23,6 +22,7 @@ RUN apk add --no-cache --virtual .build \
     && ninja -j${JNPROC} \
     && ninja install \
     && ls -al /usr/local/lib \
+    && run_deps="$(scanelf -nB /usr/local/lib/libtorrent-rasterbar* | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' | xargs -r apk info -e | sort -u)" \
     && apk del --purge .build \
-    && apk add libcrypto1.1 libgcc libssl1.1 libstdc++ \
+    && apk add --no-cache $run_deps \
     && rm -rf /tmp/* /var/cache/apk/*

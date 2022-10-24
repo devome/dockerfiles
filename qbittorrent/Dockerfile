@@ -1,5 +1,4 @@
-ARG LIBTORRENT_VERSION
-ARG ALPINE_VERSION=latest
+ARG LIBTORRENT_VERSION=2
 FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
 RUN apk add --no-cache \
        boost-dev \
@@ -41,8 +40,7 @@ RUN echo "Copy to /out" \
     && cp -d /usr/local/lib/libtorrent-rasterbar.so* /out/usr/lib \
     && cp /usr/local/bin/qbittorrent-nox /out/usr/bin
 
-ARG ALPINE_VERSION
-FROM alpine:${ALPINE_VERSION}
+FROM alpine:latest
 ENV S6_SERVICES_GRACETIME=30000 \
     S6_KILL_GRACETIME=60000 \
     S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
@@ -58,14 +56,14 @@ ENV S6_SERVICES_GRACETIME=30000 \
     PS1="\u@\h:\w \$ "
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
     && apk add --no-cache \
+       bash \
        curl \
+       jq \
        openssl \
        qt5-qtbase \
+       s6-overlay \
        shadow \
        tzdata \
-       jq \
-       bash \
-       s6-overlay \
     && rm -rf /tmp/* /var/cache/apk/* \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \

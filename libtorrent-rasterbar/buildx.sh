@@ -61,7 +61,6 @@ base_func() {
     export DOCKER_CLI_EXPERIMENTAL=enabled
     export LATEST_VERSION=$(curl -s https://api.github.com/repos/arvidn/libtorrent/tags | jq -r .[]."name" | grep -m1 -E "v([0-9]{1,2}\.?){3,4}$" | sed "s/v//")
 
-    [[ $alpine_ver ]] && export ALPINE_VERSION=$alpine_ver || export ALPINE_VERSION=latest
     [[ $ver ]] && export LIBTORRENT_VERSION=$ver || export LIBTORRENT_VERSION=${LATEST_VERSION}
     [[ $repo ]] && export DOCKERHUB_REPOSITORY=$repo || export DOCKERHUB_REPOSITORY=nevinee/libtorrent-rasterbar
     [[ $filename ]] && export DOCKERFILE_NAME=${filename} || export DOCKERFILE_NAME=Dockerfile
@@ -85,7 +84,6 @@ base_func() {
 ## 输出
 echo_console() {
     echo "控制变量如下："
-    echo "ALPINE_VERSION=${ALPINE_VERSION}"
     echo "LIBTORRENT_VERSION=${LIBTORRENT_VERSION}"
     echo "DOCKERHUB_REPOSITORY=${DOCKERHUB_REPOSITORY}"
     echo "DOCKERFILE_NAME=${DOCKERFILE_NAME}"
@@ -107,7 +105,6 @@ usage() {
     echo "-l <yes/no>    # 是否记录日志[YES|Yes|yes|y / NO|No|no|n]，默认yes"
     echo "-n <mcount>    # 信息维护次数，默认1"
     echo "-o <ourput>    # 输出到镜像(docker)还是直接推送到hub(registry)，默认registry"
-    echo "-p <alpine>    # 基础镜像alpine版本，默认latest"
     echo "-r <hubrepo>   # 构建镜像名（不含标签），默认nevinee/libtorrent-rasterbar"
     echo "-t <archtech>  # 构建架构，默认全构架"
     echo "-v <version>   # 构建版本，默认最新稳定版"
@@ -200,7 +197,7 @@ run() {
 
 ## 主函数
 main() {
-    while getopts :a:bc:f:j:l:n:p:r:t:v: opt; do
+    while getopts :a:bc:f:j:l:n:r:t:v: opt; do
         case $opt in
             # 传入参数
             a) action=$OPTARG;;
@@ -211,7 +208,6 @@ main() {
             l) log=$OPTARG;;
             n) mcount=$OPTARG;;
             o) output=$OPTARG;;
-            p) alpine_ver=$OPTARG;;
             r) repo=$OPTARG;;
             t) archtech=$OPTARG;;
             v) ver=$OPTARG;;
