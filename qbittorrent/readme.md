@@ -513,7 +513,19 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <summary markdown="span"><b> ▶ 18. qBittorrent占用了巨大的内存，如何调整</b></summary>
 
-试试依赖项libtorrent-rasterbar v2.0.8以及上的版本。
+你所见到的占用巨大的内存并不是真的占用了，使用`docker stats qbittorrent`输出的内存占用更准确一点，其他方式输出的内存占用会非常的大。因为libtorrent-rasterbar v2.x把内存使用交给内核来处理，内核会自己根据内存大小和读取频次来自动决定怎么去缓存，所以不要被看起来庞大的内存占用给吓着了。详见libtorrent-rasterbar作者的[原话](https://github.com/arvidn/libtorrent/issues/6667#issuecomment-1040874903)。
+
+谷歌翻译如下：
+
+> 总结一下，libtorrent2.0使用内存映射文件。在除windows之外的所有现代操作系统上，在块设备级别使用统一的页面缓存，其中匿名内存（由swapfile支持）和内存映射文件（包括共享库，运行可执行文件）都是同一缓存的一部分。Linux可能是决定如何在物理RAM中平衡这些页面的最复杂的工具。
+
+> 使用内存映射文件的好处主要有：
+
+> 内核（它知道机器有多少物理RAM可用）最了解何时以及以何种顺序刷新缓存。也许更重要的是，决定保留读缓存的数量和时间。
+
+> 某些类型的存储可以由CPU直接寻址，就像它是RAM一样，绕过了许多内核基础设施，并提供了非常高的性能。（linux称此DAX）
+
+> 此外，当报告libtorrent（特别是mmap磁盘后端）中的问题时，仅仅指出vmstats数字表明内核决定使用大量物理内存进行磁盘缓存是不够的。这是内存映射磁盘后端的一个特性。
 
 </details>
 
