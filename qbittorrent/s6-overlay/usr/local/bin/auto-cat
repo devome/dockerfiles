@@ -3,33 +3,48 @@
 base_fun() {
     . /usr/local/bin/share
     categories=( $($cmd_curl ${api_url_base}/torrents/categories | jq -r .[].name | sed "s# #%20#g") )
+    CATEGORY_OR_TAG=${CATEGORY_OR_TAG:-category}
 }
 
 category_one() {
     local torrent_hash="$1"
-    local tracker=$($cmd_curl ${api_url_base}/torrents/trackers?hash=${torrent_hash} | jq -r .[].url | grep -m1 -i "http" | awk -F "://|/" '{print $2}' | awk -F "." '{print $((NF - 1))}')
+    local tracker_url=$($cmd_curl ${api_url_base}/torrents/trackers?hash=${torrent_hash} | jq -r .[].url | grep -m1 -i "http" | awk -F "://|/" '{print $2}')
+    local tracker=$(echo "$tracker_url" | awk -F "." '{print $((NF - 1))}')
     if [[ $tracker == edu ]]; then
-        tracker=$($cmd_curl ${api_url_base}/torrents/trackers?hash=${torrent_hash} | jq -r .[].url | grep -m1 -i "http" | awk -F "://|/" '{print $2}' | awk -F "." '{print $((NF - 2))}')
+        tracker=$(echo "$tracker_url" | awk -F "." '{print $((NF - 2))}')
     fi
-    local category=$($cmd_curl ${api_url_base}/torrents/info?hashes=${torrent_hash} | jq -r .[].category | sed "s# #%20#g")
 
-    if [[ -z $(echo ${categories[@]} | grep -wo "$tracker") ]]; then
-        $cmd_curl_post -d "category=$tracker" ${api_url_base}/torrents/createCategory
-    fi
-    if [[ $category != $tracker ]]; then
-        $cmd_curl_post -d "hashes=${torrent_hash}&category=${tracker}" ${api_url_base}/torrents/setCategory
-    fi
+    case $CATEGORY_OR_TAG in
+        category)
+            local current_category=$($cmd_curl ${api_url_base}/torrents/info?hashes=${torrent_hash} | jq -r .[].category | sed "s# #%20#g")
+            if [[ -z $(echo ${categories[@]} | grep -wo "$tracker") ]]; then
+                $cmd_curl_post -d "category=$tracker" ${api_url_base}/torrents/createCategory
+            fi
+            if [[ $current_category != $tracker ]]; then
+                $cmd_curl_post -d "hashes=${torrent_hash}&category=${tracker}" ${api_url_base}/torrents/setCategory
+            fi
+            ;;
+        tag)
+            $cmd_curl_post -d "hashes=${torrent_hash}&tags=${tracker}" ${api_url_base}/torrents/addTags
+            ;;
+        *)
+            echo "CATEGORY_OR_TAG 赋值错误，仅能赋值 'category' 或 'tag'"
+            ;;
+    esac
 }
 
 category_all_uncategorized() {
-    local hashes=( $($cmd_curl ${api_url_base}/torrents/info?category= | jq -r .[].hash) )
-
-    if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
-        for hash in "${hashes[@]}"; do
-            category_one "$hash"
-        done
-    else
-        echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 你已将 ENABLE_AUTO_CATEGORY 设置为 false，禁止自动分类..."
+    if [[ $CATEGORY_OR_TAG == category ]]; then
+        if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
+            local hashes=( $($cmd_curl ${api_url_base}/torrents/info?category= | jq -r .[].hash) )
+            for hash in "${hashes[@]}"; do
+                category_one "$hash"
+            done
+        else
+            echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 你已将 ENABLE_AUTO_CATEGORY 设置为 false，禁止自动分类..."
+        fi
+    elif [[ $CATEGORY_OR_TAG == tag ]]; then
+        category_all
     fi
 }
 
@@ -47,10 +62,10 @@ category_all() {
 
 usage() {
     echo "用法："
-    echo "auto-cat -a        # 将所有未分类的种子按tracker分类"
-    echo "auto-cat -A        # 将所有种子按tracker分类"
+    echo "auto-cat -a        # 当CATEGORY_OR_TAG=category时，将所有未分类的种子按tracker分类；当CATEGORY_OR_TAG=tag时，对所有种子按tracker打标签"
+    echo "auto-cat -A        # 当CATEGORY_OR_TAG=category时，将所有种子按tracker分类；当CATEGORY_OR_TAG=tag时，对所有种子按tracker打标签"
     echo "auto-cat -h        # 使用帮助"
-    echo "auto-cat -i <hash> # 指定某个种子的hash，将其按tracker分类"
+    echo "auto-cat -i <hash> # 指定某个种子的hash，当CATEGORY_OR_TAG=category时，将其按tracker分类；当CATEGORY_OR_TAG=tag时，将其按tracker打标签"
 }
 
 main() {

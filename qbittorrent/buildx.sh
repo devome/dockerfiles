@@ -97,12 +97,12 @@ base_func() {
     [[ $archtech ]] && export BUILDX_ARCH="$archtech" || export BUILDX_ARCH="386 amd64 arm64 arm/v6 arm/v7 ppc64le s390x"
 
     ## 确定libtorrent版本
-    # if [[ $(echo ${QBITTORRENT_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${QBITTORRENT_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
-    #     export LIBTORRENT_VERSION=1
-    # else
-    #     export LIBTORRENT_VERSION=2
-    # fi
-    export LIBTORRENT_VERSION=2
+    if [[ $(echo ${QBITTORRENT_VERSION} | awk -F '.' '{print $1}') -eq 4 && $(echo ${QBITTORRENT_VERSION} | awk -F '.' '{print $2}') -le 3 ]]; then
+        export LIBTORRENT_VERSION=1
+    else
+        export LIBTORRENT_VERSION=2
+    fi
+    # export LIBTORRENT_VERSION=2
 
     ## 标签
     if [[ ${QBITTORRENT_VERSION} == ${LATEST_VERSION} ]]; then
