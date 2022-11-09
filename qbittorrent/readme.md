@@ -1,6 +1,6 @@
 ## 特点
 
-- 自动按`tracker`分类（**可以选择关闭**）。
+- 自动按`tracker`分类或打标签（**可以选择关闭，可以选择采用qBittorrent中的“分类”还是“标签”**）。
 
 - 下载完成发送通知（**可以选择关闭**），可选途径：钉钉（[效果图](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/notify.png)）, Telegram, ServerChan, 爱语飞飞, PUSHPLUS推送加；搭配RSS功能（[RSS教程](https://www.jianshu.com/p/54e6137ea4e3)）自动下载效果很好；下载完成后还可以补充运行你的自定义脚本。
 
@@ -76,8 +76,8 @@
 |  5  | BT_PORT                 | 34567         | BT监听端口，建议自定义，如需达到`可连接`状态，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
 |  6  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
 |  7  | INSTALL_PYTHON          | false         | 默认不安装python，如需要python（qBittorrent的搜索功能必须安装python），请设置为`true`，设置后将在首次启动容器时自动安装好。 |
-|  8  | ENABLE_AUTO_CATEGORY    | true          | 4.3.7+可用。是否自动分类，默认自动分类，如不想自动分类，请设置为`false`。 |
-|  9  | CATEGORY_OR_TAG         | category      | 4.3.9及4.4.6+可用，当ENABLE_AUTO_CATEGORY=true时，控制自动分类是qBittorrent中的”分类“还是”标签“。设置为`category`（默认值）为“分类“，设置为`tag`为“标签“。当设置为`tag`时，由于标签不是唯一的，无法筛选出没有打上tracker标签的种子，所以运行`auto-cat -a`和`auto-cat -A`都将对全部种子按tracker打标签，种子多时比较耗时；而当设置为`category`时，运行`auto-cat -a`就只对未分类种子进行分类。 |
+|  8  | ENABLE_AUTO_CATEGORY    | true          | 4.3.7+可用。是否自动按tracker进行分类，默认为`true`开启，如需关闭，请设置为`false`。 |
+|  9  | CATEGORY_OR_TAG         | category      | 4.3.9及4.4.6+可用，当`ENABLE_AUTO_CATEGORY=true`时，控制自动分类是qBittorrent中的“分类”还是“标签”。设置为`category`（默认值）为“分类”，设置为`tag`为“标签”。当设置为`tag`时，由于标签不是唯一的，无法筛选出没有打上tracker标签的种子，所以运行`auto-cat -a`和`auto-cat -A`都将对全部种子按tracker打标签，种子多时比较耗时；而当设置为`category`时，运行`auto-cat -a`就只对未分类种子进行分类。 |
 |  10 | DL_FINISH_NOTIFY        | true          | 默认会在下载完成时向设定的通知渠道发送种子下载完成的通知消息，如不想收此类通知，则设置为`false`。 |
 |  11 | TRACKER_ERROR_COUNT_MIN | 3             | 4.3.7+可用。可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。 |
 |  12 | UMASK_SET               | 000           | 权限掩码`umask`，指定qBittorrent在建立文件时预设的权限掩码，可以设置为`022`。 |
@@ -95,7 +95,7 @@
 |  24 | GOTIFY_APP_TOKEN        |               | 4.3.9及4.4.4+可用。通知渠道Gotify，填入其TOKEN，需要和`GOTIFY_URL`同时赋值。 |
 |  25 | GOTIFY_PRIORITY         | 5             | 4.3.9及4.4.4+可用。通知渠道Gotify，发送消息的优先级。 |
 |  26 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
-|  27 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron运行`auto-cat -a`命令，将所有**未分类**种子按tracker分类（当CATEGORY_OR_TAG=category时），或将所有种子按tracker打标签（当CATEGORY_OR_TAG=tag时）。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。 |
+|  27 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron运行`auto-cat -a`命令，将所有**未分类**种子按tracker分类（当`CATEGORY_OR_TAG=category`时），或将所有种子按tracker打标签（当`CATEGORY_OR_TAG=tag`时）。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。虽然本变量是全版本有效，但控制采用“分类”还是“标签”的变量`CATEGORY_OR_TAG`仅4.3.9和4.4.6+有效。 |
 |  28 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
 |  29 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
 |  30 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
