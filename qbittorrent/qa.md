@@ -2,7 +2,7 @@
 
 <details>
 
-<summary markdown="span"><b> ▶ 01. 使用此镜像会导致封号吗</b></summary>
+<summary markdown="span"><b>01. 使用此镜像会导致封号吗</b></summary>
 
 此镜像未修改qbittorrent客户端官方任何信息，在和pt站tracker服务器交互时反馈的一切信息均是qbittorrent官方原版反馈的信息，此镜像只是基于qbittorrent额外增加了一些脚本而已。增加的脚本全部代码在 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 可以查看，不会因为使用此镜像导致pt账号被封。
 
@@ -10,7 +10,7 @@
 
 <details>
 
-<summary markdown="span"><b> ▶ 02. 如何在运行 dl-finish "%I" 时调用自定义脚本</b></summary>
+<summary markdown="span"><b>02. 如何在运行 dl-finish "%I" 时调用自定义脚本</b></summary>
 
 - 此功能可用版本：4.3.7+；
 
@@ -26,7 +26,7 @@
 
 <details>
 
-<summary markdown="span"><b> ▶ 03. 如何优雅的关闭qbittorrent容器</b></summary>
+<summary markdown="span"><b>03. 如何优雅的关闭qbittorrent容器</b></summary>
 
 - 暴力强制关闭qbittorrent容器自然是容易丢失任务的，所以在关闭前应当先将所有种子暂停，过一会再关闭容器。这时，所有的配置文件和torrent恢复文件也都是暂停后的状态，然后再新建容器或重新部署，启动后再开始所有任务。
 
@@ -36,7 +36,7 @@
 
 <details>
 
-<summary markdown="span"><b> ▶ 04. 如何从其他作者的镜像/套件版转移至本镜像</b></summary>
+<summary markdown="span"><b>04. 如何从其他作者的镜像/套件版转移至本镜像</b></summary>
 
 -  **如果启用了ssl/https，请先在原qbittorrent的webui中禁用，或者将`qBittorrent.conf`中`WebUI\HTTPS\Enabled=true`改为`WebUI\HTTPS\Enabled=false`。**
 
@@ -54,7 +54,7 @@
 
 <details>
 
-<summary markdown="span"><b> ▶ 05. 可不可以不使用默认下载目录</b></summary>
+<summary markdown="span"><b>05. 可不可以不使用默认下载目录</b></summary>
 
 默认下载目录是`/data/downloads`，如不想使用默认下载目录，可以额外映射其他路径，比如映射`/volume1/media:/media`，然后在qbittorrent中设置默认下载目录为`/media`，也可以在每次下载时自己输入下载目录为`/media`。
 
@@ -62,7 +62,7 @@
 
 <details>
 
-<summary markdown="span"><b> ▶ 06. 遗忘登陆密码如何重置</b></summary>
+<summary markdown="span"><b>06. 遗忘登陆密码如何重置</b></summary>
 
 ```
 # 进入容器
@@ -79,7 +79,7 @@ curl -X POST -d 'json={"web_ui_username":"新的用户名","web_ui_password":"�
 
 <details>
 
-<summary markdown="span"><b> ▶ 07. 如何与emby, jellyfin, plex等等配合使用</b></summary>
+<summary markdown="span"><b>07. 如何与emby, jellyfin, plex等等配合使用</b></summary>
 
 将需要配合使用的容器的环境变量PUID/PGID设置为一样的即可。
 
@@ -87,7 +87,7 @@ curl -X POST -d 'json={"web_ui_username":"新的用户名","web_ui_password":"�
 
 <details>
 
-<summary markdown="span"><b> ▶ 08. 启用了其他非官方webui，导致webui打不开，如何关闭</b></summary>
+<summary markdown="span"><b>08. 启用了其他非官方webui，导致webui打不开，如何关闭</b></summary>
 
 ```
 # 进入容器
@@ -104,7 +104,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 09. 如何自动更新容器</b></summary>
+<summary markdown="span"><b>09. 如何自动更新容器</b></summary>
 
 安装watchtower即可，详见 [这里](https://hub.docker.com/r/containrrr/watchtower)
 
@@ -112,7 +112,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 10. 安装了watchtower，如何让qbittorrent不被watchtower自动更新</b></summary>
+<summary markdown="span"><b>10. 安装了watchtower，如何让qbittorrent不被watchtower自动更新</b></summary>
 
 - 方法1：部署qbittorrent容器时，直接指定标签，如`nevinee/qbittorrent:4.3.7`；
 
@@ -133,7 +133,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 11. 为何建议将qbittorrent安装在macvlan网络上</b></summary>
+<summary markdown="span"><b>11. 为何建议将qbittorrent安装在macvlan网络上</b></summary>
 
 - 可以在网关上给qbittorrent所在ip独立设置限速; 
 
@@ -143,7 +143,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 12. 将qbittorrent安装在macvlan网络上时，如何使用IYUUAutoReseed自动辅种</b></summary>
+<summary markdown="span"><b>12. 将qbittorrent安装在macvlan网络上时，如何使用IYUUAutoReseed自动辅种</b></summary>
 
 将两个容器都安装在同一个macvlan网络上即可，或者直接安装`nevinee/qbittorrent:iyuu`标签。
 
@@ -151,7 +151,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 13. 如何使用 CRON_ALTER_LIMITS 这个环境变量</b></summary>
+<summary markdown="span"><b>13. 如何使用 CRON_ALTER_LIMITS 这个环境变量</b></summary>
 
 - 4.3.8+可用。
 
@@ -171,7 +171,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 14. 如何使用 CRON_IYUU_HELP 这个环境变量</b></summary>
+<summary markdown="span"><b>14. 如何使用 CRON_IYUU_HELP 这个环境变量</b></summary>
 
 - 4.3.8+可用。
 
@@ -190,7 +190,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 15. 为什么没法使用搜索功能</b></summary>
+<summary markdown="span"><b>15. 为什么没法使用搜索功能</b></summary>
 
 搜索功能依赖于python，请在创建容器时添加环境变量`INSTALL_PYTHON`，并将值设置为`true`。
 
@@ -198,7 +198,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 16. 环境变量S6_SERVICES_GRACETIME的含义</b></summary>
+<summary markdown="span"><b>16. 环境变量S6_SERVICES_GRACETIME的含义</b></summary>
 
 - 本镜像使用了s6-overlay程序，在关闭/重启/重建容器时，s6-overlay程序会在关闭容器内程序前等待一定的时间。s6-overlay程序可以设置两个等待的最大时长，一个是`S6_SERVICES_GRACETIME`，一个是`S6_KILL_GRACETIME`，其含义详见[这里](https://github.com/just-containers/s6-overlay#customizing-s6-behaviour)。嫌太长可以直接看本文下面的说明。
 
@@ -216,7 +216,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 17. qBittorrent使用https的webui时，iyuu如何连接</b></summary>
+<summary markdown="span"><b>17. qBittorrent使用https的webui时，iyuu如何连接</b></summary>
 
 - 当qBittorrent使用https的webui时，iyuu连接qBittorrent需要使用`https://<域名>:<端口>`的形式，不能使用`https://<IP>:<端口>`，所以需要在创建iyuu容器（使用nevinee/qbittorrent:iyuu时同样也需要）指定域名和ip的对应关系。
 
@@ -233,7 +233,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b> ▶ 18. qBittorrent占用了巨大的内存，如何调整</b></summary>
+<summary markdown="span"><b>18. qBittorrent占用了巨大的内存，如何调整</b></summary>
 
 你所见到的占用巨大的内存并不是真的占用了，使用`docker stats qbittorrent`输出的内存占用更准确一点，其他方式输出的内存占用会非常的大。因为libtorrent-rasterbar v2.x把内存使用交给内核来处理，内核会自己根据内存大小和读取频次来自动决定怎么去缓存，所以不要被看起来庞大的内存占用给吓着了。详见libtorrent-rasterbar作者的[原话](https://github.com/arvidn/libtorrent/issues/6667#issuecomment-1040874903)。
 
