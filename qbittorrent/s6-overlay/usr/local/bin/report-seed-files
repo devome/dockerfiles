@@ -27,5 +27,6 @@ if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
     cat $tmplist1 | sort -u > $tmplist2
     mv $tmplist2 $tmplist1
     mv $tmplist1 $seed_files
+    [[ $(id -u) -eq 0 ]] && chown "${PUID}:${PGID}" $seed_files
     echo -e "\n生成完毕，生成的清单文件为：$seed_files\n"
 fi
