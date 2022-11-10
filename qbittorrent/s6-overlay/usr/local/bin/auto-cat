@@ -11,7 +11,7 @@ base_fun() {
         exit 0
     fi
     if [[ $CATEGORY_OR_TAG != category && $CATEGORY_OR_TAG != tag ]]; then
-        echo "CATEGORY_OR_TAG 赋值错误，仅能赋值 'category' 或 'tag'"
+        echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] CATEGORY_OR_TAG 赋值错误，仅能赋值 'category' 或 'tag'"
         exit 1
     fi
 }
