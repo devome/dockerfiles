@@ -390,4 +390,4 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 
 如有使用上的问题，或者有其他好的功能建议，请在 [Github这里](https://github.com/devome/dockerfiles/issues) 或 [Gitee这里](https://gitee.com/evine/dockerfiles/issues) 提交。
 
-[![dockeri.co](http://dockeri.co/image/nevinee/qbittorrent)](https://hub.docker.com/r/nevinee/qbittorrent/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/nevinee/qbittorrent.svg?style=for-the-badge&label=pulls&logo=docker)](https://hub.docker.com/r/nevinee/qbittorrent) [![Docker Stars](https://img.shields.io/docker/stars/nevinee/qbittorrent.svg?style=for-the-badge&label=stars&logo=docker)](https://hub.docker.com/r/nevinee/qbittorrent) [![GitHub Stars](https://img.shields.io/github/stars/devome/dockerfiles.svg?style=for-the-badge&logo=github)](https://github.com/devome/dockerfiles)
