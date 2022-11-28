@@ -1,6 +1,7 @@
 ARG LIBTORRENT_VERSION=2
 FROM nevinee/libtorrent-rasterbar:${LIBTORRENT_VERSION} AS builder
-RUN apk add --no-cache \
+RUN apk upgrade \
+    && apk add --no-cache \
        boost-dev \
        openssl-dev \
        qt5-qtbase-dev \
