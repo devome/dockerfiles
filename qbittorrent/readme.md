@@ -50,6 +50,7 @@
 | 20221024 | 4.4.5       | 2.0.8      | 3.16.2 | libtorrent-rasterbar v2.0.8 修复了内存溢出的问题，因此更新一下qbittorrent。 |
 | 20221109 | 4.3.9       | 1.2.18     | 3.16.2 | 添加`CATEGORY_OR_TAG`环境变量，详见环境变量清单；考虑到4.3.9将是许多人的使用版本，将全部新功能重新应用到4.3.9版本中。 |
 | 20221126 | 4.3.9</br>4.5.0 | 1.2.18</br>2.0.8 | 3.17.0 | alpine升级至3.17.0，升级依赖版本为：boost 1.80.0, openssl 3.0.7, qt 5.16.6, zlib 1.2.13 |
+| 20221130 | 4.5.0       | 1.2.18     | 3.17.0 | 把依赖项`libtorrent-rasterbar`从`2.0.8`切换为`1.2.18`，应用[#17994.patch](https://patch-diff.githubusercontent.com/raw/qbittorrent/qBittorrent/pull/17994.patch)修复`4.5.0`版本简体中文无法启用的bug，需要先切换为英文再切换为中文，或者在启动容器前先将`config/qBittorrent.conf`中`General\Locale`这一行从`zh`改为`zh_CN`。 |
 
 ## 环境变量清单
 
