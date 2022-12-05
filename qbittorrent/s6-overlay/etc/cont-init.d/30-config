@@ -40,6 +40,15 @@ EOF
         s!WebUI\\\Port=.*!WebUI\\\Port=${WEBUI_PORT}!g;
         s!WebUI\\\LocalHostAuth=.*!WebUI\\\LocalHostAuth=false!g;
     }" /data/config/qBittorrent.conf
+
+    major_ver=$(qbittorrent-nox --version | sed 's|qBittorrent v||' | awk -F. '{print $1}')
+    minor_ver=$(qbittorrent-nox --version | sed 's|qBittorrent v||' | awk -F. '{print $2}')
+
+    if [[ $major_ver -eq 4 && $minor_ver -ge 5 ]]; then
+        sed -i -E 's|General\\Locale=.+|General\\Locale=zh_CN|' /data/config/qBittorrent.conf
+    elif [[ $major_ver -eq 4 && $minor_ver -lt 5 ]]; then
+        sed -i -E 's|General\\Locale=.+|General\\Locale=zh|' /data/config/qBittorrent.conf
+    fi
 }
 
 fix_config 2>&1 | sed "s#^#cont-init: info: $(realpath $0): \1#g"
