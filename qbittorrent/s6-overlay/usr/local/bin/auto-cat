@@ -3,7 +3,7 @@
 base_fun() {
     if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
         . /usr/local/bin/share
-        categories=( $($cmd_curl ${api_url_base}/torrents/categories | jq -r .[].name | sed "s# #%20#g") )
+        categories_json="/data/config/categories.json"
         CATEGORY_OR_TAG=${CATEGORY_OR_TAG:-category}
         filter=""
     else
@@ -28,8 +28,8 @@ category() {
     local torrent_hash="$1"
     local tracker=$(gen_tracker "$torrent_hash")
     local current_category=$($cmd_curl "${api_url_base}/torrents/info?hashes=${torrent_hash}" | jq -r .[].category | sed "s# #%20#g")
-    if [[ -z $(echo ${categories[@]} | sed 's| |\n|g' | grep -wo "$tracker") ]]; then
-        $cmd_curl_post -d "category=$tracker" "${api_url_base}/torrents/createCategory"
+    if [[ -z $(cat $categories_json | jq -r 'keys'[] | grep -x "$tracker") ]]; then
+        $cmd_curl_post -d "category=$tracker" "${api_url_base}/torrents/createCategory" &>/dev/null
     fi
     if [[ $current_category != $tracker ]]; then
         $cmd_curl_post -d "hashes=${torrent_hash}&category=${tracker}" "${api_url_base}/torrents/setCategory"
