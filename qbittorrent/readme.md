@@ -2,7 +2,7 @@
 
 - 自动按`tracker`分类或打标签（**可以选择关闭，可以选择采用qBittorrent中的“分类”还是“标签”**）。
 
-- 下载完成发送通知（**可以选择关闭**），可选途径：钉钉（[效果图](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/notify.png)）, Telegram, ServerChan, 爱语飞飞, PUSHPLUS推送加；搭配RSS功能（[RSS教程](https://www.jianshu.com/p/54e6137ea4e3)）自动下载效果很好；下载完成后还可以补充运行你的自定义脚本。
+- 下载完成发送通知（**可以选择关闭**），可选途径：钉钉（[效果图](https://gitee.com/evine/dockerfiles/raw/master/qbittorrent/pictures/notify.png)）, Telegram, ServerChan, 爱语飞飞, PUSHPLUS推送加, 企业微信, Gotify；搭配RSS功能（[RSS教程](https://www.jianshu.com/p/54e6137ea4e3)）自动下载效果很好；下载完成后还可以补充运行你的自定义脚本。
 
 - 故障时发送通知，可选途径同上。
 
@@ -22,13 +22,13 @@
 
 ## 标签
 
-1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 5.15.6` `Libtorrent: 2.0.8` `Boost: 1.80.0` `OpenSSL:3.0.7` `zlib: 1.2.13`。
+1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 5.15.6` `Libtorrent: 2.0.8` `Boost: 1.80.0` `OpenSSL:3.0.8` `zlib: 1.2.13`。
   
 2. **`4.x.x-iyuu` , `latest-iyuu` , `iyuu`**: 标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`latest-iyuu`和`iyuu`标签，自动安装好[IYUUPlus](https://github.com/ledccn/IYUUPlus)，自动设置好下载器，主要针对不会设置下载器的用户。
 
 3. **`4.x.xbetax` , `4.x.xrcx` , `unstable`**: 标签中带有`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。此标签仅供测试使用及向qBittorrent官方反馈bug使用。
 
-4. **`edge`**: 基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**`Qt: 6.4.1` `Libtorrent: 2.0.8` `Boost: 1.80.0` `OpenSSL: 3.0.7` `zlib: 1.2.13`。
+4. **`edge`**: 基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**`Qt: 6.4.2` `Libtorrent: 2.0.8` `Boost: 1.81.0` `OpenSSL: 3.0.7` `zlib: 1.2.13`。
 
 ## 更新日志（仅列出稳定版）
 
@@ -51,6 +51,7 @@
 | 20221109 | 4.3.9       | 1.2.18     | 3.16.2 | 添加`CATEGORY_OR_TAG`环境变量，详见环境变量清单；考虑到4.3.9将是许多人的使用版本，将全部新功能重新应用到4.3.9版本中。 |
 | 20221126 | 4.3.9</br>4.5.0 | 1.2.18</br>2.0.8 | 3.17.0 | alpine升级至3.17.0，升级依赖版本为：boost 1.80.0, openssl 3.0.7, qt 5.16.6, zlib 1.2.13 |
 | 20221130 | 4.5.0       | 1.2.18     | 3.17.0 | 把依赖项`libtorrent-rasterbar`从`2.0.8`切换为`1.2.18`，应用[#17994.patch](https://patch-diff.githubusercontent.com/raw/qbittorrent/qBittorrent/pull/17994.patch)修复`4.5.0`版本简体中文无法启用的bug，需要先切换为英文再切换为中文，或者在启动容器前先将`config/qBittorrent.conf`中`General\Locale`这一行从`zh`改为`zh_CN`。 |
+| 20230213 | 4.5.1       | 1.2.18     | 3.17.2 | 1. 根据版本的不同自动设置`General\Locale`为`zh`或`zh_CN`；</br>2. 优化`auto-cat`逻辑，加快运行速度；</br>3. 优化`tracker-error`逻辑，加快运行速度，对多tracker的，只要有一个正常就不标记为`TrackerError`，`expected digit in bencoded string`状态不再标记为`TrackerError`；</br>4. 修复[#68](https://github.com/devome/dockerfiles/issues/68)，[#69](https://github.com/devome/dockerfiles/issues/69)；</br>5. 以上变化同步更新到`4.3.9`版本中。 |
 
 ## 环境变量清单
 
@@ -97,7 +98,7 @@
 |  25 | GOTIFY_PRIORITY         | 5             | 4.3.9及4.4.4+可用。通知渠道Gotify，发送消息的优先级。 |
 |  26 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
 |  27 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron运行`auto-cat -a`命令，将所有**未分类**种子按tracker分类（当`CATEGORY_OR_TAG=category`时），或将所有种子按tracker打标签（当`CATEGORY_OR_TAG=tag`时）。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。虽然本变量是全版本有效，但控制采用“分类”还是“标签”的变量`CATEGORY_OR_TAG`仅4.3.9和4.5.0+有效。 |
-|  28 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。 |
+|  28 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。在运行的时候比较吃资源，所以对于种子很多的大户人家，或者是对此不那么敏感的用户，建议把cron频率修改低一些，一天一次即可。 |
 |  29 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
 |  30 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
 |  31 | CRON_IYUU_HELP          |               | 4.3.8+可用。IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。 |

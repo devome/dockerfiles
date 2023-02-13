@@ -1,4 +1,5 @@
-FROM nevinee/qbittorrent
+ARG REPO_VERSION=latest
+FROM nevinee/qbittorrent:${REPO_VERSION}
 ENV IYUU_REPO_URL=https://gitee.com/ledc/iyuuplus.git
 RUN apk add --no-cache \
        composer \
