@@ -22,7 +22,7 @@
 
 ## 标签
 
-1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 5.15.6` `Libtorrent: 2.0.8` `Boost: 1.80.0` `OpenSSL:3.0.8` `zlib: 1.2.13`。
+1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 5.15.6` `Libtorrent: 1.2.18` `Boost: 1.80.0` `OpenSSL:3.0.8` `zlib: 1.2.13`。
   
 2. **`4.x.x-iyuu` , `latest-iyuu` , `iyuu`**: 标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`latest-iyuu`和`iyuu`标签，自动安装好[IYUUPlus](https://github.com/ledccn/IYUUPlus)，自动设置好下载器，主要针对不会设置下载器的用户。
 
