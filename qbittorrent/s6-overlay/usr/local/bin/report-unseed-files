@@ -36,18 +36,15 @@ if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
     done <<< $(echo "$detect_pathes")
 
     [[ -f $unseed_files ]] && rm $unseed_files
+    echo -e "开始生成未做种文件清单，请等待...\n"
+    tmpfile=$(mktemp)
     echo "$detect_pathes" | while read path; do
-        find "$path" -type f | while read file; do
-            if [[ -z $(grep -Fx "$file" $seed_files 2>/dev/null) ]]; then
-                echo -n "未做种："
-                echo "$file" | tee -a $unseed_files
-            else
-                echo "做种中：$file"
-            fi
-        done
+        find "$path" -type f | sort >> "$tmpfile"
     done
+    grep -Fxv -f "$seed_files" "$tmpfile" > "$unseed_files"
+    rm "$tmpfile"
     [[ $(id -u) -eq 0 ]] && chown "${PUID}:${PGID}" $unseed_files
-    echo -e "\n已成功生成指定路径下所有未做种文件清单：$unseed_files\n"
+    echo -e "已成功生成指定路径下所有未做种文件清单：$unseed_files\n"
     echo -e "如果需要删除某些未做种文件，请按以下流程操作：\n"
     echo -e "1. 打开清单 '$unseed_files'，并将想保留在系统中的文件从该清单中删除，也就是仅将想要删除的文件保留在这个清单中；\n"
     echo -e "2. 再三确认该清单中所有文件都是想要删除的文件，务必确保这一点；\n"
