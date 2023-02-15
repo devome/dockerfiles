@@ -4,8 +4,8 @@ RUN apk upgrade \
     && apk add --no-cache \
        boost-dev \
        openssl-dev \
-       qt5-qtbase-dev \
-       qt5-qttools-dev \
+       qt6-qtbase-dev \
+       qt6-qttools-dev \
        g++ \
        cmake \
        curl \
@@ -26,7 +26,7 @@ RUN mkdir -p /tmp/qbittorrent \
        -DSTACKTRACE=OFF \
        -DDBUS=OFF \
        -DGUI=OFF \
-       -DQT6=OFF \
+       -DQT6=ON \
        -Brelease \
        -GNinja \
     && cd release \
@@ -61,7 +61,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositorie
        curl \
        jq \
        openssl \
-       qt5-qtbase \
+       qt6-qtbase \
        s6-overlay \
        shadow \
        tzdata \
