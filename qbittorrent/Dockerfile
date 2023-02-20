@@ -62,6 +62,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositorie
        jq \
        openssl \
        qt6-qtbase \
+       qt6-qtbase-sqlite \
        s6-overlay \
        shadow \
        tzdata \
