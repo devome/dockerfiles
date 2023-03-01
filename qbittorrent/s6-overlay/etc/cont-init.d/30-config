@@ -11,7 +11,7 @@ ported_to_new_savepath_system=true
 
 [AutoRun]
 enabled=true
-program=dl-finish \"%I\"
+program=dl-finish \"%K\"
 
 [LegalNotice]
 Accepted=true
