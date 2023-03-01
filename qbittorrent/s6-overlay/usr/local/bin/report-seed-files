@@ -1,7 +1,9 @@
 #!/bin/bash
 
-tmplist1=$(mktemp)
-tmplist2=$(mktemp)
+tmplist=$(mktemp)
+tmppaste1=$(mktemp)
+tmppaste2=$(mktemp)
+tmppaste3=$(mktemp)
 seed_files=/data/diy/seed_files.list
 
 . /usr/local/bin/share
@@ -11,22 +13,28 @@ echo -e "种子越多，生成清单也就越耗时，请勿在生成清单过�
 read -p "请确认是否继续执行本脚本 [y/N]：" is_report
 echo
 if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
-    hashes=( $($cmd_curl ${api_url_base}/torrents/info | jq -r .[].hash) )
-    for ((i=0; i<${#hashes[@]}; i++)); do
-        echo "$(( $i + 1)): ${hashes[i]}"
-        torrent_properties=$($cmd_curl "${api_url_base}/torrents/properties?hash=${hashes[i]}")
-        save_path=$(echo "$torrent_properties" | jq -r .save_path)
-        if [[ "$save_path" != */ ]]; then
-            save_path="$save_path/"
-        fi
-        torrent_files=$($cmd_curl "${api_url_base}/torrents/files?hash=${hashes[i]}")
-        echo "$torrent_files" | jq -r .[].name | while read file; do
-            echo "${save_path}${file}" >> $tmplist1
+    read -p "是否在控制台显示处理进度（即是否显示当前正在处理的种子编号和hash，如不显示可大约减少40%运行时间） [Y/n]：" is_console
+    echo -e "\n开始生成做种文件清单...\n"
+    torrents_info=$($cmd_curl ${api_url_base}/torrents/info)
+    hashes=( $(echo "$torrents_info" | jq -r .[].hash | tee $tmppaste1) )
+    sed -i "s|^|_|g" $tmppaste1
+    echo "$torrents_info" | jq .[].save_path > $tmppaste2
+    paste -d "=" $tmppaste1 $tmppaste2 > $tmppaste3
+    . $tmppaste3
+    if [[ $is_console == [Nn] || $is_console == [Nn][Oo] ]]; then
+        for ((i=0; i<${#hashes[@]}; i++)); do
+            eval save_path=\$_${hashes[i]}
+            $cmd_curl "${api_url_base}/torrents/files?hash=${hashes[i]}" | jq -r .[].name | sed "s|^|$save_path/|g" >> $tmplist
         done
-    done
-    cat $tmplist1 | sort -u > $tmplist2
-    mv $tmplist2 $tmplist1
-    mv $tmplist1 $seed_files
+    else
+        for ((i=0; i<${#hashes[@]}; i++)); do
+            echo "$(( $i + 1)): ${hashes[i]}"
+            eval save_path=\$_${hashes[i]}
+            $cmd_curl "${api_url_base}/torrents/files?hash=${hashes[i]}" | jq -r .[].name | sed "s|^|$save_path/|g" >> $tmplist
+        done
+    fi
+    sort -u -o $seed_files $tmplist
+    rm $tmplist $tmppaste1 $tmppaste2 $tmppaste3
     [[ $(id -u) -eq 0 ]] && chown "${PUID}:${PGID}" $seed_files
     echo -e "\n生成完毕，生成的清单文件为：$seed_files\n"
 fi
