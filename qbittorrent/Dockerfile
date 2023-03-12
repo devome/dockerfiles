@@ -46,7 +46,7 @@ ENV S6_SERVICES_GRACETIME=30000 \
     S6_KILL_GRACETIME=60000 \
     S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
     S6_SYNC_DISKS=1 \
-    QBITTORRENT_HOME=/home/qbittorrent \
+    QBT_PROFILE=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=100 \
@@ -69,7 +69,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositorie
     && rm -rf /tmp/* /var/cache/apk/* \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo "${TZ}" > /etc/timezone \
-    && useradd qbittorrent -u ${PUID} -U -m -d ${QBITTORRENT_HOME} -s /sbin/nologin
+    && useradd qbittorrent -u ${PUID} -U -m -d ${QBT_PROFILE} -s /sbin/nologin
 COPY --from=builder /out /
 COPY s6-overlay /
 WORKDIR /data
