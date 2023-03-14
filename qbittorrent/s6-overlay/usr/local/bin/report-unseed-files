@@ -27,7 +27,7 @@ if [[ $is_report == [Yy] || $is_report == [Yy][Ee][Ss] ]]; then
     echo -e "请输入要检测的文件夹的绝对路径，多个路径之间使用半角冒号分隔，形如 /movies:/tv:/music\n"
     read -p "请输入所有检测路径：" detect_pathes
     echo
-    detect_pathes=$(echo $detect_pathes | sed 's|:|\n|g')
+    detect_pathes=$(echo $detect_pathes | sed 's|:|\n|g' | sort -u)
     while read path; do
         if [[ ! -d "$path" ]]; then
             echo -e "路径 '$path' 不存在，退出脚本"

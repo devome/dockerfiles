@@ -1,0 +1,55 @@
+#!/bin/bash
+
+detect_pathes="$1"
+
+usage() {
+    echo "用途：粗略估计指定的目录的重复做种率（辅种率）"
+    echo "用法：gen-dup \"<要分析的目录>\"，多个目录间以半角冒号(:)分隔"
+    echo "示例：gen-dup \"/movies\" 或 gen-dup \"/movies:/tv:/music:/video:/ebook\""
+    echo "说明：输出包含四列信息，第一列为所指定的目录，第二列为该目录的做种体积，第三列为该目录的实际占用体积，第四列为第二列占第三列的百分比"
+    echo "注意：如果指定目录下含有太多不在qBittorrent客户端中做种的文件，将会导致第三列、第四列数值偏差较大"
+}
+
+if [[ -z $detect_pathes ]]; then
+    usage
+    exit 0
+fi
+
+detect_pathes=$(echo $detect_pathes | sed 's|:|\n|g' | sort -u)
+lenth_v=0
+while read path; do
+    if [[ ! -d "$path" ]]; then
+        echo -e "路径 '$path' 不存在\n"
+        usage
+        exit 1
+    else
+        lenth_v_tmp=${#path}
+        if [[ $lenth_v_tmp -gt $lenth_v ]]; then
+            lenth_v=$lenth_v_tmp
+        fi
+    fi
+done <<< $(echo "$detect_pathes")
+
+tmppaste1=$(mktemp)
+tmppaste2=$(mktemp)
+tmppaste3=$(mktemp)
+
+. /usr/local/bin/share
+
+torrents_info=$($cmd_curl ${api_url_base}/torrents/info)
+echo "$torrents_info" | jq -r .[].save_path | sed -e "s|^|\/|" -e "s|$|\/|"  > $tmppaste1
+echo "$torrents_info" | jq -r .[].size > $tmppaste2
+paste -d ":" $tmppaste1 $tmppaste2 > $tmppaste3
+
+printf "%-${lenth_v}s  %10s  %10s  %7s\n" PATH SZ_TORRENT SZ_LOCAL DUP_PCT
+while read path; do
+    byte_torrent=$(grep -F "/${path}/" $tmppaste3 | awk -F: '{sum += $2} END {print sum}' 2>/dev/null)
+    [[ $byte_torrent ]] && size_torrent=$(nice-size $byte_torrent) || size_torrent=0
+    byte_du=$(du -b -d 0 "$path" | awk '{print $1}')
+    [[ $byte_du ]] && size_du=$(nice-size $byte_du) || size_du=0
+    [[ $byte_torrent -gt 0 && $byte_du -gt 0 ]] && perc=$(echo "scale=2; $byte_torrent * 100 / $byte_du" | bc)% || perc=0%
+    printf "%-${lenth_v}s  %10s  %10s  %7s\n" "$path" "$size_torrent" "$size_du" "$perc"
+done <<< $(echo "$detect_pathes")
+
+rm $tmppaste1 $tmppaste2 $tmppaste3
+

@@ -14,7 +14,7 @@ echo -e "请输入容器内你想检测的文件夹路径，请注意是容器�
 read -p "请输入：" detect_path
 echo
 
-detect_path=$(echo "$detect_path" | sed 's|:|\n|g')
+detect_path=$(echo "$detect_path" | sed 's|:|\n|g' | sort -u)
 while read path; do
     if [[ ! -d "$path" || "$path" != "/"* ]]; then
         echo -e "路径 '$path' 不存在，退出脚本\n"
