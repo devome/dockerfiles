@@ -4,14 +4,20 @@ size_byte=$1
 
 if [[ ${#size_byte} -ge 13 ]]; then
     size=$(echo "scale=2; $size_byte/1024^4" | bc)
-    echo "$size TB"
+    unit="TiB"
 elif [[ ${#size_byte} -ge 10 ]]; then
     size=$(echo "scale=2; $size_byte/1024^3" | bc)
-    echo "$size GB"
+    unit="GiB"
 elif [[ ${#size_byte} -ge 7 ]]; then
     size=$(echo "scale=2; $size_byte/1024^2" | bc)
-    echo "$size MB"
+    unit="MiB"
 else
     size=$(echo "scale=2; $size_byte/1024" | bc)
-    echo "$size KB"
+    unit="KiB"
 fi
+
+if [[ $size == .* ]]; then
+    size=0$size
+fi
+
+echo "$size $unit"
