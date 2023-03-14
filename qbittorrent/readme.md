@@ -8,7 +8,7 @@
 
 - 按设定的cron检查tracker状态，如发现种子的tracker状态有问题，将给该种子添加`TrackerError`的标签，方便筛选；如果tracker出错数量超过设定的阈值，给设定渠道发送通知。
 
-- **一些辅助功能：批量修改tracker；检测指定文件夹下未做种的子文件夹/文件；生成做种文件清单；生成未做种文件清单；配合IYUU自动重新校验和自动恢复做种；指定设备上线时自动限速；多时段限速等等。**
+- **一些辅助功能：批量修改tracker；检测指定文件夹下未做种的子文件夹/文件；生成做种文件清单；生成未做种文件清单；配合IYUU自动重新校验和自动恢复做种；指定设备上线时自动限速；多时段限速；分析指定目录的重复做种率（辅种率）等等。**
 
 - **如需要下载完成后自动触发EMBY/JELLYFIN扫描媒体库，触发ChineseSubFinder自动为刚刚下载完成的视频自动下载字幕，请按照 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent/diy) 操作。**
 
@@ -37,7 +37,7 @@
 | 20210608 | 4.3.5       | 1.2.13     | 3.13.5 |      |
 | 20210617 | 4.3.5       | 1.2.14     | 3.14.0 | 默认不再安装python，需要开关打开才安装 |
 | 20210628 | 4.3.6       | 1.2.14     | 3.14.0 | 优化自动分类和tracker错误检查时的资源占用 |
-| 20210804 | 4.3.7       | 1.2.14     | 3.14.0 | 1. 增加5个环境变量控制开关，详见[环境变量清单](#环境变量清单)；<br>2. 增加批量修改 tracker的功能，详见[命令](#命令)；<br>3. 增加在运行`dl-finish %I`时运行自定义脚本的功能，详见[相关问题](#相关问题)。 |
+| 20210804 | 4.3.7       | 1.2.14     | 3.14.0 | 1. 增加5个环境变量控制开关，详见[环境变量清单](#环境变量清单)；<br>2. 增加批量修改 tracker的功能，详见[命令](#命令)；<br>3. 增加在运行`dl-finish %K`时运行自定义脚本的功能，详见[相关问题](#相关问题)。 |
 | 20210830 | 4.3.8       | 1.2.14     | 3.14.2 | 1. 增加3个环境变量控制开关，详见[环境变量清单](#环境变量清单)；<br>2. 增加检测指定目录未做种的子文件夹/文件功能，详见[命令](#命令)。 |
 | 20211101 | 4.3.9       | 1.2.14     | 3.14.2 | 修复通知内容中含有字符"&"时无法正常发送的bug。 |
 | 20220107 | 4.4.0       | 2.0.5      | 3.14.3 | 1. 增加环境变量`EXTRA_PACKAGES`，详见[环境变量清单](#环境变量清单)；<br>2. 默认运行自动分类程序时仅对未分类的种子进行分类，如需要强制对所有种子进行分类，请参考[命令](#命令)；<br>3. 增加两个需要手动运行的脚本`report-seed-files`(导出所有做种文件清单)和`report-unseed-files`(导出指定文件夹下未做种文件清单)，详见[命令](#命令)。 |
@@ -315,9 +315,9 @@ networks:
 
 - 只要你将名为`diy.sh`的shell脚本放在映射目录下的`diy`文件夹下即可，容器内路径为`/data/diy/diy.sh`（hash已存储在名为torrent_hash的变量中，可通过此值获取其他信息）。
 
-- 如想传入除“%I”种子hash之外的其他参数，可以在 设置->下载->Torrent 完成时运行外部程序 下填入这种形式：`dl-finish "%I" "%N" "%L" "%F"`，必须保证"%I"是第一个参数，后面的参数根据你自己需要调整。在`diy.sh`中，`"%N" "%L" "%F"`分别通过`$2 $3 $4`调用。如：`cmd "$2" "$3 "$4"`。$2, $3, $4分别指传入的第2, 第3, 第4个参数，分别对应`"%N" "%L" "%F"`。
+- 如想传入除“%K”种子ID之外的其他参数，可以在 设置->下载->Torrent 完成时运行外部程序 下填入这种形式：`dl-finish "%K" "%N" "%L" "%F"`，必须保证"%K"是第一个参数，后面的参数根据你自己需要调整。在`diy.sh`中，`"%N" "%L" "%F"`分别通过`$2 $3 $4`调用。如：`cmd "$2" "$3 "$4"`。$2, $3, $4分别指传入的第2, 第3, 第4个参数，分别对应`"%N" "%L" "%F"`。
 
-- 假如你要调用其他语言的脚本，比如python，可以在`diy.sh`中写上`python3 /data/diy/your_python_scripts.py $torrent_hash`即可。如需要传入更多参数，请参考上一条在“Torrent 完成时运行外部程序”填入形如`dl-finish "%I" "%N" "%L" "%F"`的形式，然后在`diy.sh`中写上`python3 /data/diy/your_python_scripts.py "$2" "$3" "$4"`。
+- 假如你要调用其他语言的脚本，比如python，可以在`diy.sh`中写上`python3 /data/diy/your_python_scripts.py $torrent_hash`即可。如需要传入更多参数，请参考上一条在“Torrent 完成时运行外部程序”填入形如`dl-finish "%K" "%N" "%L" "%F"`的形式，然后在`diy.sh`中写上`python3 /data/diy/your_python_scripts.py "$2" "$3" "$4"`。
 
 - 如需要下载完成后自动触发EMBY/JELLYFIN扫描媒体库，触发ChineseSubFinder自动为刚刚下载完成的视频自动下载字幕，请按照 [这里](https://github.com/devome/dockerfiles/tree/master/qbittorrent/diy) 操作。
 
@@ -347,7 +347,7 @@ networks:
 
 - 注意新容器的PUID/PGID和要旧容器保持一致。
 
-- 注意在 `设置` -> `下载` 中勾选 `Torrent 完成时运行外部程序` 并填入 `dl-finish "%I"`，如需要https要重新设置证书路径。
+- 注意在 `设置` -> `下载` 中勾选 `Torrent 完成时运行外部程序` 并填入 `dl-finish "%K"`，如需要https要重新设置证书路径。
 
 </details>
 
@@ -615,6 +615,9 @@ docker exec -it qbittorrent report-seed-files
 
 # 生成指定路径下没有在本qBittorrent客户端做种的文件清单，4.3.9+可用
 docker exec -it qbittorrent report-unseed-files
+
+# 分析指定目录的重复做种率（辅种率），具体说明请运行下列命令，4.5.3+可用
+docker exec -it qbittorrent gen-dup
 ```
 
 </details>
@@ -635,13 +638,21 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 
 ## 效果图
 
-![notify](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/notify.png)
+![notify](pictures/notify.png)
 
-![iyuu-help](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/iyuu-help.png)
+![iyuu-help](pictures/iyuu-help.png)
 
-![change-tracker](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/change-tracker.png)
+![change-tracker](pictures/change-tracker.png)
 
-![del-unseed-dir](https://raw.githubusercontent.com/devome/dockerfiles/master/qbittorrent/pictures/del-unseed-dir.png)
+![change-tracker2](pictures/change-tracker2.png)
+
+![del-unseed-dir](pictures/del-unseed-dir.png)
+
+![report-seed-files](pictures/report-seed-files.png)
+
+![report-unseed-files](pictures/report-unseed-files.png)
+
+![gen-dup](pictures/gen-dup.png)
 
 
 ## 参考
