@@ -640,19 +640,21 @@ docker exec -it qbittorrent php /iyuu/start.php restart -d
 
 ![notify](pictures/notify.png)
 
-![iyuu-help](pictures/iyuu-help.png)
+![iyuu-help](https://s3.bmp.ovh/imgs/2023/03/16/d81ef270f591ed4c.gif)
 
-![change-tracker](pictures/change-tracker.png)
+![change-tracker](https://s3.bmp.ovh/imgs/2023/03/16/d0164dc03fa2fcdc.gif)
 
-![change-tracker2](pictures/change-tracker2.png)
+![change-tracker](https://s3.bmp.ovh/imgs/2023/03/16/c68d896355a22dcf.gif)
 
-![del-unseed-dir](pictures/del-unseed-dir.png)
+![remove-tracker](https://s3.bmp.ovh/imgs/2023/03/16/1cad397ec970f9e3.gif)
 
-![report-seed-files](pictures/report-seed-files.png)
+![del-unseed-dir](https://s3.bmp.ovh/imgs/2023/03/16/620a163165b3398f.gif)
 
-![report-unseed-files](pictures/report-unseed-files.png)
+![report-seed-files](https://s3.bmp.ovh/imgs/2023/03/16/08cd619845b95053.gif)
 
-![gen-dup](pictures/gen-dup.png)
+![report-unseed-files](https://s3.bmp.ovh/imgs/2023/03/16/0d107538303e9ce2.gif)
+
+![gen-dup](https://s3.bmp.ovh/imgs/2023/03/16/cf0b7468ef16760e.gif)
 
 
 ## 参考
