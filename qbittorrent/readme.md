@@ -53,6 +53,7 @@
 | 20221130 | 4.5.0       | 1.2.18     | 3.17.0 | 把依赖项`libtorrent-rasterbar`从`2.0.8`切换为`1.2.18`，应用[#17994.patch](https://patch-diff.githubusercontent.com/raw/qbittorrent/qBittorrent/pull/17994.patch)修复`4.5.0`版本简体中文无法启用的bug，需要先切换为英文再切换为中文，或者在启动容器前先将`config/qBittorrent.conf`中`General\Locale`这一行从`zh`改为`zh_CN`。 |
 | 20230213 | 4.5.1       | 1.2.18     | 3.17.2 | 1. 根据版本的不同自动设置`General\Locale`为`zh`或`zh_CN`；</br>2. 优化`auto-cat` `report-unseed-files` `tracker-error`逻辑，加快运行速度，对多tracker的，只要有一个正常就不标记为`TrackerError`；</br>3. 切换为qt6并增加依赖`qt6-qtbase-sqlite`；</br>4. 修复[#68](https://github.com/devome/dockerfiles/issues/68)，[#69](https://github.com/devome/dockerfiles/issues/69)。 |
 | 20230228 | 4.5.2       | 2.0.8     | 3.17.2 | 1. libtorrent-rasterbar切换为2.x；</br>2. 再一次优化`tracker-error`减少70%时长。 |
+| 20230529 | 4.5.3       | 2.0.9     | 3.18.0 | 1. 再一次优化`report-seed-files`减少70%时长；</br>2. `dl-finish`不再使用`%I`传参，而使用`%K`，已经部署好的使用`%I`也没有问题（除非会有混合种子或v2种子）；3. 增加`gen-dup`脚本，详见“命令”章节。 |
 
 ## 环境变量清单
 

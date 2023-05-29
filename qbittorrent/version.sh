@@ -46,15 +46,15 @@ if [[ $ver_qbbeta_official ]]; then
 fi
 
 ## 需要更新时则重新构建
-if [[ $stable_build_mark -eq 1 ]]; then
-    #gh workflow run qbittorrent-buildx2.yml -f version=$ver_qb_official
-    curl \
-        -X POST \
-        -H "Accept: application/vnd.github+json" \
-        -H "Authorization: token $GITHUB_WORKFLOW_TOKEN" \
-        -d "{\"ref\":\"master\",\"inputs\":{\"qbittorrent_version\":\"$ver_qb_official\"}}" \
-        "https://api.github.com/repos/devome/dockerfiles/actions/workflows/qbittorrent-buildx2.yml/dispatches"
-fi
+# if [[ $stable_build_mark -eq 1 ]]; then
+#     #gh workflow run qbittorrent-buildx2.yml -f version=$ver_qb_official
+#     curl \
+#         -X POST \
+#         -H "Accept: application/vnd.github+json" \
+#         -H "Authorization: token $GITHUB_WORKFLOW_TOKEN" \
+#         -d "{\"ref\":\"master\",\"inputs\":{\"qbittorrent_version\":\"$ver_qb_official\"}}" \
+#         "https://api.github.com/repos/devome/dockerfiles/actions/workflows/qbittorrent-buildx2.yml/dispatches"
+# fi
 
 # if [[ $unstable_build_mark -eq 1 ]]; then
 #     gh workflow run qbittorrent-buildx2.yml -f version=$ver_qbbeta_official
