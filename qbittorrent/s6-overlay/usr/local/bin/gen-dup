@@ -29,10 +29,15 @@ while read path; do
         fi
     fi
 done <<< $(echo "$detect_pathes")
+if [[ $lenth_v -lt 5 ]]; then
+    lenth_v=5
+fi
 
 tmppaste1=$(mktemp)
 tmppaste2=$(mktemp)
 tmppaste3=$(mktemp)
+byte_torrent_total=0
+byte_du_total=0
 
 . /usr/local/bin/share
 
@@ -44,12 +49,19 @@ paste -d ":" $tmppaste1 $tmppaste2 > $tmppaste3
 printf "%-${lenth_v}s  %10s  %10s  %7s\n" PATH SZ_TORRENT SZ_LOCAL DUP_PCT
 while read path; do
     byte_torrent=$(grep -F "/${path}/" $tmppaste3 | awk -F: '{sum += $2} END {print sum}' 2>/dev/null)
-    [[ $byte_torrent ]] && size_torrent=$(nice-size $byte_torrent) || size_torrent=0
+    byte_torrent_total=$(( $byte_torrent_total + ${byte_torrent:-0} ))
+    size_torrent=$(nice-size ${byte_torrent:-0})
     byte_du=$(du -b -d 0 "$path" | awk '{print $1}')
-    [[ $byte_du ]] && size_du=$(nice-size $byte_du) || size_du=0
+    byte_du_total=$(( $byte_du_total + ${byte_du:-0} ))
+    size_du=$(nice-size ${byte_du:-0})
     [[ $byte_torrent -gt 0 && $byte_du -gt 0 ]] && perc=$(echo "scale=2; $byte_torrent * 100 / $byte_du" | bc)% || perc=0%
     printf "%-${lenth_v}s  %10s  %10s  %7s\n" "$path" "$size_torrent" "$size_du" "$perc"
 done <<< $(echo "$detect_pathes")
+
+size_torrent_total=$(nice-size ${byte_torrent_total:-0})
+size_du_total=$(nice-size ${byte_du_total:-0})
+[[ $byte_torrent_total -gt 0 && $byte_du_total -gt 0 ]] && perc_total=$(echo "scale=2; $byte_torrent_total * 100 / $byte_du_total" | bc)% || perc_total=0%
+printf "%-${lenth_v}s  %10s  %10s  %7s\n" "total" "$size_torrent_total" "$size_du_total" "$perc_total"
 
 rm $tmppaste1 $tmppaste2 $tmppaste3
 
