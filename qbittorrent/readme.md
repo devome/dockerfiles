@@ -22,13 +22,13 @@
 
 ## 标签
 
-1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 6.5.0` `Libtorrent: 2.0.9` `Boost: 1.82.0` `OpenSSL:3.1.0` `zlib: 1.2.13`。
+1. **`4.x.x` , `latest`**: 标签以纯数字版本号命名，这是qBittorrent正式发布的稳定版，其中最新的版本额外增加`latest`标签。`Qt: 6.5.1` `Libtorrent: 2.0.9` `Boost: 1.82.0` `OpenSSL:3.1.1` `zlib: 1.2.13`。
   
 2. **`4.x.x-iyuu` , `latest-iyuu` , `iyuu`**: 标签中带有`iyuu`字样，基于qBittorrent稳定版集成了[IYUUPlus](https://github.com/ledccn/IYUUPlus)，其中最新的版本额外增加`latest-iyuu`和`iyuu`标签，自动安装好[IYUUPlus](https://github.com/ledccn/IYUUPlus)，自动设置好下载器，主要针对不会设置下载器的用户。
 
 3. **`x.x.xalphax`, `x.x.xbetax` , `x.x.xrcx` , `unstable`**: 标签中带有`alpha`、`beta`或`rc`字样，这是qBittorrent发布的测试版，其中最新的测试版额外增加`unstable` 标签。此标签仅供测试使用及向qBittorrent官方反馈bug使用。
 
-4. **`edge`**: 基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**`Qt: 6.5.1` `Libtorrent: 2.0.9` `Boost: 1.82.0` `OpenSSL: 3.1.0` `zlib: 1.2.13`。
+4. **`edge`**: 基于`alpine:edge`制作的镜像，体积最小，所依赖的组件版本最新，会提供`riscv64`版本镜像。**所有新功能或者BUG修复，或者有任何变化时，都会第一时间更新到此标签。**`Qt: 6.5.1` `Libtorrent: 2.0.9` `Boost: 1.82.0` `OpenSSL: 3.1.1` `zlib: 1.2.13`。
 
 ## 更新日志（仅列出稳定版）
 
@@ -54,6 +54,7 @@
 | 20230213 | 4.5.1       | 1.2.18     | 3.17.2 | 1. 根据版本的不同自动设置`General\Locale`为`zh`或`zh_CN`；</br>2. 优化`auto-cat` `report-unseed-files` `tracker-error`逻辑，加快运行速度，对多tracker的，只要有一个正常就不标记为`TrackerError`；</br>3. 切换为qt6并增加依赖`qt6-qtbase-sqlite`；</br>4. 修复[#68](https://github.com/devome/dockerfiles/issues/68)，[#69](https://github.com/devome/dockerfiles/issues/69)。 |
 | 20230228 | 4.5.2       | 2.0.8     | 3.17.2 | 1. libtorrent-rasterbar切换为2.x；</br>2. 再一次优化`tracker-error`减少70%时长。 |
 | 20230529 | 4.5.3       | 2.0.9     | 3.18.0 | 1. 再一次优化`report-seed-files`减少70%时长；</br>2. `dl-finish`不再使用`%I`传参，而使用`%K`，已经部署好的使用`%I`也没有问题（除非会有混合种子或v2种子）；3. 增加`gen-dup`脚本，详见“命令”章节。 |
+| 20230619 | 4.5.4       | 2.0.9     | 3.18.2 | `gen-dup`脚本增加总计输出。 |
 
 ## 环境变量清单
 
