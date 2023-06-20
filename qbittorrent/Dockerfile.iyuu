@@ -31,5 +31,5 @@ RUN apk add --no-cache \
     && git clone https://github.com/ledccn/IYUUPlus.git /iyuu \
     && echo -e "upload_max_filesize=100M\npost_max_size=108M\nmemory_limit=1024M\ndate.timezone=${TZ}" > /etc/php81/conf.d/99-overrides.ini \
     && rm -rf /var/cache/apk/* /tmp/*
-COPY s6-overlay-iyuu /
+COPY root2 /
 VOLUME ["/iyuu"]

@@ -1,5 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-sleep 5
-cd /data/data/logs/
-exec s6-setuidgid qbittorrent tail -F qbittorrent.log

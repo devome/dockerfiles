@@ -71,7 +71,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositorie
     && echo "${TZ}" > /etc/timezone \
     && useradd qbittorrent -u ${PUID} -U -m -d ${QBT_PROFILE} -s /sbin/nologin
 COPY --from=builder /out /
-COPY s6-overlay /
+COPY root /
 WORKDIR /data
 VOLUME ["/data"]
 ENTRYPOINT ["/init"]
