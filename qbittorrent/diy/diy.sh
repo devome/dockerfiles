@@ -72,7 +72,7 @@ hash="$1"
 content_path=$(curl -sSk "${api_url_base}/torrents/info?hashes=${hash}" | jq -r .[0].content_path)
 is_match=no
 for ((j=0; j<${#qb2csf_dir_match[*]}; j++)); do
-    match_before=$(echo ${qb2csf_dir_match[i]} | awk -F ':' '{print $2}')
+    match_before=$(echo ${qb2csf_dir_match[j]} | awk -F ':' '{print $2}')
     if [[ "$content_path" == "$match_before/"* ]]; then
         is_match=yes
         break
@@ -111,10 +111,10 @@ tmplist=$(mktemp)
 find "$content_path" \( $fdtmp \) > $tmplist
 cat $tmplist | grep -Evi "$ignore_keyword" | while read file; do
     for ((j=0; j<${#qb2csf_dir_match[*]}; j++)); do
-        match_before=$(echo ${qb2csf_dir_match[i]} | awk -F ':' '{print $2}')
+        match_before=$(echo ${qb2csf_dir_match[j]} | awk -F ':' '{print $2}')
         if [[ "$file" == "$match_before/"* ]]; then
-            video_type=$(echo ${qb2csf_dir_match[i]} | awk -F ':' '{print $1}')
-            match_after=$(echo ${qb2csf_dir_match[i]} | awk -F ':' '{print $3}')
+            video_type=$(echo ${qb2csf_dir_match[j]} | awk -F ':' '{print $1}')
+            match_after=$(echo ${qb2csf_dir_match[j]} | awk -F ':' '{print $3}')
             csf_file=$(echo "$file" | sed "s|$match_before|$match_after|")
             csf_result=$(curl -sSk \
                 -H "Content-Type: application/json" \
