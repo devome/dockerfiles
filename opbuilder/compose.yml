@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  opbuilder:
+    image: nevinee/opbuilder
+    container_name: opbuilder
+    restart: unless-stopped
+    network_mode: host
+    hostname: opbuilder
+    volumes:
+      - .:/home/evine
+    init: true
+    environment:
+      PUID: 1000 # 如果需要使用其他uid的用户来编译，请修改为对应用户的uid
+      PGID: 1000 # 如果需要使用其他gid的用户来编译，请修改为对应用户的gid
