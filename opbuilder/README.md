@@ -53,4 +53,16 @@ source $ZSH/oh-my-zsh.sh
 
 `.zshrc`中和plugin如何使用请见：https://github.com/ohmyzsh/ohmyzsh/wiki/Plugins
 
+本容器亦支持运行一次编译脚本后直接删除容器，创建时只要增加command即可：
+
+```shell
+docker run -d \
+  --rm \
+  --volume $(pwd):/home/evine \
+  --env PUID=1000 `#默认1000,如果保持默认可以不要本行` \
+  --env PGID=1000 `#默认1000,如果保持默认可以不要本行` \
+  nevinee/opbuilder \
+  bash /home/evine/your_script.sh  #只要带上command即可，运行完你的脚本后会直接删除容器
+```
+
 Dockerfile见：https://github.com/devome/dockerfiles/tree/master/opbuilder
