@@ -7,6 +7,7 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=1000 \
+    ENABLE_CHOWN=false \
     USERNAME=evine
 RUN echo "change repo..." \
     && sed -i 's/archive.ubuntu.com/mirrors.bfsu.edu.cn/g' /etc/apt/sources.list \
@@ -83,6 +84,7 @@ RUN echo "change repo..." \
        python2.7 \
        python3 \
        python3-pyelftools \
+       python3-setuptools \
        qemu-utils \
        rsync \
        scons \

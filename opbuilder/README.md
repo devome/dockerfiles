@@ -1,4 +1,4 @@
-用来编译openwrt的容器，容器中已含有全部编译的依赖项，创建的配置如下：
+用来编译 openwrt / lede 的容器，容器中已含有全部编译的依赖项，创建的配置如下：
 
 ```yaml
 version: "3.8"
@@ -13,17 +13,19 @@ services:
       - .:/home/evine
     init: true
     environment:
-      PUID: 1000 # 如果需要使用其他uid的用户来编译，请修改为对应用户的uid
-      PGID: 1000 # 如果需要使用其他gid的用户来编译，请修改为对应用户的gid
+      PUID: 1000           # 默认1000，如果需要使用其他uid的用户来编译，请修改为对应用户的uid
+      PGID: 1000           # 默认1000，如果需要使用其他gid的用户来编译，请修改为对应用户的gid
+      ENABLE_CHOWN: false  # 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限
 ```
 
-也可以按需修改下列命令中`$(pwd)` `PUID` `PGID`来创建：
+也可以按需修改下列命令中`$(pwd)` `PUID` `PGID` `ENABLE_CHOWN`来创建：
 
 ```shell
 docker run -d \
   --volume $(pwd):/home/evine \
-  --env PUID=1000 \
-  --env PGID=1000 \
+  --env PUID=1000 `# 默认1000，如果需要使用其他uid的用户来编译，请修改为对应用户的uid` \
+  --env PGID=1000 `# 默认1000，如果需要使用其他gid的用户来编译，请修改为对应用户的gid` \
+  --env ENABLE_CHOWN=false `# 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限` \
   --restart unless-stopped \
   --hostname opbuilder \
   --name opbuilder \
@@ -59,8 +61,9 @@ source $ZSH/oh-my-zsh.sh
 docker run -d \
   --rm \
   --volume $(pwd):/home/evine \
-  --env PUID=1000 `#默认1000,如果保持默认可以不要本行` \
-  --env PGID=1000 `#默认1000,如果保持默认可以不要本行` \
+  --env PUID=1000 `# 默认1000，如果保持默认可以不要本行` \
+  --env PGID=1000 `# 默认1000，如果保持默认可以不要本行` \
+  --env ENABLE_CHOWN=false `# 默认false，不重新设置文件所有者，如果保持默认可以不要本行` \
   nevinee/opbuilder \
   bash /home/evine/your_script.sh  #只要带上command即可，运行完你的脚本后会直接删除容器
 ```

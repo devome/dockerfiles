@@ -10,5 +10,6 @@ services:
       - .:/home/evine
     init: true
     environment:
-      PUID: 1000 # 如果需要使用其他uid的用户来编译，请修改为对应用户的uid
-      PGID: 1000 # 如果需要使用其他gid的用户来编译，请修改为对应用户的gid
+      PUID: 1000           # 默认1000，如果需要使用其他uid的用户来编译，请修改为对应用户的uid
+      PGID: 1000           # 默认1000，如果需要使用其他gid的用户来编译，请修改为对应用户的gid
+      ENABLE_CHOWN: false  # 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限
