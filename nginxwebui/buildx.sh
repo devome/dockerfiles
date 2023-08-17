@@ -14,10 +14,7 @@ buildx() {
     docker buildx create --name builder --use 2>/dev/null || docker buildx use builder
     docker buildx inspect --bootstrap
     docker buildx build \
-        --cache-from "type=local,src=/tmp/.buildx-cache" \
-        --cache-to "type=local,dest=/tmp/.buildx-cache" \
-        --build-arg "ALPINE_VERSION=latest" \
-        --platform "$arch"" \
+        --platform "$arch" \
         --tag ${repo}:${ver} \
         --tag ${repo}:latest \
         --push \
