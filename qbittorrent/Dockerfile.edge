@@ -1,9 +1,5 @@
 FROM alpine:edge
-ENV S6_SERVICES_GRACETIME=30000 \
-    S6_KILL_GRACETIME=60000 \
-    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
-    S6_SYNC_DISKS=1 \
-    QBT_PROFILE=/var/lib/qbittorrent \
+ENV QBT_PROFILE=/var/lib/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=100 \
@@ -14,13 +10,15 @@ ENV S6_SERVICES_GRACETIME=30000 \
     PS1="\u@\h:\w \$ "
 RUN apk add --no-cache \
        bash \
+       busybox-suid \
        curl \
        jq \
        openssl \
        qbittorrent-nox \
        qt6-qtbase-sqlite \
-       s6-overlay \
        shadow \
+       su-exec \
+       tini \
        tzdata \
     && rm -rf /tmp/* /var/cache/apk/* \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
@@ -29,4 +27,4 @@ RUN apk add --no-cache \
 COPY root /
 WORKDIR /data
 VOLUME ["/data"]
-ENTRYPOINT ["/init"]
+ENTRYPOINT ["tini", "-g", "--", "entrypoint.sh"]

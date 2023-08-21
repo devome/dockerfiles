@@ -28,7 +28,7 @@ RUN apk add --no-cache \
        php81-xml \
     && git config --global pull.ff only \
     && git config --global --add safe.directory /iyuu \
-    && git clone https://github.com/ledccn/IYUUPlus.git /iyuu \
+    && git clone --depth 1 https://github.com/ledccn/IYUUPlus.git /iyuu \
     && echo -e "upload_max_filesize=100M\npost_max_size=108M\nmemory_limit=1024M\ndate.timezone=${TZ}" > /etc/php81/conf.d/99-overrides.ini \
     && rm -rf /var/cache/apk/* /tmp/*
 COPY root2 /

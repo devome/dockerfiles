@@ -13,7 +13,6 @@ RUN apk upgrade \
        samurai \
     && rm -rf /tmp/* /var/cache/apk/*
 ARG QBITTORRENT_VERSION
-ARG JNPROC=1
 RUN mkdir -p /tmp/qbittorrent \
     && cd /tmp/qbittorrent \
     && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xz --strip-components 1 \
@@ -29,9 +28,8 @@ RUN mkdir -p /tmp/qbittorrent \
        -DQT6=ON \
        -Brelease \
        -GNinja \
-    && cd release \
-    && ninja -j${JNPROC} \
-    && ninja install \
+    && cmake --build release -j $(nproc) \
+    && cmake --install release \
     && ls -al /usr/local/bin/ \
     && qbittorrent-nox --help
 RUN echo "Copy to /out" \
@@ -42,11 +40,7 @@ RUN echo "Copy to /out" \
     && cp /usr/local/bin/qbittorrent-nox /out/usr/bin
 
 FROM alpine:latest
-ENV S6_SERVICES_GRACETIME=30000 \
-    S6_KILL_GRACETIME=60000 \
-    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
-    S6_SYNC_DISKS=1 \
-    QBT_PROFILE=/home/qbittorrent \
+ENV QBT_PROFILE=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=100 \
@@ -58,13 +52,15 @@ ENV S6_SERVICES_GRACETIME=30000 \
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositories \
     && apk add --no-cache \
        bash \
+       busybox-suid \
        curl \
        jq \
        openssl \
        qt6-qtbase \
        qt6-qtbase-sqlite \
-       s6-overlay \
        shadow \
+       su-exec \
+       tini \
        tzdata \
     && rm -rf /tmp/* /var/cache/apk/* \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
@@ -74,4 +70,4 @@ COPY --from=builder /out /
 COPY root /
 WORKDIR /data
 VOLUME ["/data"]
-ENTRYPOINT ["/init"]
+ENTRYPOINT ["tini", "-g", "--", "entrypoint.sh"]

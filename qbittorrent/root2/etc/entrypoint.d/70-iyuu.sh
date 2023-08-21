@@ -1,5 +1,3 @@
-#!/usr/bin/with-contenv bash
-
 cd /iyuu
 
 ## 更新一次IYUU
@@ -29,7 +27,6 @@ if [[ $(readlink -f /iyuu/db 2>/dev/null) != ${IYUU_DB} ]]; then
     rm -rf /iyuu/db 2>/dev/null
     ln -sf ${IYUU_DB} /iyuu/db
 fi
-chown -R root:users ${IYUU_DB}
 
 ## 写入/data/iyuu_db/clients.json
 CLIENT_FILE=/data/iyuu_db/clients.json
@@ -48,4 +45,5 @@ else
 fi
 
 ## 以Daemon形式启动IYUU
-exec php start.php start -d
+chown -R "${PUID}:${PGID}" ${IYUU_DB} /iyuu
+su-exec "${PUID}:${PGID}" php start.php start -d

@@ -1,5 +1,3 @@
-#!/usr/bin/with-contenv bash
-
 PUID=${PUID:-1000}
 PGID=${PGID:-100}
 echo "Change owner to user 'qbittorrent' (PUID=$PUID PGID=$PGID)..."

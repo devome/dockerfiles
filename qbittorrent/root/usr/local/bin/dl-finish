@@ -38,5 +38,5 @@ if [[ $torrent_hash =~ ^[0-9a-f]+$ ]]; then
         . /data/diy/diy.sh
     fi
 else
-    echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 传入参数不正确，请将HASH作为第1个传入参数，形如：dl-finish \"%I\"..."
+    echo "(W) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 传入参数不正确，请将HASH作为第1个传入参数，形如：dl-finish \"%K\"..."
 fi

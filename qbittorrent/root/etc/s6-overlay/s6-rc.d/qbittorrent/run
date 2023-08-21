@@ -1,6 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-UMASK_SET=${UMASK_SET:-000}
-umask $UMASK_SET
-
-exec s6-setuidgid qbittorrent qbittorrent-nox

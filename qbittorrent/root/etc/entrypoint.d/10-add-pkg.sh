@@ -1,5 +1,3 @@
-#!/usr/bin/with-contenv bash
-
 if [[ $INSTALL_PYTHON == true ]]; then
     echo "Install python3 ..."
     apk add --update --no-cache python3

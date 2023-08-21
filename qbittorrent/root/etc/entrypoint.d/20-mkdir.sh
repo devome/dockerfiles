@@ -1,5 +1,3 @@
-#!/usr/bin/with-contenv bash
-
 echo "Make some folders..."
 
 cd /data

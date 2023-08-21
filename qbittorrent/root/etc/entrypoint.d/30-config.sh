@@ -1,5 +1,3 @@
-#!/usr/bin/with-contenv bash
-
 QB_CONF_FILE="/data/config/qBittorrent.conf"
 
 BT_PORT=${BT_PORT:-34567}
