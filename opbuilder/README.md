@@ -15,7 +15,7 @@ services:
     environment:
       PUID: 1000           # 默认1000，如果需要使用其他uid的用户来编译，请修改为对应用户的uid
       PGID: 1000           # 默认1000，如果需要使用其他gid的用户来编译，请修改为对应用户的gid
-      ENABLE_CHOWN: false  # 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限
+      ENABLE_CHOWN: true   # 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限
 ```
 
 也可以按需修改下列命令中`$(pwd)` `PUID` `PGID` `ENABLE_CHOWN`来创建：
@@ -25,7 +25,7 @@ docker run -d \
   --volume $(pwd):/home/evine \
   --env PUID=1000 `# 默认1000，如果需要使用其他uid的用户来编译，请修改为对应用户的uid` \
   --env PGID=1000 `# 默认1000，如果需要使用其他gid的用户来编译，请修改为对应用户的gid` \
-  --env ENABLE_CHOWN=false `# 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限` \
+  --env ENABLE_CHOWN=true `# 默认false，不重新设置文件所有者，如遇文件权限问题，请设置为true，将在创建后重新设置映射文件夹的权限` \
   --restart unless-stopped \
   --hostname opbuilder \
   --name opbuilder \
@@ -34,6 +34,13 @@ docker run -d \
 ```
 
 已安装zsh，以`docker exec -it opbuilder zsh`进入容器后即可编译openwrt。**注：在容器内可以免密执行sudo命令。**
+
+如果不想输入上面这么长的命令，可以在宿主机上这样操作（如果使用的是zsh可以把`.bashrc`换成`.zshrc`），然后你就可以直接输入`dto`就进入容器了：
+
+```shell
+echo "alias dto='docker exec -it opbuilder zsh'" >> ~/.bashrc
+source ~/.bashrc
+```
 
 建议首次创建时，进入容器后运行一次以下命令以安装`oh-my-zsh`：
 
@@ -63,7 +70,7 @@ docker run -d \
   --volume $(pwd):/home/evine \
   --env PUID=1000 `# 默认1000，如果保持默认可以不要本行` \
   --env PGID=1000 `# 默认1000，如果保持默认可以不要本行` \
-  --env ENABLE_CHOWN=false `# 默认false，不重新设置文件所有者，如果保持默认可以不要本行` \
+  --env ENABLE_CHOWN=true `# 默认false，不重新设置文件所有者，如果保持默认可以不要本行` \
   nevinee/opbuilder \
   bash /home/evine/your_script.sh  #只要带上command即可，运行完你的脚本后会直接删除容器
 ```
