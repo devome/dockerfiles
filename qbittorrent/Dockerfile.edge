@@ -5,6 +5,8 @@ ENV QBT_PROFILE=/var/lib/qbittorrent \
     PGID=100 \
     WEBUI_PORT=8080 \
     BT_PORT=34567 \
+    QB_USERNAME=admin \
+    QB_PASSWORD=adminadmin \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ "
@@ -14,6 +16,7 @@ RUN apk add --no-cache \
        curl \
        jq \
        openssl \
+       python3 \
        qbittorrent-nox \
        qt6-qtbase-sqlite \
        shadow \
