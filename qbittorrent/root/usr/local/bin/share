@@ -1,12 +1,28 @@
-is_ssl=$(grep -i "WebUI\\\HTTPS\\\Enabled=" /data/config/qBittorrent.conf | awk -F "=" '{print $2}')
+WEBUI_PORT=${WEBUI_PORT:-34567}
+    
+get_qb_url() {
+    local is_ssl=$(grep -i "WebUI\\\HTTPS\\\Enabled=" /data/config/qBittorrent.conf | awk -F "=" '{print $2}')
+    local url_prefix
 
-if [[ $is_ssl == true ]]; then
-    cmd_curl="curl -sk"
-    url_prefix="https://"
-else
-    cmd_curl="curl -s"
-    url_prefix="http://"
-fi
+    if [[ $is_ssl == true ]]; then
+        url_prefix="https://"
+    else
+        url_prefix="http://"
+    fi
 
+    local qb_url="${url_prefix}127.0.0.1:${WEBUI_PORT}"
+    echo "$qb_url"
+}
+
+get_qb_ck() {
+    local info=$(curl -iksS -H "Referer: $qb_url" -d "username=${QB_USERNAME}&password=${QB_PASSWORD}" $api_url_base/auth/login)
+    local qb_cookie=$(echo "$info" | awk '/set-cookie/{print $2}')
+    if [[ -n $qb_cookie ]]; then
+        echo $qb_cookie
+    fi
+}
+
+qb_url=$(get_qb_url)
+api_url_base="$qb_url/api/v2"
+cmd_curl="curl -sk -b \"$(get_qb_ck)\""
 cmd_curl_post="$cmd_curl -X POST"
-api_url_base="${url_prefix}127.0.0.1:${WEBUI_PORT:-34567}/api/v2"

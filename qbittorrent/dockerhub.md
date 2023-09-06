@@ -4,6 +4,8 @@
 
 **因Docker Hub简介有字数限制，详细教程及全部说明请见 [Github](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。**
 
+为保证用户安全，防止用户因使用反代并代理了127.0.0.1这种情况导致安全性降低，从2023年9月5日更新的镜像开始，创建容器需要新增设置两个环境变量：QB_USERNAME（登陆qBittorrent的用户名）和QB_PASSWORD（登陆qBittorrent的密码）。容器将在创建时使用这两个环境变量去设置（如已存在配置文件则是修改）登陆qBittorent的用户名和密码。如未设置这两个环境变量，或者保持为qBittorrent的默认值（默认用户名：admin，默认密码：adminadmin），则本容器附加的所有脚本、定时任务将无法继续使用。[详情](https://github.com/devome/dockerfiles/issues/101)。也因此镜像默认即安装好python，不再需要设置`INSTALL_PYTHON`这个环境变量。
+
 ## 声明
 
 本镜像非魔改版、非快验版、非Enhanced增强版，qBittorrent自身的行为/功能全部未做任何改动（也不会考虑添加或修改官方客户端行为/功能的内容），全部属于官方客户端的默认行为/功能，在和PT站Tracker服务器交互时反馈的一切信息均是qBittorrent官方版反馈的信息。本镜像只是基于官方客户端附加了一些实用的脚本，脚本全部是合理合法使用qBittorrent官方API获取信息，脚本全部行为都集中在本地，与任何远端服务器无任何联系。增加的脚本全部代码在 [Github](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent) 均可查看 。绝对不会因为使用此镜像而导致账号被封。

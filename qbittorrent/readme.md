@@ -56,6 +56,7 @@
 | 20230529 | 4.5.3       | 2.0.9     | 3.18.0 | 1. 再一次优化`report-seed-files`减少70%时长；</br>2. `dl-finish`不再使用`%I`传参，而使用`%K`，已经部署好的使用`%I`也没有问题（除非会有混合种子或v2种子）；3. 增加`gen-dup`脚本，详见“命令”章节。 |
 | 20230619 | 4.5.4       | 2.0.9     | 3.18.2 | `gen-dup`脚本增加总计输出。 |
 | 20230830 | 4.5.5       | 2.0.9     | 3.18.3 | 抛弃`s6-overlay`，直接交给`tini`来捕获退出信号，在退出/停止容器时qB会自动保存配置和种子进度。定时任务改由低权限运行，日志记录在容器内的`/data/diy/crond.log`，不再输出到容器控制台。 |
+| 20230906 | 4.5.5       | 2.0.9     | 3.18.3 | 为保证用户安全，防止用户因使用反代并代理了127.0.0.1这种情况导致安全性降低，从2023年9月5日更新的镜像开始，创建容器需要新增设置两个环境变量：QB_USERNAME（登陆qBittorrent的用户名）和QB_PASSWORD（登陆qBittorrent的密码）。容器将在创建时使用这两个环境变量去设置（如已存在配置文件则是修改）登陆qBittorent的用户名和密码。如未设置这两个环境变量，或者保持为qBittorrent的默认值（默认用户名：admin，默认密码：adminadmin），则本容器附加的所有脚本、定时任务将无法继续使用。[详情](https://github.com/devome/dockerfiles/issues/101)。也因此镜像默认即安装好python，不再需要设置`INSTALL_PYTHON`这个环境变量。 |
 
 ## 环境变量清单
 
@@ -80,33 +81,35 @@
 |  3  | PGID                    | 100          | 用户的gid，输入命令`id -g`可以查到，以该用户运行qbittorrent-nox，群晖用户必须改。 |
 |  4  | WEBUI_PORT              | 8080          | WebUI访问端口，建议自定义，如需公网访问，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
 |  5  | BT_PORT                 | 34567         | BT监听端口，建议自定义，如需达到`可连接`状态，需要将qBittorrent和公网之间所有网关设备上都设置端口转发。 |
-|  6  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
-|  7  | INSTALL_PYTHON          | false         | 默认不安装python，如需要python（qBittorrent的搜索功能必须安装python），请设置为`true`，设置后将在首次启动容器时自动安装好。 |
-|  8  | ENABLE_AUTO_CATEGORY    | true          | 4.3.7+可用。是否自动按tracker进行分类，默认为`true`开启，如需关闭，请设置为`false`。 |
-|  9  | CATEGORY_OR_TAG         | category      | 4.3.9及4.5.0+可用，当`ENABLE_AUTO_CATEGORY=true`时，控制自动分类是qBittorrent中的“分类”还是“标签”。设置为`category`（默认值）为“分类”，设置为`tag`为“标签”。当设置为`tag`时，由于标签不是唯一的，无法筛选出没有打上tracker标签的种子，所以运行`auto-cat -a`和`auto-cat -A`都将对全部种子按tracker打标签，种子多时比较耗时；而当设置为`category`时，运行`auto-cat -a`就只对未分类种子进行分类。 |
-|  10 | DL_FINISH_NOTIFY        | true          | 默认会在下载完成时向设定的通知渠道发送种子下载完成的通知消息，如不想收此类通知，则设置为`false`。 |
-|  11 | TRACKER_ERROR_COUNT_MIN | 3             | 4.3.7+可用。可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。 |
-|  12 | UMASK_SET               | 000           | 权限掩码`umask`，指定qBittorrent在建立文件时预设的权限掩码，可以设置为`022`。 |
-|  13 | TG_USER_ID              |               | 通知渠道telegram，如需使用需要和 TG_BOT_TOKEN 同时赋值，私聊 @getuseridbot 获取。 |
-|  14 | TG_BOT_TOKEN            |               | 通知渠道telegram，如需使用需要和 TG_USER_ID 同时赋值，私聊 @BotFather 获取。 |
-|  15 | TG_PROXY_ADDRESS        |               | 4.3.7+可用。给TG机器人发送消息的代理地址，当设置了`TG_USER_ID`和`TG_BOT_TOKEN`后可以设置此值，形如：`http://192.168.1.1:7890`，也可以不设置。 |
-|  16 | TG_PROXY_USER           |               | 4.3.7+可用。给TG机器人发送消息的代理的用户名和密码，当设置了`TG_PROXY_ADDRESS`后可以设置此值，格式为：`<用户名>:<密码>`，形如：`admin:password`，如没有可不设置。 |
-|  17 | DD_BOT_TOKEN            |               | 通知渠道钉钉，如需使用需要和 DD_BOT_SECRET 同时赋值，机器人设置中webhook链接`access_token=`后面的字符串（不含`=`以及`=`之前的字符）。 |
-|  18 | DD_BOT_SECRET           |               | 通知渠道钉钉，如需使用需要和 DD_BOT_TOKEN 同时赋值，机器人设置中**只启用**`加签`，加签的秘钥，形如：`SEC1234567890abcdefg`。 |
-|  19 | IYUU_TOKEN              |               | 通知渠道爱语飞飞，通过 [这里](http://iyuu.cn) 获取，爱语飞飞的TOKEN。 |
-|  20 | SCKEY                   |               | 通知渠道ServerChan，通过 [这里](http://sc.ftqq.com/3.version) 获取。 |
-|  21 | PUSHPLUS_TOKEN          |               | 4.3.7+可用。通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)。 |
-|  22 | WORK_WECHAT_BOT_KEY     |               | 4.3.9及4.4.3+可用。通知渠道企业微信群机器人，填入机器人设置webhook链接中`key=`后面的字符串，不含`key=`。 |
-|  23 | GOTIFY_URL              |               | 4.3.9及4.4.4+可用。通知渠道Gotify，填入其通知网址，需要和`GOTIFY_APP_TOKEN`同时赋值。 |
-|  24 | GOTIFY_APP_TOKEN        |               | 4.3.9及4.4.4+可用。通知渠道Gotify，填入其TOKEN，需要和`GOTIFY_URL`同时赋值。 |
-|  25 | GOTIFY_PRIORITY         | 5             | 4.3.9及4.4.4+可用。通知渠道Gotify，发送消息的优先级。 |
-|  26 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
-|  27 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron运行`auto-cat -a`命令，将所有**未分类**种子按tracker分类（当`CATEGORY_OR_TAG=category`时），或将所有种子按tracker打标签（当`CATEGORY_OR_TAG=tag`时）。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。虽然本变量是全版本有效，但控制采用“分类”还是“标签”的变量`CATEGORY_OR_TAG`仅4.3.9和4.5.0+有效。 |
-|  28 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。在运行的时候比较吃资源，所以对于种子很多的大户人家，或者是对此不那么敏感的用户，建议把cron频率修改低一些，一天一次即可。 |
-|  29 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
-|  30 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
-|  31 | CRON_IYUU_HELP          |               | 4.3.8+可用。IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。 |
-|  32 | EXTRA_PACKAGES          |               | 4.3.9+可用。你需要安装的其他软件包，形如`htop nano nodejs`，多个软件包用半角空格分开，在docker cli中请用一对双引号引起来，在docker-compose中不要增加引号。 |
+|  6  | QB_USERNAME             | admin         | 4.5.5+必须设置此环境变量，登陆qBittorrent的用户名，**请务必不要使用默认值**。 |
+|  7  | QB_PASSWORD             | adminadmin    | 4.5.5+必须设置此环境变量，登陆qBittorrent的密码，**请务必不要使用默认值**。 |
+|  8  | TZ                      | Asia/Shanghai | 时区，可填内容详见：https://meetingplanner.io/zh-cn/timezone/cities |
+|  9  | INSTALL_PYTHON          | false         | **从4.5.5起，默认安装好python，不再需要设置这个环境变量。**默认不安装python，如需要python（qBittorrent的搜索功能必须安装python），请设置为`true`，设置后将在首次启动容器时自动安装好。 |
+|  10  | ENABLE_AUTO_CATEGORY    | true          | 4.3.7+可用。是否自动按tracker进行分类，默认为`true`开启，如需关闭，请设置为`false`。 |
+|  11  | CATEGORY_OR_TAG         | category      | 4.3.9及4.5.0+可用，当`ENABLE_AUTO_CATEGORY=true`时，控制自动分类是qBittorrent中的“分类”还是“标签”。设置为`category`（默认值）为“分类”，设置为`tag`为“标签”。当设置为`tag`时，由于标签不是唯一的，无法筛选出没有打上tracker标签的种子，所以运行`auto-cat -a`和`auto-cat -A`都将对全部种子按tracker打标签，种子多时比较耗时；而当设置为`category`时，运行`auto-cat -a`就只对未分类种子进行分类。 |
+|  12 | DL_FINISH_NOTIFY        | true          | 默认会在下载完成时向设定的通知渠道发送种子下载完成的通知消息，如不想收此类通知，则设置为`false`。 |
+|  13 | TRACKER_ERROR_COUNT_MIN | 3             | 4.3.7+可用。可以设置的值：正整数。在检测到tracker出错的种子数量超过这个阈值时，给设置的通知渠道发送通知。 |
+|  14 | UMASK_SET               | 000           | 权限掩码`umask`，指定qBittorrent在建立文件时预设的权限掩码，可以设置为`022`。 |
+|  15 | TG_USER_ID              |               | 通知渠道telegram，如需使用需要和 TG_BOT_TOKEN 同时赋值，私聊 @getuseridbot 获取。 |
+|  16 | TG_BOT_TOKEN            |               | 通知渠道telegram，如需使用需要和 TG_USER_ID 同时赋值，私聊 @BotFather 获取。 |
+|  17 | TG_PROXY_ADDRESS        |               | 4.3.7+可用。给TG机器人发送消息的代理地址，当设置了`TG_USER_ID`和`TG_BOT_TOKEN`后可以设置此值，形如：`http://192.168.1.1:7890`，也可以不设置。 |
+|  18 | TG_PROXY_USER           |               | 4.3.7+可用。给TG机器人发送消息的代理的用户名和密码，当设置了`TG_PROXY_ADDRESS`后可以设置此值，格式为：`<用户名>:<密码>`，形如：`admin:password`，如没有可不设置。 |
+|  19 | DD_BOT_TOKEN            |               | 通知渠道钉钉，如需使用需要和 DD_BOT_SECRET 同时赋值，机器人设置中webhook链接`access_token=`后面的字符串（不含`=`以及`=`之前的字符）。 |
+|  20 | DD_BOT_SECRET           |               | 通知渠道钉钉，如需使用需要和 DD_BOT_TOKEN 同时赋值，机器人设置中**只启用**`加签`，加签的秘钥，形如：`SEC1234567890abcdefg`。 |
+|  21 | IYUU_TOKEN              |               | 通知渠道爱语飞飞，通过 [这里](http://iyuu.cn) 获取，爱语飞飞的TOKEN。 |
+|  22 | SCKEY                   |               | 通知渠道ServerChan，通过 [这里](http://sc.ftqq.com/3.version) 获取。 |
+|  23 | PUSHPLUS_TOKEN          |               | 4.3.7+可用。通知渠道PUSH PLUS，填入其token，详见 [这里](http://www.pushplus.plus)。 |
+|  24 | WORK_WECHAT_BOT_KEY     |               | 4.3.9及4.4.3+可用。通知渠道企业微信群机器人，填入机器人设置webhook链接中`key=`后面的字符串，不含`key=`。 |
+|  25 | GOTIFY_URL              |               | 4.3.9及4.4.4+可用。通知渠道Gotify，填入其通知网址，需要和`GOTIFY_APP_TOKEN`同时赋值。 |
+|  26 | GOTIFY_APP_TOKEN        |               | 4.3.9及4.4.4+可用。通知渠道Gotify，填入其TOKEN，需要和`GOTIFY_URL`同时赋值。 |
+|  27 | GOTIFY_PRIORITY         | 5             | 4.3.9及4.4.4+可用。通知渠道Gotify，发送消息的优先级。 |
+|  28 | CRON_HEALTH_CHECK       | 12 * * * *    | 宕机检查的cron，在设定的cron运行时如发现qbittorrent-nox宕机了，则向设置的通知渠道发送通知。 |
+|  29 | CRON_AUTO_CATEGORY      | 32 */2 * * *  | 自动分类的cron，在设定的cron运行`auto-cat -a`命令，将所有**未分类**种子按tracker分类（当`CATEGORY_OR_TAG=category`时），或将所有种子按tracker打标签（当`CATEGORY_OR_TAG=tag`时）。对于种子很多的大户人家，建议把cron频率修改低一些，一天一次即可。此cron可以由`ENABLE_AUTO_CATEGORY`关闭，关闭后不生效。虽然本变量是全版本有效，但控制采用“分类”还是“标签”的变量`CATEGORY_OR_TAG`仅4.3.9和4.5.0+有效。 |
+|  30 | CRON_TRACKER_ERROR      | 52 */4 * * *  | 检查tracker状态是否健康的cron，在设定的cron将检查所有种子的tracker状态，如果有问题就打上`TrackerError`的标签。在运行的时候比较吃资源，所以对于种子很多的大户人家，或者是对此不那么敏感的用户，建议把cron频率修改低一些，一天一次即可。 |
+|  31 | MONITOR_IP              |               | 4.3.8+可用。可设置为局域网设备的ip，多个ip以半角空格分隔，形如：`192.168.1.5 192.168.1.9 192.168.1.20`。本变量作用：当检测到这些设置的ip中有任何一个ip在线时（检测频率为每分钟），自动启用qbittorent客户端的“备用速度限制”，如果都不在线就关闭“备用速度限制”。“备用速度限制”需要事先设置好限制速率，建议在路由器上给需要设置的设备固定ip。在docker cli中请使用一对双引号引起来，在docker-compose中不要使用引用。 |
+|  32 | CRON_ALTER_LIMITS       |               | 4.3.8+可用。启动和关闭“备用速度限制“的cron，主要针对多时段限速场景，当设置了`MONITOR_IP`时本变量的cron不生效（因为会冲突）。详见 [相关问题](#相关问题) 问题13。 |
+|  33 | CRON_IYUU_HELP          |               | 4.3.8+可用。IYUUPlus辅助任务的cron，自动重校验、自动恢复做种，详见 [相关问题](#相关问题) 问题14。 |
+|  34 | EXTRA_PACKAGES          |               | 4.3.9+可用。你需要安装的其他软件包，形如`htop nano nodejs`，多个软件包用半角空格分开，在docker cli中请用一对双引号引起来，在docker-compose中不要增加引号。 |
 
 **以下是仅`iyuu`标签额外可用的环境变量：**
 

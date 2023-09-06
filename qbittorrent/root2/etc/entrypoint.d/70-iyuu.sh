@@ -28,20 +28,39 @@ if [[ $(readlink -f /iyuu/db 2>/dev/null) != ${IYUU_DB} ]]; then
     ln -sf ${IYUU_DB} /iyuu/db
 fi
 
+get_qb_url() {
+    local is_ssl=$(grep -i "WebUI\\\HTTPS\\\Enabled=" /data/config/qBittorrent.conf | awk -F "=" '{print $2}')
+    local url_prefix
+
+    if [[ $is_ssl == true ]]; then
+        url_prefix="https://"
+    else
+        url_prefix="http://"
+    fi
+
+    local qb_url="${url_prefix}127.0.0.1:${WEBUI_PORT}"
+    echo "$qb_url"
+}
+
 ## 写入/data/iyuu_db/clients.json
 CLIENT_FILE=/data/iyuu_db/clients.json
-. /usr/local/bin/share
-HOST="${url_prefix}127.0.0.1:${WEBUI_PORT:-34567}"
-HOST=$(echo $HOST | sed "s|/|\\\\\\\/|g")
+HOST=$(get_qb_url | sed "s|/|\\\\\\\/|g")
 if [[ ! -s ${CLIENT_FILE} ]]; then
     cur_timestamp=$(( $(date +'%s') * 1000 + $RANDOM % 1000 ))
     PID="pid$$_${cur_timestamp}"
-    CLIENT_INFO="eyJQSUQiOnsidHlwZSI6InFCaXR0b3JyZW50IiwidXVpZCI6IlBJRCIsIm5hbWUiOiJsb2NhbGhvc3QiLCJob3N0IjoiSE9TVCIsImVuZHBvaW50IjoiIiwidXNlcm5hbWUiOiJhbm9ueW1vdXMiLCJwYXNzd29yZCI6ImFub255bW91cyIsImRvY2tlciI6Im9uIiwiZGVmYXVsdCI6Im9uIiwicm9vdF9mb2xkZXIiOiJvbiIsIndhdGNoIjoiXC9kYXRhXC93YXRjaCIsImRvd25sb2Fkc0RpciI6IlwvZGF0YVwvZG93bmxvYWRzIiwiQlRfYmFja3VwIjoiXC9kYXRhXC9kYXRhXC9CVF9iYWNrdXAifX0="
+    CLIENT_INFO="eyJQSUQiOnsidHlwZSI6InFCaXR0b3JyZW50IiwidXVpZCI6IlBJRCIsIm5hbWUiOiJsb2NhbGhvc3QiLCJob3N0IjoiSE9TVCIsImVuZHBvaW50IjoiIiwidXNlcm5hbWUiOiJRQl9VU0VSTkFNRSIsInBhc3N3b3JkIjoiUUJfUEFTU1dPUkQiLCJkb2NrZXIiOiJvbiIsImRlZmF1bHQiOiJvbiIsInJvb3RfZm9sZGVyIjoib24iLCJ3YXRjaCI6IlwvZGF0YVwvd2F0Y2giLCJkb3dubG9hZHNEaXIiOiJcL2RhdGFcL2Rvd25sb2FkcyIsIkJUX2JhY2t1cCI6IlwvZGF0YVwvZGF0YVwvQlRfYmFja3VwIn19"
     echo -en "$CLIENT_INFO" | base64 -d > ${CLIENT_FILE}
     chmod 666 ${CLIENT_FILE}
     sed -i "{s#PID#$PID#g; s#HOST#$HOST#g;}" ${CLIENT_FILE}
 else
     sed -i "s#\(\"host\":\"\)[^\"]*127\.0\.0\.1[^\"]*\(\"\)#\1$HOST\2#g" ${CLIENT_FILE}
+fi
+
+if [[ ${QB_USERNAME} != admin || $QB_PASSWORD != adminadmin ]]; then
+    sed -i "{
+        s|QB_USERNAME|${QB_USERNAME}|g;
+        s|QB_PASSWORD|${QB_PASSWORD}|g;
+    }" ${CLIENT_FILE}
 fi
 
 ## 以Daemon形式启动IYUU

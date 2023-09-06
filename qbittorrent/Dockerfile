@@ -46,6 +46,8 @@ ENV QBT_PROFILE=/home/qbittorrent \
     PGID=100 \
     WEBUI_PORT=8080 \
     BT_PORT=34567 \
+    QB_USERNAME=admin \
+    QB_PASSWORD=adminadmin \
     LANG=zh_CN.UTF-8 \
     SHELL=/bin/bash \
     PS1="\u@\h:\w \$ "
@@ -56,6 +58,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.bfsu.edu.cn/g' /etc/apk/repositorie
        curl \
        jq \
        openssl \
+       python3 \
        qt6-qtbase \
        qt6-qtbase-sqlite \
        shadow \
