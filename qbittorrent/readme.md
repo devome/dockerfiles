@@ -209,6 +209,7 @@ services:
     tty: true
     network_mode: bridge
     hostname: qbitorrent
+    stop_grace_period: 10m # 让qBittorrent程序自行退出后再关闭/删除/重启容器的最长时间，如不设置，则docker默认10秒，这时，种子多的qBittorrent可能还没有完全保存好全部需要保存的信息。
     volumes:
       - ./data:/data      # 配置保存目录
     tmpfs:
@@ -247,6 +248,7 @@ services:
       - 114.114.114.114
       - 1.2.4.8
     hostname: qbitorrent
+    stop_grace_period: 10m # 让qBittorrent程序自行退出后再关闭/删除/重启容器的最长时间，如不设置，则docker默认10秒，这时，种子多的qBittorrent可能还没有完全保存好全部需要保存的信息。
     volumes:
       - ./data:/data
     tmpfs:
