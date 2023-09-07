@@ -24,5 +24,5 @@ get_qb_ck() {
 
 qb_url=$(get_qb_url)
 api_url_base="$qb_url/api/v2"
-cmd_curl="curl -sk -b \"$(get_qb_ck)\""
+cmd_curl="curl -sk -b $(get_qb_ck)"
 cmd_curl_post="$cmd_curl -X POST"
