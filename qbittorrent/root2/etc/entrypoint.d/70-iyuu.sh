@@ -52,14 +52,17 @@ if [[ ! -s ${CLIENT_FILE} ]]; then
     echo -en "$CLIENT_INFO" | base64 -d > ${CLIENT_FILE}
     chmod 666 ${CLIENT_FILE}
     sed -i "{s#PID#$PID#g; s#HOST#$HOST#g;}" ${CLIENT_FILE}
+    if [[ ${QB_USERNAME} != admin || $QB_PASSWORD != adminadmin ]]; then
+        sed -i "{
+            s|QB_USERNAME|${QB_USERNAME}|g;
+            s|QB_PASSWORD|${QB_PASSWORD}|g;
+        }" ${CLIENT_FILE}
+    fi
 else
-    sed -i "s#\(\"host\":\"\)[^\"]*127\.0\.0\.1[^\"]*\(\"\)#\1$HOST\2#g" ${CLIENT_FILE}
-fi
-
-if [[ ${QB_USERNAME} != admin || $QB_PASSWORD != adminadmin ]]; then
     sed -i "{
-        s|QB_USERNAME|${QB_USERNAME}|g;
-        s|QB_PASSWORD|${QB_PASSWORD}|g;
+        s|\(\"host\":\"\)[^\"]*127\.0\.0\.1[^\"]*\(\"\)|\1$HOST\2|g;
+        s|\(\"username\":\"\)[^\"]*\(\"\)|\1${QB_USERNAME}\2|g;
+        s|\(\"password\":\"\)[^\"]*\(\"\)|\1${QB_PASSWORD}\2|g;
     }" ${CLIENT_FILE}
 fi
 
