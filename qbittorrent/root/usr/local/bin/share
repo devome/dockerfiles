@@ -15,6 +15,7 @@ get_qb_url() {
 }
 
 get_qb_ck() {
+    local QB_PASSWORD=$(echo $QB_PASSWORD | sed 's|&|%26|g')
     local info=$(curl -iksS -H "Referer: $qb_url" -d "username=${QB_USERNAME}&password=${QB_PASSWORD}" $api_url_base/auth/login)
     local qb_cookie=$(echo "$info" | awk '/set-cookie/{print $2}')
     if [[ -n $qb_cookie ]]; then
