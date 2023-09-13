@@ -123,8 +123,8 @@ notify_gotify() {
 }
 
 ## 发送通知，$1：标题；$2：内容
-title=$(echo "$1" | sed "s!&!%26!g")
-desp=$(echo "$2" | sed "s!&!%26!g")
+title=$(echo "$1")
+desp=$(echo "$2")
 [[ $DD_BOT_TOKEN ]] && [[ $DD_BOT_SECRET ]] && notify_dingding_bot "$title\n\n$desp"
 [[ $TG_BOT_TOKEN ]] && [[ $TG_USER_ID ]] && notify_telegram "$title\n\n$desp"
 [[ $IYUU_TOKEN ]] && notify_iyuu "$title" "$desp"
