@@ -21,7 +21,7 @@ notify_dingding_bot () {
 
 ## 发送Telegram通知，$1：消息内容
 notify_telegram () {
-    local message="$(echo -e $1)"
+    local message="$(echo -e $1 | sed 's!&!%26!g')"
     local tg_api_url="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
     local send_result err_code err_message
     local cmd_proxy_user cmd_proxy
@@ -44,8 +44,8 @@ notify_telegram () {
 
 ## 爱语飞飞通知，$1：标题；$2：内容
 notify_iyuu () {
-    local title="$1"
-    local desp="$(echo -e $2)"
+    local title="$(echo $1 | sed 's!&!%26!g')"
+    local desp="$(echo -e $2 | sed 's!&!%26!g')"
     local iyuu_url=http://iyuu.cn/${IYUU_TOKEN}.send
     local send_result err_code err_message
 
@@ -61,8 +61,8 @@ notify_iyuu () {
 
 ## Server酱通知，$1：标题；$2：内容
 notify_serverchan () {
-    local title="$1"
-    local desp="$(echo -e $2)"
+    local title="$(echo $1 | sed 's!&!%26!g')"
+    local desp="$(echo -e $2 | sed 's!&!%26!g')"
     local serverchan_url send_result
 
     [[ $SCKEY == SCT* ]] && serverchan_url=https://sctapi.ftqq.com/${SCKEY}.send || serverchan_url=https://fcqq.com/${SCKEY}.send
