@@ -3,8 +3,7 @@
 if [[ $MONITOR_IP ]]; then
     alter_limits_switch=off
     for ip in $MONITOR_IP; do
-        ping -c 2 $ip &>/dev/null
-        if [[ $? -eq 0 ]]; then
+        if ping -c 2 $ip &>/dev/null; then
             alter_limits_switch=on
             break
         fi
