@@ -497,33 +497,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>15. 为什么没法使用搜索功能</b></summary>
-
-搜索功能依赖于python，请在创建容器时添加环境变量`INSTALL_PYTHON`，并将值设置为`true`。
-
-</details>
-
-<details>
-
-<summary markdown="span"><b>16. 环境变量S6_SERVICES_GRACETIME的含义</b></summary>
-
-- 本镜像使用了s6-overlay程序，在关闭/重启/重建容器时，s6-overlay程序会在关闭容器内程序前等待一定的时间。s6-overlay程序可以设置两个等待的最大时长，一个是`S6_SERVICES_GRACETIME`，一个是`S6_KILL_GRACETIME`，其含义详见[这里](https://github.com/just-containers/s6-overlay#customizing-s6-behaviour)。嫌太长可以直接看本文下面的说明。
-
-- qBittorrent程序在下线时，会尝试保存`qBittorrent.conf`, `qBittorrent-data.conf`, `BT_bacup`下的种子做种状态数据以及其他文件。尤其是`BT_bacup`文件夹的数据，对保留做种状态是极其重要的。在qBittorrent做种数量大时，保存这些数据可能需要花费较长的时间，所以我们需要尽量将`S6_SERVICES_GRACETIME`设置大一些。设置大了也不要紧，这只是等待的最长时间，实际使用时大部分都不会等待这么久。
-
-- 我们为了**温和（不要暴力）的关闭**qBittorrent程序，需要尽可能的等待qBittorrent程序自行下线，也就是加大`S6_SERVICES_GRACETIME`的值。
-
-- 但在4.3.9版本及以前，本镜像没有重设`S6_SERVICES_GRACETIME`的值，所以采用了s6-overlay程序默认的`3000`毫秒，这对qBittorrent程序来说，不是一个合适的值，因此建议4.3.9版本及以前的在创建容器时，手动指定一个更大的值，个人认为`30000`毫秒是一个不错的选择。
-
-- 如果你发现容器在关闭/重启/重建时所花费的时间已经比较接近，甚至是超过`S6_SERVICES_GRACETIME`所设置的时间时，就建议将`S6_SERVICES_GRACETIME`设置得再大一些，大到远远超过关闭/重启/重建时所花费的时间。
-
-- 在4.4.0及以后，本镜像将重设`S6_SERVICES_GRACETIME`的值为`30000`毫秒，但仍然可以由用户指定其他值。
-
-</details>
-
-<details>
-
-<summary markdown="span"><b>17. qBittorrent使用https的webui时，iyuu如何连接</b></summary>
+<summary markdown="span"><b>15. qBittorrent使用https的webui时，iyuu如何连接</b></summary>
 
 - 当qBittorrent使用https的webui时，iyuu连接qBittorrent需要使用`https://<域名>:<端口>`的形式，不能使用`https://<IP>:<端口>`，所以需要在创建iyuu容器（使用nevinee/qbittorrent:iyuu时同样也需要）指定域名和ip的对应关系。
 
@@ -540,7 +514,7 @@ curl -X POST -d 'json={"alternative_webui_enabled":false}' http://127.0.0.1:${WE
 
 <details>
 
-<summary markdown="span"><b>18. qBittorrent占用了巨大的内存，如何调整</b></summary>
+<summary markdown="span"><b>16. qBittorrent占用了巨大的内存，如何调整</b></summary>
 
 你所见到的占用巨大的内存并不是真的占用了，使用`docker stats qbittorrent`输出的内存占用更准确一点，其他方式输出的内存占用会非常的大。因为libtorrent-rasterbar v2.x把内存使用交给内核来处理，内核会自己根据内存大小和读取频次来自动决定怎么去缓存，所以不要被看起来庞大的内存占用给吓着了。详见libtorrent-rasterbar作者的[原话](https://github.com/arvidn/libtorrent/issues/6667#issuecomment-1040874903)。
 
