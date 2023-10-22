@@ -1,21 +1,27 @@
 #!/bin/bash
 
-main() {
-    local toggle=$1
-    . /usr/local/bin/share
-    current_mode=$($cmd_curl $api_url_base/transfer/speedLimitsMode)
+toggle=$1
+. /usr/local/bin/share
 
-    if [[ $toggle == off && $current_mode == 1 ]]; then
-        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 关闭备用速度限制..."
-        $cmd_curl_post $api_url_base/transfer/toggleSpeedLimitsMode
-    elif [[ $toggle == on && $current_mode == 0 ]]; then
-        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 启用备用速度限制..."
-        $cmd_curl_post $api_url_base/transfer/toggleSpeedLimitsMode
-    elif [[ $toggle == off && $current_mode == 0 ]]; then
-        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 当前已经关闭备用速度限制，无需再次关闭..."
-    elif [[ $toggle == on && $current_mode == 1 ]]; then
-        echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 当前已经启用备用速度限制，无需再次启用..."
-    fi
-}
+current_mode=$($cmd_curl $api_url_base/transfer/speedLimitsMode)
 
-main "$@"
+major_ver=$(qbittorrent-nox --version | sed 's|qBittorrent v||' | awk -F. '{print $1}')
+minor_ver=$(qbittorrent-nox --version | sed 's|qBittorrent v||' | awk -F. '{print $2}')
+
+if [[ $major_ver -eq 4 && $minor_ver -le 4 ]]; then
+    toggle_cmd=$cmd_curl
+else
+    toggle_cmd=$cmd_curl_post
+fi
+
+if [[ $toggle == off && $current_mode == 1 ]]; then
+    echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 关闭备用速度限制..."
+    $toggle_cmd $api_url_base/transfer/toggleSpeedLimitsMode
+elif [[ $toggle == on && $current_mode == 0 ]]; then
+    echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 启用备用速度限制..."
+    $toggle_cmd $api_url_base/transfer/toggleSpeedLimitsMode
+elif [[ $toggle == off && $current_mode == 0 ]]; then
+    echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 当前已经关闭备用速度限制，无需再次关闭..."
+elif [[ $toggle == on && $current_mode == 1 ]]; then
+    echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] 当前已经启用备用速度限制，无需再次启用..."
+fi
