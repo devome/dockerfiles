@@ -1,8 +1,8 @@
 ---
 
-## 说明
+## 因 Docker Hub 简介有字数限制，详细教程及全部说明请见 [我的博客](https://evine.win/p/docker-install-qbittorrent/)
 
-**因Docker Hub简介有字数限制，详细教程及全部说明请见 [我的博客](https://devome.github.io/blog/p/一款更懂你的-qbittorrent-docker-镜像) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。**
+## 说明
 
 为保证用户安全，防止用户因使用反代并代理了127.0.0.1这种情况导致安全性降低，从2023年9月5日更新的镜像开始，创建容器需要新增设置两个环境变量：QB_USERNAME（登陆qBittorrent的用户名）和QB_PASSWORD（登陆qBittorrent的密码）。容器将在创建时使用这两个环境变量去设置（如已存在配置文件则是修改）登陆qBittorent的用户名和密码。如未设置这两个环境变量，或者保持为qBittorrent的默认值（默认用户名：admin，默认密码：adminadmin），则本容器附加的所有脚本、定时任务将无法继续使用。[详情](https://github.com/devome/dockerfiles/issues/101)。也因此镜像默认即安装好python，不再需要设置`INSTALL_PYTHON`这个环境变量。
 
