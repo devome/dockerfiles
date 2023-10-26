@@ -1,14 +1,25 @@
 ## 清除root的crontab
 crontab -r
 
-## health-check和tracker-error
+## health-check
 if [[ -z ${CRON_HEALTH_CHECK} ]]; then
     CRON_HEALTH_CHECK="12 * * * *"
+elif [[ ${CRON_HEALTH_CHECK} == off ]]; then
+    CRON_HEALTH_CHECK=""
 fi
+if [[ -n "${CRON_HEALTH_CHECK}" ]]; then
+    echo -e "# qbittorrent客户端健康检查\n${CRON_HEALTH_CHECK} health-check >> /data/diy/crond.log\n" > /tmp/crontab.list
+fi
+
+## tracker-error
 if [[ -z ${CRON_TRACKER_ERROR} ]]; then
     CRON_TRACKER_ERROR="52 */4 * * *"
+elif [[ ${CRON_TRACKER_ERROR} == off ]]; then
+    CRON_TRACKER_ERROR=""
 fi
-echo -e "# qbittorrent客户端健康检查\n${CRON_HEALTH_CHECK} health-check >> /data/diy/crond.log\n\n# Tracker出错检查\n${CRON_TRACKER_ERROR} tracker-error >> /data/diy/crond.log\n" > /tmp/crontab.list
+if [[ -n "$CRON_TRACKER_ERROR" ]]; then
+    echo -e "# Tracker出错检查\n${CRON_TRACKER_ERROR} tracker-error >> /data/diy/crond.log\n" >> /tmp/crontab.list
+fi
 
 ## auto-cat
 if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
@@ -19,12 +30,12 @@ if [[ $ENABLE_AUTO_CATEGORY != false ]]; then
 fi
 
 ## iyuu-help
-if [[ ${CRON_IYUU_HELP} ]]; then
+if [[ -n "${CRON_IYUU_HELP}" ]]; then
     echo -e "# IYUU辅助任务，自动重校验、自动恢复做种\n${CRON_IYUU_HELP} iyuu-help >> /data/diy/crond.log\n" >> /tmp/crontab.list
 fi
 
 ## detect-ip
-if [[ ${MONITOR_IP} ]]; then
+if [[ -n "${MONITOR_IP}" ]]; then
     echo -e "# 每分钟检测局域网指定设备是否在线，若在线则启用备用速度限制\n* * * * * detect-ip &>/dev/null\n" >> /tmp/crontab.list
 fi
 
