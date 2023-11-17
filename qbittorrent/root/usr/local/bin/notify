@@ -22,9 +22,23 @@ notify_dingding_bot () {
 ## 发送Telegram通知，$1：消息内容
 notify_telegram () {
     local message="$(echo -e $1 | sed 's!&!%26!g')"
-    local tg_api_url="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
+    ## local tg_api_url="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
     local send_result err_code err_message
     local cmd_proxy_user cmd_proxy
+
+## 使用 Telegram API 反代地址替代原始 API 地址
+    if [ -z "$TG_API_HOST" ]; then
+        local tg_api_url="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
+    else
+        if [[ "${TG_API_HOST: -1}" != "/" ]]; then
+            TG_API_HOST="${TG_API_HOST}/"
+        fi
+        if [[ "http://" == "${TG_API_HOST:0:7}" || "https://" == "${TG_API_HOST:0:8}" ]]; then
+            local tg_api_url="${TG_API_HOST}bot${TG_BOT_TOKEN}/sendMessage"
+        else
+            local tg_api_url="https://${TG_API_HOST}bot${TG_BOT_TOKEN}/sendMessage"
+        fi
+    fi
 
     [[ $TG_PROXY_USER ]] && cmd_proxy_user="--proxy-user ${TG_PROXY_USER}" || cmd_proxy_user=""
     [[ $TG_PROXY_ADDRESS ]] && cmd_proxy="--proxy $TG_PROXY_ADDRESS $cmd_proxy_user" || cmd_proxy=""
