@@ -4,7 +4,8 @@ ENV LANG=zh_CN.UTF-8 \
     PUID=1000 \
     PGID=1000 \
     PS1="\u@\h:\w \$ "
-RUN apk add --no-cache \
+RUN apk upgrade \
+    && apk add --no-cache \
        acme.sh \
        curl \
        fontconfig \
