@@ -39,7 +39,7 @@ RUN echo "Copy to /out" \
     && cp -d /usr/local/lib/libtorrent-rasterbar.so* /out/usr/lib \
     && cp /usr/local/bin/qbittorrent-nox /out/usr/bin
 
-FROM alpine:latest
+FROM alpine:latest AS app
 ENV QBT_PROFILE=/home/qbittorrent \
     TZ=Asia/Shanghai \
     PUID=1000 \
