@@ -46,8 +46,9 @@ fi
 major_ver=$(qbittorrent-nox --version | sed 's|qBittorrent v||' | awk -F. '{print $1}')
 minor_ver=$(qbittorrent-nox --version | sed 's|qBittorrent v||' | awk -F. '{print $2}')
 
-if [[ $major_ver -eq 4 && $minor_ver -ge 5 ]]; then
-    sed -i -E 's|General\\Locale=.+|General\\Locale=zh_CN|' $QB_CONF_FILE
-elif [[ $major_ver -eq 4 && $minor_ver -lt 5 ]]; then
+if [[ $major_ver -eq 4 && $minor_ver -lt 5 ]]; then
     sed -i -E 's|General\\Locale=.+|General\\Locale=zh|' $QB_CONF_FILE
+    sed -i -E 's|program=dl-finish \\"%K\\"|program=dl-finish \\"%I\\"|' $QB_CONF_FILE
+else
+    sed -i -E 's|General\\Locale=.+|General\\Locale=zh_CN|' $QB_CONF_FILE
 fi

@@ -11,4 +11,7 @@ fi
 crond
 
 echo "Start qbittorrent-nox..."
+if [[ -n ${UMASK_SET} ]]; then
+    umask ${UMASK_SET}
+fi
 exec su-exec "${PUID}:${PGID}" qbittorrent-nox
