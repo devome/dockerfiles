@@ -55,3 +55,15 @@
 如果镜像好用，请点亮star。如有使用上的问题，或者有其他好的功能建议，请在 [Github这里](https://github.com/devome/dockerfiles/issues) 或 [Gitee这里](https://gitee.com/evine/dockerfiles/issues) 提交。
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/nevinee/qbittorrent.svg?style=for-the-badge&label=pulls&logo=docker)](https://hub.docker.com/r/nevinee/qbittorrent) [![Docker Stars](https://img.shields.io/docker/stars/nevinee/qbittorrent.svg?style=for-the-badge&label=stars&logo=docker)](https://hub.docker.com/r/nevinee/qbittorrent) [![GitHub Stars](https://img.shields.io/github/stars/devome/dockerfiles.svg?style=for-the-badge&logo=github)](https://github.com/devome/dockerfiles)
+
+## 源代码、问题反馈、意见建议
+
+如果镜像好用，请点亮star。全套代码见 [Github](https://github.com/devome/dockerfiles/tree/master/qbittorrent) 或 [Gitee](https://gitee.com/evine/dockerfiles/tree/master/qbittorrent)。如有使用上的问题，或者有其他好的功能建议，请直接在本文下方评论，或者在 [Github这里](https://github.com/devome/dockerfiles/issues) 或 [Gitee这里](https://gitee.com/evine/dockerfiles/issues) 提交。
+
+提交bug必须反馈的信息，如不反馈以下信息，我就直接无视了。
+
+- 创建命令或 `docker-compose.yml` 文件，请自行对密码打码；
+
+- 使用的docker镜像的tag；
+
+- 进入容器后运行 `bash -x /usr/local/bin/<命令名>` 如 `bash -x /usr/local/bin/report-seed-files` 的输出，请自行对密码打码。
