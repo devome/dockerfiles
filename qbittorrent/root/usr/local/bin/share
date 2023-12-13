@@ -33,6 +33,12 @@ get_qb_ck() {
     fi
 }
 
+if [[ $QB_USERNAME == admin && $QB_PASSWORD == adminadmin ]]; then
+    echo "环境变量 QB_USERNAME 和 QB_PASSWORD 为默认值，无法使用本脚本，请修改这两项环境变量为非默认值后再试。"
+    echo "Environmental variable QB_USERNAME and QB_PASSWORD is the default value and cannot be used in this script. Please modify these two environment variables to non default values and try again."
+    exit 1
+fi
+
 qb_url=$(get_qb_url)
 api_url_base="$qb_url/api/v2"
 cmd_curl="curl -sk -b $(get_qb_ck)"
