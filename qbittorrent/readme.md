@@ -64,6 +64,6 @@
 
 - 创建命令或 `docker-compose.yml` 文件，请自行对密码打码；
 
-- 使用的docker镜像的tag；
+- 使用的docker镜像的tag，以及qBittorrent的版本；
 
 - 进入容器后运行 `bash -x /usr/local/bin/<命令名>` 如 `bash -x /usr/local/bin/report-seed-files` 的输出，请自行对密码打码。
