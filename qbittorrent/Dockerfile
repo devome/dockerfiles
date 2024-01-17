@@ -13,6 +13,7 @@ RUN apk upgrade \
        samurai \
     && rm -rf /tmp/* /var/cache/apk/*
 ARG QBITTORRENT_VERSION
+ARG NPROC=1
 RUN mkdir -p /tmp/qbittorrent \
     && cd /tmp/qbittorrent \
     && curl -sSL https://github.com/qbittorrent/qBittorrent/archive/refs/tags/release-${QBITTORRENT_VERSION}.tar.gz | tar xz --strip-components 1 \
@@ -28,7 +29,7 @@ RUN mkdir -p /tmp/qbittorrent \
        -DQT6=ON \
        -Brelease \
        -GNinja \
-    && cmake --build release -j $(nproc) \
+    && cmake --build release -j $NPROC \
     && cmake --install release \
     && ls -al /usr/local/bin/ \
     && qbittorrent-nox --help
