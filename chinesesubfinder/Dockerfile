@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.18.3
 ENV TZ=Asia/Shanghai \
     PUID=1000 \
     PGID=100 \
