@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.18.3
 ARG LIBTORRENT_VERSION
 ARG JNPROC=1
 RUN apk add --no-cache --virtual .build \
