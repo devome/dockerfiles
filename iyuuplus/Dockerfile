@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.18.3
 ENV APP_ENV=prod \
     LANG=zh_CN.UTF-8 \
     TZ=Asia/Shanghai \
