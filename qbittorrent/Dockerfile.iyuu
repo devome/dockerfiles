@@ -8,28 +8,28 @@ RUN apk add --no-cache \
        tar \
        unzip \
        zip \
-       php81 \
-       php81-curl \
-       php81-dom \
-       php81-json \
-       php81-mbstring \
-       php81-openssl \
-       php81-opcache \
-       php81-pdo \
-       php81-pdo_sqlite \
-       php81-phar \
-       php81-pcntl \
-       php81-posix \
-       php81-simplexml \
-       php81-sockets \
-       php81-session \
-       php81-zip \
-       php81-zlib \
-       php81-xml \
+       php83 \
+       php83-curl \
+       php83-dom \
+       php83-mbstring \
+       php83-openssl \
+       php83-opcache \
+       php83-pcntl \
+       php83-pdo \
+       php83-pdo_sqlite \
+       php83-phar \
+       php83-posix \
+       php83-simplexml \
+       php83-sockets \
+       php83-session \
+       php83-zip \
+       php83-xml \
     && git config --global pull.ff only \
     && git config --global --add safe.directory /iyuu \
     && git clone --depth 1 https://github.com/ledccn/IYUUPlus.git /iyuu \
-    && echo -e "upload_max_filesize=100M\npost_max_size=108M\nmemory_limit=1024M\ndate.timezone=${TZ}" > /etc/php81/conf.d/99-overrides.ini \
+    && echo -e "upload_max_filesize=100M\npost_max_size=108M\nmemory_limit=1024M\ndate.timezone=${TZ}" > /etc/php83/conf.d/99-overrides.ini \
+    && cd /usr/bin \
+    && ln -sf php83 php \
     && rm -rf /var/cache/apk/* /tmp/*
 COPY root2 /
 VOLUME ["/iyuu"]
