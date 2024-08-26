@@ -6,6 +6,7 @@ send_notify() {
     local torrent_properties=$($cmd_curl "${api_url_base}/torrents/properties?hash=${hash}")
     local torrent_files=$($cmd_curl "${api_url_base}/torrents/files?hash=${hash}")
 
+    local hostname=$(cat /etc/hostname)
     local torrent_name=$(echo "$torrent_info" | jq -r .name)
     local save_path=$(echo "$torrent_properties" | jq -r .save_path)
     local category=$(echo "$torrent_info" | jq -r .category)
@@ -14,11 +15,18 @@ send_notify() {
     local addition_date=$(echo "$torrent_properties" | jq .addition_date)
     local addition_date_format=$(date +'%Y-%m-%d %H:%M:%S' -d @$addition_date)
     local completion_date=$(echo "$torrent_properties" | jq .completion_date)
-    local completion_date_format=$(date +'%Y-%m-%d %H:%M:%S' -d @$completion_date)
-    local download_time=$(nice-time $(($completion_date - $addition_date)))
+    if [[ "$completion_date" != "-1" ]]; then
+        local completion_date_format=$(date +'%Y-%m-%d %H:%M:%S' -d @$completion_date)
+        local download_time=$(nice-time $(($completion_date - $addition_date)))
+    else
+        local completion_date_format=""
+        local download_time=""
+    fi
 
     if [[ $torrent_name ]]; then
-        notify "种子下载完成" "种子名称：$torrent_name\n保存路径：$save_path\n种子分类：$category\n选定大小：$size\n文件数量：$files_sum\n开始时间：$addition_date_format\n完成时间：$completion_date_format\n下载用时：$download_time\n"
+        notify \
+            "${hostname}种子下载$(if [[ "$completion_date" != "-1" ]]; then echo "完成"; else echo "开始"; fi)" \
+            "种子名称：$torrent_name\n保存路径：$save_path\n$(if [[ -n $category ]]; then echo "种子分类：$category\n"; fi)选定大小：$size\n文件数量：$files_sum\n开始时间：$addition_date_format\n$(if [[ "$completion_date" != "-1" ]]; then echo "完成时间：$completion_date_format\n下载用时：$download_time\n"; fi)"
     fi
 }
 
