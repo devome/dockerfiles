@@ -5,6 +5,13 @@
 ## 2. 检查暂停清单（就是qbittorrent筛选“暂停”的清单），检测该清单中100%下载完成/100%校验通过的种子，将这些种子恢复做种。校验未通过不达100%完成率的种子不会启动，仍然保持暂停状态。
 
 . /usr/local/bin/share
+if [[ $(qbittorrent-nox -v | awk '{print $2}') == "v5."* ]]; then
+    mark_states=stopped
+    mark_start=start
+else
+    mark_states=paused
+    mark_start=resume
+fi
 
 ## 检测出需要校验的种子并发起校验
 downloading_info=$($cmd_curl "${api_url_base}/torrents/info?filter=downloading")
@@ -14,7 +21,7 @@ recheck_hashes=""
 for ((i=0; i<${#downloading_hashes[*]}; i++)); do
     piece_states=""
     piece_states=$($cmd_curl "$api_url_base/torrents/pieceStates?hash=${downloading_hashes[i]}")
-    if [[ ${downloading_states[i]} == pausedDL && ${piece_states} != *2* ]]; then
+    if [[ ${downloading_states[i]} == ${mark_states}DL && ${piece_states} != *2* ]]; then
         recheck_hashes="${recheck_hashes}|${downloading_hashes[i]}"
     fi
 done
@@ -29,18 +36,18 @@ fi
 
 ## 检测校验完成的种子，并对100%完成率的种子恢复做种
 sleep 1
-paused_info=$($cmd_curl "${api_url_base}/torrents/info?filter=paused")
+paused_info=$($cmd_curl "${api_url_base}/torrents/info?filter=${mark_states}")
 paused_hashes=( $(echo $paused_info | jq -r .[].hash) )
 paused_states=( $(echo $paused_info | jq -r .[].state) )
 resume_hashes=""
 for ((i=0; i<${#paused_hashes[*]}; i++)); do
     piece_states=""
     piece_states=$($cmd_curl "$api_url_base/torrents/pieceStates?hash=${paused_hashes[i]}")
-    if [[ ${paused_states[i]} == pausedUP && ${piece_states} != *0* && ${piece_states} != *1* ]]; then
+    if [[ ${paused_states[i]} == ${mark_states}UP && ${piece_states} != *0* && ${piece_states} != *1* ]]; then
         resume_hashes="${resume_hashes}|${paused_hashes[i]}"
     fi
 done
-echo "hashes=${resume_hashes/|/}" | $cmd_curl_post "$api_url_base/torrents/resume" -d @-
+echo "hashes=${resume_hashes/|/}" | $cmd_curl_post "$api_url_base/torrents/$mark_start" -d @-
 resume_hashes_sum=$(echo ${resume_hashes/|/} | awk -F "|" '{print NF}')
 if [[ $resume_hashes_sum -gt 0 ]]; then
     echo "(N) $(date +'%Y-%m-%dT%H:%M:%S') - [$(basename $0)] qbittorrent客户端对 ${resume_hashes_sum} 个种子恢复做种"
