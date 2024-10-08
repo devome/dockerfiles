@@ -20,7 +20,7 @@ RUN mkdir -p /tmp/qbittorrent \
     && cmake \
        -DCMAKE_BUILD_TYPE=Release \
        -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
-       -DCMAKE_CXX_STANDARD=17 \
+       -DCMAKE_CXX_STANDARD=20 \
        -DWEBUI=ON \
        -DVERBOSE_CONFIGURE=OFF \
        -DSTACKTRACE=OFF \
