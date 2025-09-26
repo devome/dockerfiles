@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:24.10
 ARG S6_VERSION=v2.2.0.3
 ARG S6_ARCH=amd64
 ARG DEBIAN_FRONTEND=noninteractive
