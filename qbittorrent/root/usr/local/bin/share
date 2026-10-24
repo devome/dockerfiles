@@ -11,7 +11,7 @@ urlencode() {
 }
 
 get_qb_url() {
-    local is_ssl=$(awk -F "=" '/^WebUI\\HTTPS\\Enabled=/{print $2}' /data/config/qBittorrent.conf)
+    local is_ssl=$(awk -F "=" '/^HTTPS\\Enabled=/{print $2}' /data/config/qBittorrent.conf)
     local url_prefix
 
     if [[ $is_ssl == true ]]; then
@@ -25,7 +25,7 @@ get_qb_url() {
 }
 
 get_qb_api_key() {
-    local apikey=$(awk -F "=" '/^WebUI\\APIKey=/ {print $2}' /data/config/qBittorrent.conf)
+    local apikey=$(awk -F "=" '/^APIKey=/ {print $2}' /data/config/qBittorrent.conf)
     if [[ -n $apikey ]]; then
         echo "$apikey"
     else

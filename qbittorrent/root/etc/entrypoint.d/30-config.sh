@@ -20,17 +20,19 @@ Accepted=true
 
 [Preferences]
 General\Locale=zh_CN
-WebUI\APIKey=${API_KEY}
-WebUI\Port=${WEBUI_PORT}
+
+[WebUI]
+APIKey=${API_KEY}
+Port=${WEBUI_PORT}
 EOF
 fi
 
 echo "Overriding required parameters..."
 sed -i "{
     s!Session\\\Port=.*!Session\\\Port=${BT_PORT}!g;
-    s!WebUI\\\Port=.*!WebUI\\\Port=${WEBUI_PORT}!g;
+    s!Port=.*!WebUI\\\Port=${WEBUI_PORT}!g;
 }" $QB_CONF_FILE
 
-if ! grep -q "^WebUI\\\APIKey=" $QB_CONF_FILE; then
-    sed -i "/^\[Preferences\]$/a WebUI\\\APIKey=${API_KEY}" $QB_CONF_FILE
+if ! grep -q "^APIKey=" $QB_CONF_FILE; then
+    sed -i "/^\[WebUI\]$/a APIKey=${API_KEY}" $QB_CONF_FILE
 fi
