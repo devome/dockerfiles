@@ -28,9 +28,9 @@ EOF
 fi
 
 echo "Overriding required parameters..."
-sed -i "{
+sed -i -E "{
     s|^Session\\\Port=.*|Session\\\Port=${BT_PORT}|g;
-    s|^Port=.*|Port=${WEBUI_PORT}|g;
+    s|^(WebUI\\\)?Port=.*|Port=${WEBUI_PORT}|g;
 }" $QB_CONF_FILE
 
 if ! grep -q "^APIKey=" $QB_CONF_FILE; then
